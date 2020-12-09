@@ -1,0 +1,32 @@
+{% extends "kouteikanri/base.html" %}
+{% load bootstrap %}
+
+{% block title %}工程の編集{% endblock title %}
+
+{% block content %}
+
+    <p><h3 class="page-header">工程の編集</h3>
+
+    {% if form.end.value %}
+        <form action="{% url 'kouteikanri:end_none' form.initial.id %}" method="post">
+            <p><a href="{{request.META.HTTP_REFERER}}" class="btn btn-primary">戻る</a>
+            {% csrf_token %}
+            <input type="submit" value="終了を解除" class="btn btn-warning">
+        </form>
+    {% else %}
+        <p><a href="{{request.META.HTTP_REFERER}}" class="btn btn-primary">戻る</a>
+    {% endif %}
+
+<hr>
+
+    <form action="./?next={{ request.META.HTTP_REFERER }}" method="post" class="form-horizontal" role="form">
+        {% csrf_token %}
+        {{ form|bootstrap_horizontal }}
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <button type="submit" class="btn btn-primary">送信</button>
+            </div>
+        </div>
+    </form>
+
+{% endblock content %}

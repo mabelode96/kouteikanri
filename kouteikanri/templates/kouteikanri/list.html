@@ -1,0 +1,163 @@
+{% extends "kouteikanri/base.html" %}
+{% load mathfilters %}
+{% load utils %}
+
+{% block title %}
+工程一覧
+{% endblock title %}
+
+{% block content %}
+
+<header class="site-header">
+    <table class="table" align="center">
+        <tr>
+            <th style="padding: 10px">
+                <a href="{% url 'kouteikanri:top' %}" class="btn btn-primary" id="btn_bak">ライン選択に戻る</a>
+            </th>
+            <th style="padding: 10px"><h3 align="right">{{ linef }}</h3></th>
+            <th style="padding: 10px"><h3 align="left">{{ periodf }}</h3></th>
+            <th style="padding: 10px"><h3 align="right">{{ datef }}</h3></th>
+        </tr>
+    </table>
+    <table class="table table-striped table-bordered" align="center">
+        <thead>
+            <tr class="text-center" style="background-color: #F3E2A9;">
+                <th width="14%">生産高</th>
+                <th width="14%">能率</th>
+                <th width="16%"><span style="color:#4169E1;">終了</span> / 総数</th>
+                <th width="10%">終了予定</th>
+                <th width="10%">切替平均</th>
+                <th width="10%">実際終了</th>
+                <th width="12%">進捗</th>
+                <th width="14%"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr style="background-color: #FFFFFF;" align="center">
+                <td>{{ sdstr }}</td>
+                <td>{{ nouritsu }}</td>
+                <td>
+                    {% if valend.value__sum %}
+                        <span style="color:#4169E1;"> {{ valend.value__sum }} </span>
+                    {% else %}0{% endif %} / {{ valsum.value__sum }}
+                </td>
+                <td>{{ maxend|date:"G:i" }}</td>
+                <td>
+                    {% if chavg.change__avg %}
+                        {{ chavg.change__avg|floatformat:1 }}
+                    {% else %}0{% endif %}
+                </td>
+                <td>{{ comptime|date:"G:i" }}</td>
+                <td>
+                    {% if progress == 0 %}
+                        <span style="color:#4169E1;">遅れなし</span>
+                    {% else %}
+                        {% if progress > 0 %}
+                            <span style="color:#4169E1;">{{ progress }}分進み</span>
+                        {% else %}
+                            <div class="text-danger" align="center">{{ progress|mul:-1 }}分遅れ</div>
+                        {% endif %}
+                    {% endif %}
+                </td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+</header>
+
+<div class="site-content">
+    <table class="table-sm table-striped table-bordered" align="left">
+
+        <thead class="table">
+            <tr class="text-center">
+                <th width="5%">便</th>
+                <th width="21%">製品名</th>
+                <th width="6%">数量</th>
+                <th width="7%">開始<br>予定</th>
+                <th width="7%">終了<br>予定</th>
+                <th width="6%">生産<br>予定</th>
+                <th width="7%">開始<br>時間</th>
+                <th width="7%">終了<br>時間</th>
+                <th width="6%">生産<br>時間</th>
+                <th width="6%">差</th>
+                <th width="6%">切替<br>時間</th>
+                <th width="16%">操作</th>
+            </tr>
+        <tbody>
+            {% for koutei in kouteis %}
+            {% if koutei.status == 1 %}
+                <tr class="table-danger">
+            {% else %}
+                <tr>
+            {% endif %}
+                    <td class="text-right" width="5%">{% if koutei.bin %}{{ koutei.bin }}{% endif %}</td>
+                    <td width="21%" id="{{ koutei.id }}">
+                        {% if koutei.kubun %}
+                            {{ koutei.kubun }}）{{ koutei.name }}
+                        {% else %}
+                            {{ koutei.name }}
+                        {% endif %}
+                    </td>
+                    <td class="text-right" width="6%">{% if koutei.value %}{{ koutei.value }}{% endif %}</td>
+                    <td class="text-right" width="7%">{{ koutei.starty|date:"G:i" }}</td>
+                    <td class="text-right" width="7%">{{ koutei.endy|date:"G:i" }}</td>
+                    <td class="text-right" width="6%">{{ koutei.processy }}</td>
+                    <td class="text-right" width="7%">{{ koutei.start|date:"G:i" }}</td>
+                    <td class="text-right" width="7%">{{ koutei.end|date:"G:i" }}</td>
+                    <td class="text-right" width="6%">{{ koutei.end|seisantime:koutei.start }}</td>
+                    <td class="text-right" width="6%">
+                        {% if koutei.end %}
+                            {% if koutei.end|seisantime:koutei.start|sub:koutei.processy < 0 %}
+                                <div class="text-primary" align="right">
+                                    +{{ koutei.end|seisantime:koutei.start|sub:koutei.processy|mul:-1 }}
+                                </div>
+                            {% elif koutei.end|seisantime:koutei.start|sub:koutei.processy == 0 %}
+                                <div class="text-primary" align="right">
+                                    {{ koutei.end|seisantime:koutei.start|sub:koutei.processy|mul:-1 }}
+                                </div>
+                            {% else %}
+                                <div class="text-danger" align="right">
+                                    {{ koutei.end|seisantime:koutei.start|sub:koutei.processy|mul:-1 }}
+                                </div>
+                            {% endif %}
+                        {% endif %}
+                    </td>
+                    <td class="text-right" width="6%">{% if koutei.change %}{{ koutei.change }}{% endif %}</td>
+                    <td class="text-right" width="16%">
+                        <!-- 開始・終了ボタン -->
+                        {% if koutei.status == 1 %}
+                            <a href="{% url 'kouteikanri:start_or_end' id=koutei.id %}" class="btn btn-danger">終了</a>
+                        {% elif koutei.status == 2 %}
+                            <a href="{% url 'kouteikanri:start_or_end' id=koutei.id %}" class="btn btn-secondary">終了</a>
+                        {% else %}
+                            {% if cntst == 0 %}
+                                <a href="{% url 'kouteikanri:start_or_end' id=koutei.id %}" class="btn btn-success">開始</a>
+                            {% else %}
+                                <button type="button" class="btn-success btn active" data-toggle="modal" data-target="#testModal">開始</button>
+                            {% endif %}
+                        {% endif %}
+                        <a href="{% url 'kouteikanri:edit' id=koutei.id %}" class="btn btn-primary">編集</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="modal fade" id="testModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">確認画面</h4>
+            </div>
+            <div class="modal-body">
+                <h4><label>すでに生産中の製品があるため開始することができません。</label></h4>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">閉じる</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
