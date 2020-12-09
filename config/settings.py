@@ -56,7 +56,7 @@ MIDDLEWARE = [
 ]
 
 
-ROOT_URLCONF = 'kouteikanri.urls'
+ROOT_URLCONF = 'config.urls'
 
 
 TEMPLATES = [
@@ -79,7 +79,7 @@ TEMPLATES = [
 ]
 
 
-WSGI_APPLICATION = 'kouteikanri.wsgi.application'
+WSGI_APPLICATION = 'config.wsgi.application'
 
 
 # Database
