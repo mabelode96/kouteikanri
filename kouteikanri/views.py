@@ -36,19 +36,29 @@ class KouteiList(ListView):
         ctx['periodf'] = self.kwargs['period']
         # 終了予定 ========================================================================
         maxend = process.objects.all().filter(ql & qd & qp).aggregate(Max('endy'))
-        ctx['maxend'] = maxend['endy__max'].astimezone()
-        # 終了/総数 ========================================================================
-        ctx['valsum'] = process.objects.all().filter(ql & qd & qp).aggregate(Sum('value'))
-        if process.objects.all().filter(
-            ql & qd & qp & Q(status__exact='2')).aggregate(Sum('value')) is None:
-            valend = 0
+        if maxend['endy__max'] is None:
+            ctx['maxend'] = None
         else:
-            valend = process.objects.all().filter(
+            ctx['maxend'] = maxend['endy__max'].astimezone()
+        # 終了/総数 ========================================================================
+        valsum = process.objects.all().filter(ql & qd & qp).aggregate(Sum('value'))
+        if valsum['value__sum'] is None:
+            ctx['valsum'] = '0'
+        else:
+            ctx['valsum'] = valsum
+        valend = process.objects.all().filter(
+            ql & qd & qp & Q(status__exact='2')).aggregate(Sum('value'))
+        if valend['value__sum'] is None:
+            ctx['valend'] = '0'
+        else:
+            ctx['valend'] = process.objects.all().filter(
                 ql & qd & qp & Q(status__exact='2')).aggregate(Sum('value'))
-        ctx['valend'] = valend
         # 生産高 ===========================================================================
         sd = process.objects.all().filter(ql & qd & qp).aggregate(Sum('seisand'))
-        sdstr = '{:,}'.format(round(sd['seisand__sum']/1000))+' 千円'
+        if sd['seisand__sum'] is None:
+            sdstr = '0 円'
+        else:
+            sdstr = '{:,}'.format(round(sd['seisand__sum'] / 1000)) + ' 千円'
         ctx['sdstr'] = sdstr
         # 能率 =============================================================================
         stfavg = process.objects.all().filter(
@@ -85,7 +95,10 @@ class KouteiList(ListView):
         ctx['chavg'] = process.objects.all().filter(ql & qd & qp).aggregate(Avg('change'))
         # 終了予測 ======================================================================
         if process.objects.all().filter(ql & qd & qp & Q(status__exact='2')).count() == 0:
-            comptime = maxend['endy__max'].astimezone()
+            if maxend['endy__max'] is None:
+                comptime = None
+            else:
+                comptime = maxend['endy__max'].astimezone()
         else:
             sumPY = process.objects.all().filter(
                 ql & qd & qp & Q(status__lt='2')).aggregate(Sum('processy'))
@@ -103,7 +116,10 @@ class KouteiList(ListView):
             comptime = maxEn['end__max'].astimezone() + datetime.timedelta(minutes=tt)
         ctx['comptime'] = comptime
         # 進捗 ==========================================================================
-        progress = get_stime(comptime, maxend['endy__max'].astimezone())
+        if maxend['endy__max'] is None:
+            progress = 0
+        else:
+            progress = get_stime(comptime, maxend['endy__max'].astimezone())
         ctx['progress'] = progress
         return ctx
 
@@ -114,37 +130,37 @@ class KouteiList(ListView):
             Q(period__exact=self.kwargs['period']))
 
     def post(self, request, **kwargs):
-        line = request.POST['line_fld']
-        date = request.POST['date_fld']
-        period = request.POST['period_fld']
+        line = request.POST['line']
+        date = request.POST['date']
+        period = request.POST['period']
         return redirect('kouteikanri:list', line, date, period)
 
 
-# 新規と編集
+# 新規 or 編集
 def edit(request, id=None):
-    # idがあるとき（編集の時）
+    # 編集
     if id:
-        # idで検索して、結果を戻すか、404エラー
         koutei = get_object_or_404(process, pk=id)
-    # idが無いとき（新規の時）
+    # 新規
     else:
-        # kouteiを作成
-        koutei = process()
-
-    # POSTの時（新規であれ編集であれ登録ボタンが押されたとき）
+        koutei = process() # kouteiを追加
+    # POST
     if request.method == 'POST':
-        # フォームを生成
         form = KouteiForm(request.POST, instance=koutei)
-        # バリデーションがOKなら保存
+        # バリデーションチェック
         if form.is_valid():
             koutei = form.save(commit=False)
+            koutei.line = request.POST['line']
+            koutei.period = request.POST['period']
             koutei.save()
             if 'next' in request.GET:
                 return redirect(request.GET['next'])
-    # GETの時（フォームを生成）
+    # GET
     else:
         form = KouteiForm(instance=koutei)
-    # 新規・編集画面を表示
+        if 'next' in request.GET:
+            return redirect(request.GET['next'])
+#        return render(request, 'kouteikanri/edit.html', dict(form=form, id=id, line_old=koutei.line))
     return render(request, 'kouteikanri/edit.html', dict(form=form, id=id))
 
 
@@ -153,12 +169,6 @@ def delete(request, id):
     koutei = get_object_or_404(process, pk=id)
     koutei.delete()
     return redirect('kouteikanri:list', koutei.line, koutei.date, koutei.period)
-
-
-# 詳細
-def detail(request, id=id):
-    koutei = get_object_or_404(process, pk=id)
-    return render(request, 'kouteikanri/detail.html', {'koutei': koutei})
 
 
 # 開始 or 終了

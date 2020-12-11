@@ -21,7 +21,7 @@
     </table>
     <table class="table table-striped table-bordered" align="center">
         <thead>
-            <tr class="text-center" style="background-color: #F3E2A9;">
+            <tr class="text-center" style="background-color: #F3E2A9; font-size:16px">
                 <th width="14%">生産高</th>
                 <th width="14%">能率</th>
                 <th width="16%"><span style="color:#4169E1;">終了</span> / 総数</th>
@@ -39,7 +39,9 @@
                 <td>
                     {% if valend.value__sum %}
                         <span style="color:#4169E1;"> {{ valend.value__sum }} </span>
-                    {% else %}0{% endif %} / {{ valsum.value__sum }}
+                    {% else %}0{% endif %} /
+                    {% if valsum.value__sum %}{{ valsum.value__sum }}
+                    {% else %}0{% endif %}
                 </td>
                 <td>{{ maxend|date:"G:i" }}</td>
                 <td>
@@ -67,13 +69,14 @@
 
 <div class="site-content">
     <table class="table-sm table-striped table-bordered" align="left">
-
         <thead class="table">
-            <tr class="text-center">
+            <tr class="text-center" style="font-size:16px">
                 <th width="5%">便</th>
-                <th width="21%">製品名</th>
+                <th width="5%">区分</th>
+                <th width="17%">製品名</th>
                 <th width="6%">数量</th>
-                <th width="7%">開始<br>予定</th>
+                <!--<th width="6%">開始<br>予定</th>-->
+                <th width="6%">能力<br>1h</th>
                 <th width="7%">終了<br>予定</th>
                 <th width="6%">生産<br>予定</th>
                 <th width="7%">開始<br>時間</th>
@@ -90,22 +93,18 @@
             {% else %}
                 <tr>
             {% endif %}
-                    <td class="text-right" width="5%">{% if koutei.bin %}{{ koutei.bin }}{% endif %}</td>
-                    <td width="21%" id="{{ koutei.id }}">
-                        {% if koutei.kubun %}
-                            {{ koutei.kubun }}）{{ koutei.name }}
-                        {% else %}
-                            {{ koutei.name }}
-                        {% endif %}
-                    </td>
-                    <td class="text-right" width="6%">{% if koutei.value %}{{ koutei.value }}{% endif %}</td>
-                    <td class="text-right" width="7%">{{ koutei.starty|date:"G:i" }}</td>
-                    <td class="text-right" width="7%">{{ koutei.endy|date:"G:i" }}</td>
-                    <td class="text-right" width="6%">{{ koutei.processy }}</td>
-                    <td class="text-right" width="7%">{{ koutei.start|date:"G:i" }}</td>
-                    <td class="text-right" width="7%">{{ koutei.end|date:"G:i" }}</td>
-                    <td class="text-right" width="6%">{{ koutei.end|seisantime:koutei.start }}</td>
-                    <td class="text-right" width="6%">
+                    <td class="text-right">{% if koutei.bin %}{{ koutei.bin }}{% endif %}</td>
+                    <td>{% if koutei.kubun %}{{koutei.kubun }}{% endif %}</td>
+                    <td id="{{ koutei.id }}">{{ koutei.name }}</td>
+                    <td class="text-right">{% if koutei.value %}{{ koutei.value }}{% endif %}</td>
+                    <td class="text-right">{% if koutei.seisanh %}{{ koutei.seisanh }}{% endif %}</td>
+                    <!--<td class="text-right">{{ koutei.starty|date:"G:i" }}</td>-->
+                    <td class="text-right">{{ koutei.endy|date:"G:i" }}</td>
+                    <td class="text-right">{{ koutei.processy }}</td>
+                    <td class="text-right">{{ koutei.start|date:"G:i" }}</td>
+                    <td class="text-right">{{ koutei.end|date:"G:i" }}</td>
+                    <td class="text-right">{{ koutei.end|seisantime:koutei.start }}</td>
+                    <td class="text-right">
                         {% if koutei.end %}
                             {% if koutei.end|seisantime:koutei.start|sub:koutei.processy < 0 %}
                                 <div class="text-primary" align="right">
@@ -122,8 +121,8 @@
                             {% endif %}
                         {% endif %}
                     </td>
-                    <td class="text-right" width="6%">{% if koutei.change %}{{ koutei.change }}{% endif %}</td>
-                    <td class="text-right" width="16%">
+                    <td class="text-right">{% if koutei.change %}{{ koutei.change }}{% endif %}</td>
+                    <td class="text-right">
                         <!-- 開始・終了ボタン -->
                         {% if koutei.status == 1 %}
                             <a href="{% url 'kouteikanri:start_or_end' id=koutei.id %}" class="btn btn-danger">終了</a>
