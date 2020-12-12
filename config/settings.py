@@ -84,6 +84,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
+# DB に SQLite を使用する場合以下を有効化
 
 # DATABASES = {
 #     'default': {
@@ -93,6 +94,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # }
 
 
+# PostgreSQL を使用 (環境に応じて修正する)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -148,4 +150,4 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
 
-STATIC_ROOT = '/root/kouteikanri/static'
+#STATIC_ROOT = '/root/kouteikanri/static'
