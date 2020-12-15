@@ -1,125 +1,17 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from .models import Process
-from .forms import KouteiForm, KouteiEditForm, MyModelForm
+from .forms import KouteiEditForm, MyModelForm
 from django.views.generic import ListView
 from django.db.models import Q, Max, Min, Sum, Avg, Count
 import datetime
 from django.db import connection
 
+
 # 検索
 def top(request):
     f = MyModelForm()
     return render(request, 'kouteikanri/top.html', {'form1': f})
-
-
-# 「総数」を計算する関数
-def value_sum(line, date, period):
-    koutei = Process.objects.filter(
-        Q(line__exact=line) & Q(date__exact=date) & Q(period__exact=period)
-    )
-    if koutei.count() == 0:
-        return 0
-    else:
-        return koutei.aggregate(Sum('value'))
-
-
-# 「終了数」を計算する関数
-def value_end(line, date, period):
-    koutei = Process.objects.filter(
-        Q(line__exact=line) & Q(date__exact=date) & Q(period__exact=period) &
-        Q(status__exact=2)
-    )
-    if koutei.count() == 0:
-        return 0
-    else:
-        return koutei.aggregate(Sum('value'))
-
-
-# 「切替平均」を計算する関数
-def change_avg(line, date, period):
-    koutei = Process.objects.filter(
-        Q(line__exact=line) & Q(date__exact=date) & Q(period__exact=period)
-    )
-    if koutei.count() == 0:
-        return 0
-    else:
-        return koutei.aggregate(Avg('change'))
-
-
-# 「終了予定」を取得する関数
-def endy_max(line, date, period):
-    koutei = Process.objects.filter(
-        Q(line__exact=line) & Q(date__exact=date) & Q(period__exact=period)
-    )
-    if koutei.count() == 0:
-        return None
-    else:
-        ym = koutei.aggregate(Max('endy'))
-        if ym['endy__max'] is None:
-            return None
-        else:
-            return ym['endy__max'].astimezone()
-
-
-# 「終了実績」を取得する関数
-def endj_max(line, date, period):
-    koutei = Process.objects.filter(
-        Q(line__exact=line) & Q(date__exact=date) & Q(period__exact=period)
-    )
-    if koutei.count() == 0:
-        return None
-    else:
-        jm = koutei.aggregate(Max('end'))
-        if jm['end__max'] is None:
-            return None
-        else:
-            return jm['end__max'].astimezone()
-
-
-# 「残り生産時間」を計算する関数
-def left_time(line, date, period):
-    koutei = Process.objects.filter(
-        Q(line__exact=line) & Q(date__exact=date) & Q(period__exact=period) &
-        Q(status__lt=2)
-    )
-    sum_py = koutei.aggregate(Sum('processy'))
-    if sum_py['processy__sum'] is None:
-        py = 0
-    else:
-        py = sum_py['processy__sum']
-    sum_cy = koutei.aggregate(Sum('changey'))
-    if sum_cy['changey__sum'] is None:
-        cy = 0
-    else:
-        cy = sum_cy['changey__sum']
-    tt = py + cy
-    return datetime.timedelta(minutes=tt)
-
-
-# 「終了予測」を計算する関数
-def comp_time(line, date, period):
-    koutei = Process.objects.filter(
-        Q(line__exact=line) & Q(date__exact=date) & Q(period__exact=period) &
-        Q(status__exact='2')
-    )
-    if koutei.count() == 0:
-        return None
-    else:
-        ct = endy_max(line, date, period)
-        if ct is None:
-            return None
-        else:
-            return endj_max(line, date, period) + left_time(line, date, period)
-
-
-def dict_fetchall(cursor):
-    # Return all rows from a cursor as a dict
-    columns = [col[0] for col in cursor.description]
-    return [
-        dict(zip(columns, row))
-        for row in cursor.fetchall()
-    ]
 
 
 # 全ライン
@@ -201,13 +93,13 @@ class KouteiList(ListView):
         ctx['sdstr'] = sdstr
         # 能率 =============================================================================
         stfavg = Process.objects.all().filter(
-            ql & qd & qp & Q(status__exact='2')).aggregate(Avg('staff'))
+            ql & qd & qp & Q(status__exact=1)).aggregate(Avg('staff'))
         if stfavg['staff__avg'] is None:
             jin = 0
         else:
             jin = stfavg['staff__avg']
         sdEnd = Process.objects.all().filter(
-            ql & qd & qp & Q(status__exact='2')).aggregate(Sum('seisand'))
+            ql & qd & qp & Q(status__exact=1)).aggregate(Sum('seisand'))
         if sdEnd['seisand__sum'] is None:
             sdE = 0
         else:
@@ -228,7 +120,9 @@ class KouteiList(ListView):
         except ZeroDivisionError:
             ctx['nouritsu'] = '0 円'
         # 生産中の調査 ===================================================================
-        cntst = Process.objects.all().filter(ql & qd & qp & Q(status__exact='1')).count()
+        cntst = Process.objects.all().filter(
+            ql & qd & qp & Q(status__exact=0) & Q(start__isnull=False)
+        ).count()
         ctx['cntst'] = cntst
         # 切替平均 ======================================================================
         ctx['chavg'] = change_avg(ln, dt, pr)
@@ -283,6 +177,17 @@ def edit(request, id=None):
     return render(request, 'kouteikanri/edit.html', dict(form=form, id=id))
 
 
+# 終了解除
+def end_none(request, id=id):
+    koutei = get_object_or_404(Process, pk=id)
+    if request.method == 'POST':
+        koutei.end = None
+        # 終了を解除、開始はそのまま
+        koutei.status = 0
+        koutei.save()
+    return redirect('kouteikanri:list', koutei.line, koutei.date, koutei.period)
+
+
 # 削除
 def delete(request, id):
     koutei = get_object_or_404(Process, pk=id)
@@ -305,28 +210,30 @@ def start_or_end(request, id=id):
             if maxend['end__max'] is None:
                 koutei.change = 0
             else:
-                dt = maxend['end__max']
-                koutei.change = get_stime(dt.astimezone(), nw)
+                dt = maxend['end__max'].astimezone()
+                koutei.change = get_stime(dt, nw)
         # 開始時間を更新
         koutei.start = nw
-        koutei.status = 1
         koutei.save()
     # 終了の処理
     else:
         if koutei.end is None:
             koutei.end = datetime.datetime.now().astimezone()
-            koutei.status = 2
+            koutei.status = 1
             koutei.save()
     # 一覧のアンカーにジャンプ
-    if Process.objects.all().filter(ql & qd & qp & Q(status__exact='2')).count() < 9:
-        ancstr = None
-    else:
-        ancstr = str(koutei.id)
-    return redirect('{}#'.format(reverse('kouteikanri:list',kwargs={
-        'line': koutei.line,
-        'date': koutei.date,
-        'period': koutei.period
-    })) + ancstr)
+    ancstr = str(koutei.id)
+    return redirect(
+        '{}#'.format(
+            reverse(
+                'kouteikanri:list',kwargs={
+                    'line': koutei.line,
+                    'date': koutei.date,
+                    'period': koutei.period
+                }
+            )
+        ) + ancstr
+    )
 
 
 # 生産中をキャンセル
@@ -343,8 +250,8 @@ def start_cancel(request, **kwargs):
             d = dt.strftime("%Y-%m-%d")
         period = request.POST['period']
         kouteis = Process.objects.all().filter(
-            Q(line__exact=line) & Q(date__exact=d) &
-            Q(period__exact=period) & Q(status__exact='1'))
+            Q(line__exact=line) & Q(date__exact=d) & Q(period__exact=period) &
+            Q(status__exact=0) & Q(end__isnull=True))
         if kouteis.count() > 0:
             for koutei in kouteis:
                 koutei.start = None
@@ -353,19 +260,36 @@ def start_cancel(request, **kwargs):
             # 生産中のデータを一括更新
             Process.objects.bulk_update(update_list, fields=["start", "status"])
         return redirect('kouteikanri:list', line, d, period)
-        # 戻っても良い？
-        # return redirect(request.META.get('HTTP_REFERER', '/'))
 
 
-# 終了解除
-def end_none(request, id=id):
-    koutei = get_object_or_404(Process, pk=id)
+# すべての実績をリセット
+def reset_all(request, **kwargs):
+    # POST
     if request.method == 'POST':
-        koutei.end = None
-        # 生産中にする
-        koutei.status = 1
-        koutei.save()
-    return redirect('kouteikanri:list', koutei.line, koutei.date, koutei.period)
+        update_list = []
+        line = request.POST['line']
+        date = request.POST['date']
+        dt = datetime.datetime.strptime(date, '%Y年%m月%d日')
+        if dt is None:
+            d = datetime.datetime.now().strftime("%Y-%m-%d")
+        else:
+            d = dt.strftime("%Y-%m-%d")
+        period = request.POST['period']
+        kouteis = Process.objects.all().filter(
+            Q(line__exact=line) & Q(date__exact=d) & Q(period__exact=period)
+        )
+        if kouteis.count() > 0:
+            for koutei in kouteis:
+                koutei.start = None
+                koutei.end = None
+                koutei.change = None
+                koutei.status = 0
+                update_list.append(koutei)
+            # 工程のデータを一括更新
+            Process.objects.bulk_update(update_list, fields=["start", "end", "change", "status"])
+        return redirect('kouteikanri:list', line, d, period)
+        # 戻ったほうが良い？
+        # return redirect(request.META.get('HTTP_REFERER', '/'))
 
 
 # 所要時間計算
@@ -377,3 +301,103 @@ def get_stime(start_time, end_time):
     else:
         td = end_time - start_time
         return round((td.days * 1440) + (td.seconds / 60))
+
+
+# 「総数」を計算する関数
+def value_sum(line, date, period):
+    koutei = Process.objects.filter(
+        Q(line__exact=line) & Q(date__exact=date) & Q(period__exact=period)
+    )
+    if koutei.count() == 0:
+        return 0
+    else:
+        return koutei.aggregate(Sum('value'))
+
+
+# 「終了数」を計算する関数
+def value_end(line, date, period):
+    koutei = Process.objects.filter(
+        Q(line__exact=line) & Q(date__exact=date) & Q(period__exact=period) &
+        Q(status__exact=1)
+    )
+    if koutei.count() == 0:
+        return 0
+    else:
+        return koutei.aggregate(Sum('value'))
+
+
+# 「切替平均」を計算する関数
+def change_avg(line, date, period):
+    koutei = Process.objects.filter(
+        Q(line__exact=line) & Q(date__exact=date) & Q(period__exact=period)
+    )
+    if koutei.count() == 0:
+        return 0
+    else:
+        return koutei.aggregate(Avg('change'))
+
+
+# 「終了予定」を取得する関数
+def endy_max(line, date, period):
+    koutei = Process.objects.filter(
+        Q(line__exact=line) & Q(date__exact=date) & Q(period__exact=period)
+    )
+    if koutei.count() == 0:
+        return None
+    else:
+        ym = koutei.aggregate(Max('endy'))
+        if ym['endy__max'] is None:
+            return None
+        else:
+            return ym['endy__max'].astimezone()
+
+
+# 「終了実績」を取得する関数
+def endj_max(line, date, period):
+    koutei = Process.objects.filter(
+        Q(line__exact=line) & Q(date__exact=date) & Q(period__exact=period)
+    )
+    if koutei.count() == 0:
+        return None
+    else:
+        jm = koutei.aggregate(Max('end'))
+        if jm['end__max'] is None:
+            return None
+        else:
+            return jm['end__max'].astimezone()
+
+
+# 「残り生産時間」を計算する関数
+def left_time(line, date, period):
+    koutei = Process.objects.filter(
+        Q(line__exact=line) & Q(date__exact=date) & Q(period__exact=period) &
+        Q(status__exact=0)
+    )
+    sum_py = koutei.aggregate(Sum('processy'))
+    if sum_py['processy__sum'] is None:
+        py = 0
+    else:
+        py = sum_py['processy__sum']
+    sum_cy = koutei.aggregate(Sum('changey'))
+    if sum_cy['changey__sum'] is None:
+        cy = 0
+    else:
+        cy = sum_cy['changey__sum']
+    tt = py + cy
+    return datetime.timedelta(minutes=tt)
+
+
+# 「終了予測」を計算する関数
+def comp_time(line, date, period):
+    koutei = Process.objects.filter(
+        Q(line__exact=line) & Q(date__exact=date) & Q(period__exact=period) &
+        Q(status__exact=1)
+    )
+    if koutei.count() == 0:
+        return None
+    else:
+        ct = endy_max(line, date, period)
+        if ct is None:
+            return None
+        else:
+            return endj_max(line, date, period) + left_time(line, date, period)

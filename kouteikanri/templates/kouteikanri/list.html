@@ -17,6 +17,17 @@
             <th style="padding: 10px"><h3 align="right">{{ linef }}</h3></th>
             <th style="padding: 10px"><h3 align="left">{{ periodf }}</h3></th>
             <th style="padding: 10px"><h3 align="right">{{ datef }}製造</h3></th>
+            <th style="padding: 10px">
+                <form action="{% url 'kouteikanri:reset_all' linef datef periodf %}" method="post">
+                    {% csrf_token %}
+                    <input type="text" name="line" value="{{ linef }}" hidden>
+                    <input type="text" name="date" value="{{ datef }}" hidden>
+                    <input type="text" name="period" value="{{ periodf }}" hidden>
+                    <!-- リセットボタン hidden を削除すれば表示されます -->
+                    <input type="submit" value="リセット" class="btn-sm btn-danger" hidden>
+                    <!-- リセットボタン ここまで -->
+                </form>
+            </th>
         </tr>
     </table>
     <table class="table-sm table-bordered" align="center" style="width: 98%">
@@ -96,8 +107,12 @@
             </tr>
         <tbody>
             {% for koutei in kouteis %}
-            {% if koutei.status == 1 %}
-                <tr class="table-danger">
+            {% if koutei.status == 0 %}
+                {% if koutei.start %}
+                    <tr class="table-danger">
+                {% else %}
+                    <tr>
+                {% endif %}
             {% else %}
                 <tr>
             {% endif %}
@@ -133,14 +148,24 @@
                     <td class="text-right">
                         <!-- 開始・終了ボタン -->
                         {% if koutei.status == 1 %}
-                            <a href="{% url 'kouteikanri:start_or_end' id=koutei.id %}" class="btn btn-danger">終了</a>
-                        {% elif koutei.status == 2 %}
+                            <!-- 終了済 -->
                             <a href="{% url 'kouteikanri:start_or_end' id=koutei.id %}" class="btn btn-secondary">終了</a>
-                        {% else %}
-                            {% if cntst == 0 %}
-                                <a href="{% url 'kouteikanri:start_or_end' id=koutei.id %}" class="btn btn-success">開始</a>
+                        {% elif koutei.status == 0 %}
+                            {% if koutei.end %}
+                                <!-- 通常は通らない　-->
+                                <a href="{% url 'kouteikanri:start_or_end' id=koutei.id %}" class="btn btn-danger">終了</a>
                             {% else %}
-                                <button type="button" class="btn-success btn active" data-toggle="modal" data-target="#testModal">開始</button>
+                                {% if koutei.start %}
+                                    <!-- 通常の終了のパターン（生産中） -->
+                                    <a href="{% url 'kouteikanri:start_or_end' id=koutei.id %}" class="btn btn-danger">終了</a>
+                                {% else %}
+                                    <!-- 通常の開始のパターン -->
+                                    {% if cntst == 0 %}
+                                        <a href="{% url 'kouteikanri:start_or_end' id=koutei.id %}" class="btn btn-success">開始</a>
+                                    {% else %}
+                                        <button type="button" class="btn-success btn active" data-toggle="modal" data-target="#testModal">開始</button>
+                                    {% endif %}
+                                {% endif %}
                             {% endif %}
                         {% endif %}
                         <!-- 編集ボタン -->

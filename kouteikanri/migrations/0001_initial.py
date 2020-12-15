@@ -42,4 +42,8 @@ class Migration(migrations.Migration):
                 ('kouteicd', models.CharField(blank=True, max_length=100, verbose_name='識別cd')),
             ],
         ),
+        migrations.AlterModelTable(
+            name='process',
+            table='kouteikanri_process',
+        ),
     ]
