@@ -3,37 +3,37 @@
 {% load utils %}
 
 {% block title %}
-工程一覧
+{{ linef }} {{ periodf }}
 {% endblock title %}
 
 {% block content %}
 
 <header class="site-header">
-    <table class="table" align="center">
+    <table class="table-sm" align="center" style="width: 100%">
         <tr>
             <th style="padding: 10px">
                 <a href="{% url 'kouteikanri:top' %}" class="btn btn-primary" id="btn_bak">ライン選択に戻る</a>
             </th>
             <th style="padding: 10px"><h3 align="right">{{ linef }}</h3></th>
             <th style="padding: 10px"><h3 align="left">{{ periodf }}</h3></th>
-            <th style="padding: 10px"><h3 align="right">{{ datef }}</h3></th>
+            <th style="padding: 10px"><h3 align="right">{{ datef }}製造</h3></th>
         </tr>
     </table>
-    <table class="table table-striped table-bordered" align="center">
+    <table class="table-sm table-bordered" align="center" style="width: 98%">
         <thead>
             <tr class="text-center" style="background-color: #F3E2A9; font-size:16px">
                 <th width="14%">生産高</th>
                 <th width="14%">能率</th>
-                <th width="16%"><span style="color:#4169E1;">終了</span> / 総数</th>
-                <th width="10%">終了予定</th>
-                <th width="10%">切替平均</th>
-                <th width="10%">実際終了</th>
-                <th width="12%">進捗</th>
-                <th width="14%"></th>
+                <th width="18%"><span style="color:#4169E1;">終了</span> / 総数</th>
+                <th width="10%">終了<br>予定</th>
+                <th width="8%">切替<br>平均</th>
+                <th width="10%">実際<br>終了</th>
+                <th width="16%">進捗</th>
+                <th width="10%" style="font-size: 14px">生産中を<br>キャンセル</th>
             </tr>
         </thead>
         <tbody>
-            <tr style="background-color: #FFFFFF;" align="center">
+            <tr style="background-color: #FFFFFF; font-size:22px" align="center">
                 <td>{{ sdstr }}</td>
                 <td>{{ nouritsu }}</td>
                 <td>
@@ -61,7 +61,15 @@
                         {% endif %}
                     {% endif %}
                 </td>
-                <td></td>
+                <td>
+                    <form action="{% url 'kouteikanri:start_cancel' linef datef periodf %}" method="post">
+                        {% csrf_token %}
+                        <input type="text" name="line" value="{{ linef }}" hidden>
+                        <input type="text" name="date" value="{{ datef }}" hidden>
+                        <input type="text" name="period" value="{{ periodf }}" hidden>
+                        <input type="submit" value="キャンセル" class="btn btn-warning">
+                    </form>
+                </td>
             </tr>
         </tbody>
     </table>
@@ -71,9 +79,9 @@
     <table class="table-sm table-striped table-bordered" align="left">
         <thead class="table">
             <tr class="text-center" style="font-size:16px">
-                <th width="5%">便</th>
+                <th width="3%">便</th>
                 <th width="5%">区分</th>
-                <th width="17%">製品名</th>
+                <th width="20%">製品名</th>
                 <th width="6%">数量</th>
                 <!--<th width="6%">開始<br>予定</th>-->
                 <th width="6%">能力<br>1h</th>
@@ -84,7 +92,7 @@
                 <th width="6%">生産<br>時間</th>
                 <th width="6%">差</th>
                 <th width="6%">切替<br>時間</th>
-                <th width="16%">操作</th>
+                <th width="15%">操作</th>
             </tr>
         <tbody>
             {% for koutei in kouteis %}
@@ -135,7 +143,12 @@
                                 <button type="button" class="btn-success btn active" data-toggle="modal" data-target="#testModal">開始</button>
                             {% endif %}
                         {% endif %}
-                        <a href="{% url 'kouteikanri:edit' id=koutei.id %}" class="btn btn-primary">編集</a>
+                        <!-- 編集ボタン -->
+                        {% if cntst == 0 %}
+                            <a href="{% url 'kouteikanri:edit' id=koutei.id %}" class="btn btn-primary">編集</a>
+                        {% else %}
+                            <button type="button" class="btn-primary btn active" data-toggle="modal" data-target="#testModal">編集</button>
+                        {% endif %}
                     </td>
                 </tr>
             {% endfor %}
@@ -150,7 +163,7 @@
                 <h4 class="modal-title" id="myModalLabel">確認画面</h4>
             </div>
             <div class="modal-body">
-                <h4><label>すでに生産中の製品があるため開始することができません。</label></h4>
+                <h4><label>生産中の製品があるため [開始] と [編集] は実行することができません。</label></h4>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" data-dismiss="modal">閉じる</button>

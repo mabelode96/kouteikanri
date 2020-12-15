@@ -9,7 +9,11 @@
 
 <br><br>
 <h1 align="center">盛付工程進捗管理</h1>
-<br><br>
+<br>
+<form>
+    <a href="{% url 'kouteikanri:all' %}" class="btn btn-info" id="btn_bak">全ライン工程一覧へ</a>
+</form>
+<br>
 
 <form action="{% url 'kouteikanri:list' '調理パンＡライン' '2020-11-17' '昼勤' %}" method="post">
     {% csrf_token %}
@@ -23,7 +27,7 @@
                 </th>
             </tr>
         </thead>
-        <tbody style="font-size: width: 100%; height: 60px; font-size: 28px;">
+        <tbody style="width: 100%; height: 60px; font-size: 28px;">
             <tr>
                 <td>
                     <h3><label for="line">ライン名</label></h3>
@@ -53,7 +57,6 @@
                 </td>
                 <td align="right">
                     <input type="submit" value="検索" class="btn btn-primary btn-lg">
-                           <!--style="WIDTH: 100px; HEIGHT: 60px; font-size: 32px; background-color: cyan">-->
                 </td>
             </tr>
         </tbody>

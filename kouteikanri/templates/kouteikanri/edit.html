@@ -6,18 +6,24 @@
 {% block content %}
 
     <table>
+        <thead>
+            <tr>
+                <td><h5>工程の編集</h5></td>
+            </tr>
+        </thead>
         <tbody>
             <tr>
-                <a href="./?next={{ request.META.HTTP_REFERER }}" class="btn btn-primary">戻る</a>
-            </tr>
-            <tr>　</tr>
-            <tr>
-                {% if form.end.value %}
-                    <form action="{% url 'kouteikanri:end_none' form.initial.id %}" method="post">
-                        {% csrf_token %}
-                        <input type="submit" value="終了を解除" class="btn btn-warning">
-                    </form>
-                {% endif %}
+                <td>
+                    <a href="./?next={{ request.META.HTTP_REFERER }}" class="btn btn-primary">戻る</a>
+                </td>
+                <td>
+                    {% if form.end.value %}
+                        <form action="{% url 'kouteikanri:end_none' form.initial.id %}" method="post">
+                            {% csrf_token %}
+                            <input type="submit" value="終了を解除" class="btn btn-warning">
+                        </form>
+                    {% endif %}
+                </td>
             </tr>
         </tbody>
     </table>

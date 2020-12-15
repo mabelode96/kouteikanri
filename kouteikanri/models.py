@@ -9,7 +9,7 @@ from django.db import models
 # 開始時間,終了時間,切替実績,status,識別cd
 
 
-class process(models.Model):
+class Process(models.Model):
     line = models.CharField('ライン名', blank=True, max_length=20)
     period = models.CharField('時間帯', blank=True, max_length=10)
     date = models.DateField('製造日', blank=True)
@@ -35,6 +35,9 @@ class process(models.Model):
     change = models.IntegerField('切替時間', blank=True)
     status = models.IntegerField('status', default=0)
     kouteicd = models.CharField('識別cd', blank=True, max_length=100)
+
+    class Meta:
+        db_table = 'kouteikanri_process'
 
     def __str__(self):
         return self.name
