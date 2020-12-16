@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from .models import Process
-from .forms import KouteiEditForm, MyModelForm
+from .forms import KouteiEditForm, KouteiAddForm, MyModelForm
 from django.views.generic import ListView
 from django.db.models import Q, Max, Min, Sum, Avg, Count
 import datetime
@@ -14,45 +14,47 @@ def top(request):
     return render(request, 'kouteikanri/top.html', {'form1': f})
 
 
-# 全ライン
-class AllList(ListView):
-    model = Process
-    context_object_name = 'result'
-    template_name = 'kouteikanri/all.html'
+# 全ライン一覧
+# 参考url: https://qiita.com/t-iguchi/items/827865481e82bb32ad04
+def all_list(request):
+    # 製造日は当日固定
+    # date = datetime.datetime.now().astimezone() - datetime.timedelta(hours=7)
+    # dt_str = date.strftime("%Y-%m-%d")
+    dt_str = '2020-12-08'
+    sql_text = (
+        "SELECT line, period, "
+        "sum(value) AS val_sum, "
+        "sum(value * status) AS val_end_sum, "
+        "sum(value) - sum(value * status) AS left_val, "
+        "count(value * status) AS left_cnt, "
+        "max(endy) AS endy_max, "
+        "max(endj) AS endj_max, "
+        "sum(processy) + sum(changey) - sum(processy * status) + sum(changey * status) AS left_time, "
+        "sum(value * status) * 100 / sum(value) AS progress "
+        "FROM kouteikanri_process "
+        "WHERE date='" + dt_str + "' "
+        "GROUP BY line, period;"
+    )
+    emp_list=exec_query(sql_text)
+    return render(request, 'kouteikanri/all.html', {'emp_list': emp_list, 'date': dt_str})
 
-#    def get_queryset(self, **kwargs):
-#        # 製造日は当日固定
-#        date = datetime.datetime.now().astimezone() - datetime.timedelta(hours=7)
-#        dtStr = date.strftime("%Y-%m-%d")
 
-#        koutei = Process.objects.filter(date__exact=dtStr, status__exact=2)
-#        kouteis = koutei.values('line', 'period').annotate(
-#            val_sum=Sum('value'),
-#            proc_sum=Sum('processy'),
-#        )
+# cursor.descriptionでフィールド名を配列にセットして、resultsにフィールド名を付加
+def exec_query(sql_txt):
+    with connection.cursor() as c:
+        c.execute(sql_txt)
+        results = c.fetchall()
+        columns = []
+        for field in c.description:
+            columns.append(field.name)
+        values = []
+        for result in results:
+            value_dic = {}
+            for index, field in enumerate(columns):
+                value_dic[field] = result[index]
+            values.append(value_dic)
+        return values
 
-#        return kouteis
-
-    def get_context_data(self, **kwargs):
-        # 製造日は当日固定
-        # date = datetime.datetime.now().astimezone() - datetime.timedelta(hours=7)
-        # dtStr = date.strftime("%Y-%m-%d")
-        dtStr = '2020-12-08'
-        ctx = super().get_context_data(**kwargs)
-
-        with connection.cursor() as cursor:
-            cursor = connection.cursor()
-            cursor.execute("SELECT line,period,"
-                "Sum(value) AS val_sum,"
-                "Sum(processy) AS proc_sum "
-                "FROM kouteikanri_process "
-                "WHERE date='"+dtStr+"' "
-                "GROUP BY line,period;")
-            tuple = cursor.fetchall()
-
-        ctx['tuple'] = tuple
-        ctx['date'] = dtStr
-        return ctx
 
 # 工程一覧
 class KouteiList(ListView):
@@ -79,7 +81,7 @@ class KouteiList(ListView):
         # 時間帯 ==========================================================================
         ctx['periodf'] = self.kwargs['period']
         # 終了予定 ========================================================================
-        ctx['maxend'] = endy_max(ln, dt, pr)
+        ctx['maxendy'] = endy_max(ln, dt, pr)
         # 終了数/総数 ========================================================================
         ctx['valsum'] = value_sum(ln, dt, pr)
         ve = value_end(ln, dt, pr)
@@ -104,14 +106,14 @@ class KouteiList(ListView):
             sdE = 0
         else:
             sdE = sdEnd['seisand__sum']
-        minSt = Process.objects.all().filter(ql & qd & qp).aggregate(Min('start'))
-        maxEn = Process.objects.all().filter(ql & qd & qp).aggregate(Max('end'))
-        if minSt['start__min'] is None:
+        minSt = Process.objects.all().filter(ql & qd & qp).aggregate(Min('startj'))
+        maxEn = Process.objects.all().filter(ql & qd & qp).aggregate(Max('endj'))
+        if minSt['startj__min'] is None:
             tm = 0
         else:
-            Smin = minSt['start__min']
-            if maxEn['end__max'] is not None:
-                Emax = maxEn['end__max']
+            Smin = minSt['startj__min']
+            if maxEn['endj__max'] is not None:
+                Emax = maxEn['endj__max']
                 tm = get_stime(Smin, Emax) / 60
             else:
                 tm = 0
@@ -121,11 +123,11 @@ class KouteiList(ListView):
             ctx['nouritsu'] = '0 円'
         # 生産中の調査 ===================================================================
         cntst = Process.objects.all().filter(
-            ql & qd & qp & Q(status__exact=0) & Q(start__isnull=False)
+            ql & qd & qp & Q(status__exact=0) & Q(startj__isnull=False)
         ).count()
         ctx['cntst'] = cntst
         # 切替平均 ======================================================================
-        ctx['chavg'] = change_avg(ln, dt, pr)
+        ctx['chavg'] = changej_avg(ln, dt, pr)
         # 終了予測 ======================================================================
         ctx['comptime'] = comp_time(ln, dt, pr)
         # 進捗 ==========================================================================
@@ -137,7 +139,7 @@ class KouteiList(ListView):
         return ctx
 
     def get_queryset(self, **kwargs):
-        return Process.objects.order_by('start', 'starty').filter(
+        return Process.objects.order_by('startj', 'starty').filter(
             Q(line__exact=self.kwargs['line']) &
             Q(date__exact=self.kwargs['date']) &
             Q(period__exact=self.kwargs['period']))
@@ -181,7 +183,7 @@ def edit(request, id=None):
 def end_none(request, id=id):
     koutei = get_object_or_404(Process, pk=id)
     if request.method == 'POST':
-        koutei.end = None
+        koutei.endj = None
         # 終了を解除、開始はそのまま
         koutei.status = 0
         koutei.save()
@@ -202,23 +204,23 @@ def start_or_end(request, id=id):
     ql = Q(line__exact=koutei.line)
     qd = Q(date__exact=koutei.date)
     qp = Q(period__exact=koutei.period)
-    if koutei.start is None:
+    if koutei.startj is None:
         nw = datetime.datetime.now().astimezone()
         # 切替時間を更新
         if koutei.value is not None:
-            maxend = Process.objects.all().filter(ql & qd & qp).aggregate(Max('end'))
-            if maxend['end__max'] is None:
-                koutei.change = 0
+            maxendj = Process.objects.all().filter(ql & qd & qp).aggregate(Max('endj'))
+            if maxendj['endj__max'] is None:
+                koutei.changej = 0
             else:
-                dt = maxend['end__max'].astimezone()
-                koutei.change = get_stime(dt, nw)
+                dt = maxendj['endj__max'].astimezone()
+                koutei.changej = get_stime(dt, nw)
         # 開始時間を更新
-        koutei.start = nw
+        koutei.startj = nw
         koutei.save()
     # 終了の処理
     else:
-        if koutei.end is None:
-            koutei.end = datetime.datetime.now().astimezone()
+        if koutei.endj is None:
+            koutei.endj = datetime.datetime.now().astimezone()
             koutei.status = 1
             koutei.save()
     # 一覧のアンカーにジャンプ
@@ -251,14 +253,14 @@ def start_cancel(request, **kwargs):
         period = request.POST['period']
         kouteis = Process.objects.all().filter(
             Q(line__exact=line) & Q(date__exact=d) & Q(period__exact=period) &
-            Q(status__exact=0) & Q(end__isnull=True))
+            Q(status__exact=0) & Q(endj__isnull=True))
         if kouteis.count() > 0:
             for koutei in kouteis:
-                koutei.start = None
+                koutei.startj = None
                 koutei.status = 0
                 update_list.append(koutei)
             # 生産中のデータを一括更新
-            Process.objects.bulk_update(update_list, fields=["start", "status"])
+            Process.objects.bulk_update(update_list, fields=["startj", "status"])
         return redirect('kouteikanri:list', line, d, period)
 
 
@@ -280,13 +282,13 @@ def reset_all(request, **kwargs):
         )
         if kouteis.count() > 0:
             for koutei in kouteis:
-                koutei.start = None
-                koutei.end = None
-                koutei.change = None
+                koutei.startj = None
+                koutei.endj = None
+                koutei.changej = None
                 koutei.status = 0
                 update_list.append(koutei)
             # 工程のデータを一括更新
-            Process.objects.bulk_update(update_list, fields=["start", "end", "change", "status"])
+            Process.objects.bulk_update(update_list, fields=["startj", "endj", "changej", "status"])
         return redirect('kouteikanri:list', line, d, period)
         # 戻ったほうが良い？
         # return redirect(request.META.get('HTTP_REFERER', '/'))
@@ -327,14 +329,14 @@ def value_end(line, date, period):
 
 
 # 「切替平均」を計算する関数
-def change_avg(line, date, period):
+def changej_avg(line, date, period):
     koutei = Process.objects.filter(
         Q(line__exact=line) & Q(date__exact=date) & Q(period__exact=period)
     )
     if koutei.count() == 0:
         return 0
     else:
-        return koutei.aggregate(Avg('change'))
+        return koutei.aggregate(Avg('changej'))
 
 
 # 「終了予定」を取得する関数
@@ -360,11 +362,11 @@ def endj_max(line, date, period):
     if koutei.count() == 0:
         return None
     else:
-        jm = koutei.aggregate(Max('end'))
-        if jm['end__max'] is None:
+        jm = koutei.aggregate(Max('endj'))
+        if jm['endj__max'] is None:
             return None
         else:
-            return jm['end__max'].astimezone()
+            return jm['endj__max'].astimezone()
 
 
 # 「残り生産時間」を計算する関数

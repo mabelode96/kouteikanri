@@ -14,9 +14,9 @@
             <th style="padding: 10px">
                 <a href="{% url 'kouteikanri:top' %}" class="btn btn-primary" id="btn_bak">ライン選択に戻る</a>
             </th>
-            <th style="padding: 10px"><h3 align="right">{{ linef }}</h3></th>
-            <th style="padding: 10px"><h3 align="left">{{ periodf }}</h3></th>
-            <th style="padding: 10px"><h3 align="right">{{ datef }}製造</h3></th>
+            <th style="padding: 10px"><h4 align="right">{{ linef }}</h4></th>
+            <th style="padding: 10px"><h4 align="left">{{ periodf }}</h4></th>
+            <th style="padding: 10px"><h4 align="right">{{ datef }}製造</h4></th>
             <th style="padding: 10px">
                 <form action="{% url 'kouteikanri:reset_all' linef datef periodf %}" method="post">
                     {% csrf_token %}
@@ -24,7 +24,7 @@
                     <input type="text" name="date" value="{{ datef }}" hidden>
                     <input type="text" name="period" value="{{ periodf }}" hidden>
                     <!-- リセットボタン hidden を削除すれば表示されます -->
-                    <input type="submit" value="リセット" class="btn-sm btn-danger" hidden>
+                    <input type="submit" value="リセット" class="btn-sm btn-danger">
                     <!-- リセットボタン ここまで -->
                 </form>
             </th>
@@ -54,10 +54,10 @@
                     {% if valsum.value__sum %}{{ valsum.value__sum }}
                     {% else %}0{% endif %}
                 </td>
-                <td>{{ maxend|date:"G:i" }}</td>
+                <td>{{ maxendy|date:"G:i" }}</td>
                 <td>
-                    {% if chavg.change__avg %}
-                        {{ chavg.change__avg|floatformat:1 }}
+                    {% if chavg.changej__avg %}
+                        {{ chavg.changej__avg|floatformat:1 }}
                     {% else %}0{% endif %}
                 </td>
                 <td>{{ comptime|date:"G:i" }}</td>
@@ -78,7 +78,7 @@
                         <input type="text" name="line" value="{{ linef }}" hidden>
                         <input type="text" name="date" value="{{ datef }}" hidden>
                         <input type="text" name="period" value="{{ periodf }}" hidden>
-                        <input type="submit" value="キャンセル" class="btn btn-warning">
+                        <input type="submit" value="キャンセル" class="btn-sm btn-danger">
                     </form>
                 </td>
             </tr>
@@ -95,7 +95,7 @@
                 <th width="20%">製品名</th>
                 <th width="6%">数量</th>
                 <!--<th width="6%">開始<br>予定</th>-->
-                <th width="6%">能力<br>1h</th>
+                <th width="7%">能力<br>1h</th>
                 <th width="7%">終了<br>予定</th>
                 <th width="6%">生産<br>予定</th>
                 <th width="7%">開始<br>時間</th>
@@ -103,12 +103,12 @@
                 <th width="6%">生産<br>時間</th>
                 <th width="6%">差</th>
                 <th width="6%">切替<br>時間</th>
-                <th width="15%">操作</th>
+                <th width="14%">操作</th>
             </tr>
         <tbody>
             {% for koutei in kouteis %}
             {% if koutei.status == 0 %}
-                {% if koutei.start %}
+                {% if koutei.startj %}
                     <tr class="table-danger">
                 {% else %}
                     <tr>
@@ -120,42 +120,42 @@
                     <td>{% if koutei.kubun %}{{koutei.kubun }}{% endif %}</td>
                     <td id="{{ koutei.id }}">{{ koutei.name }}</td>
                     <td class="text-right">{% if koutei.value %}{{ koutei.value }}{% endif %}</td>
-                    <td class="text-right">{% if koutei.seisanh %}{{ koutei.seisanh }}{% endif %}</td>
+                    <td class="text-right">{% if koutei.seisanh %}{{ koutei.seisanh }}/h{% endif %}</td>
                     <!--<td class="text-right">{{ koutei.starty|date:"G:i" }}</td>-->
                     <td class="text-right">{{ koutei.endy|date:"G:i" }}</td>
                     <td class="text-right">{{ koutei.processy }}</td>
-                    <td class="text-right">{{ koutei.start|date:"G:i" }}</td>
-                    <td class="text-right">{{ koutei.end|date:"G:i" }}</td>
-                    <td class="text-right">{{ koutei.end|seisantime:koutei.start }}</td>
+                    <td class="text-right">{{ koutei.startj|date:"G:i" }}</td>
+                    <td class="text-right">{{ koutei.endj|date:"G:i" }}</td>
+                    <td class="text-right">{{ koutei.endj|seisantime:koutei.startj }}</td>
                     <td class="text-right">
-                        {% if koutei.end %}
-                            {% if koutei.end|seisantime:koutei.start|sub:koutei.processy < 0 %}
+                        {% if koutei.endj %}
+                            {% if koutei.endj|seisantime:koutei.startj|sub:koutei.processy < 0 %}
                                 <div class="text-primary" align="right">
-                                    +{{ koutei.end|seisantime:koutei.start|sub:koutei.processy|mul:-1 }}
+                                    +{{ koutei.endj|seisantime:koutei.startj|sub:koutei.processy|mul:-1 }}
                                 </div>
-                            {% elif koutei.end|seisantime:koutei.start|sub:koutei.processy == 0 %}
+                            {% elif koutei.endj|seisantime:koutei.startj|sub:koutei.processy == 0 %}
                                 <div class="text-primary" align="right">
-                                    {{ koutei.end|seisantime:koutei.start|sub:koutei.processy|mul:-1 }}
+                                    {{ koutei.endj|seisantime:koutei.startj|sub:koutei.processy|mul:-1 }}
                                 </div>
                             {% else %}
                                 <div class="text-danger" align="right">
-                                    {{ koutei.end|seisantime:koutei.start|sub:koutei.processy|mul:-1 }}
+                                    {{ koutei.endj|seisantime:koutei.startj|sub:koutei.processy|mul:-1 }}
                                 </div>
                             {% endif %}
                         {% endif %}
                     </td>
-                    <td class="text-right">{% if koutei.change %}{{ koutei.change }}{% endif %}</td>
+                    <td class="text-right">{% if koutei.changej %}{{ koutei.changej }}{% endif %}</td>
                     <td class="text-right">
                         <!-- 開始・終了ボタン -->
                         {% if koutei.status == 1 %}
                             <!-- 終了済 -->
                             <a href="{% url 'kouteikanri:start_or_end' id=koutei.id %}" class="btn btn-secondary">終了</a>
                         {% elif koutei.status == 0 %}
-                            {% if koutei.end %}
+                            {% if koutei.endj %}
                                 <!-- 通常は通らない　-->
                                 <a href="{% url 'kouteikanri:start_or_end' id=koutei.id %}" class="btn btn-danger">終了</a>
                             {% else %}
-                                {% if koutei.start %}
+                                {% if koutei.startj %}
                                     <!-- 通常の終了のパターン（生産中） -->
                                     <a href="{% url 'kouteikanri:start_or_end' id=koutei.id %}" class="btn btn-danger">終了</a>
                                 {% else %}

@@ -7,7 +7,7 @@ app_name = 'kouteikanri'
 
 urlpatterns = [
     path('', views.top, name='top'),
-    path('all/', views.AllList.as_view(), name='all'),
+    path('all/', views.all_list, name='all'),
     path('<str:line>/<date>/<str:period>/#<int:anchor>', views.KouteiList.as_view(), name='list'),
     path('<str:line>/<date>/<str:period>/', views.KouteiList.as_view(), name='list'),
     url(r'^add/$', views.edit, name='add'),

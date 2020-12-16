@@ -30,9 +30,9 @@ class Process(models.Model):
     processy = models.IntegerField('生産時間', blank=True)
     starty = models.DateTimeField('開始予定', blank=True)
     endy = models.DateTimeField('終了予定', blank=True)
-    start = models.DateTimeField('開始時間', blank=True)
-    end = models.DateTimeField('終了時間', blank=True)
-    change = models.IntegerField('切替時間', blank=True)
+    startj = models.DateTimeField('開始時間', blank=True)
+    endj = models.DateTimeField('終了時間', blank=True)
+    changej = models.IntegerField('切替時間', blank=True)
     status = models.IntegerField('status', default=0)
     kouteicd = models.CharField('識別cd', blank=True, max_length=100)
 

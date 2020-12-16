@@ -84,14 +84,6 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
-# DB に SQLite を使用する場合以下を有効化
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
 
 
 # PostgreSQL を使用 (環境に応じて修正する)
@@ -101,7 +93,7 @@ DATABASES = {
         'NAME': 'postgres',
         'USER': 'postgres',
         'PASSWORD': 'postgres',
-        'HOST': '12.23.1.198',
+        'HOST': '192.168.1.100',
         'PORT': '5432',
     }
 }

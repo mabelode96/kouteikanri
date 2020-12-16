@@ -17,10 +17,10 @@
                     <a href="./?next={{ request.META.HTTP_REFERER }}" class="btn btn-primary">戻る</a>
                 </td>
                 <td>
-                    {% if form.end.value %}
+                    {% if form.endj.value %}
                         <form action="{% url 'kouteikanri:end_none' form.initial.id %}" method="post">
                             {% csrf_token %}
-                            <input type="submit" value="終了を解除" class="btn btn-warning">
+                            <input type="submit" value="終了を解除" class="btn-sm btn-danger">
                         </form>
                     {% endif %}
                 </td>
