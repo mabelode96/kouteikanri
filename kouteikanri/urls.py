@@ -6,6 +6,7 @@ from . import views
 app_name = 'kouteikanri'
 
 urlpatterns = [
+    path('blank.html', views.blank, name='blank'),
     path('', views.top, name='top'),
     path('all/', views.all_list, name='all'),
     path('<str:line>/<date>/<str:period>/#<int:anchor>', views.KouteiList.as_view(), name='list'),

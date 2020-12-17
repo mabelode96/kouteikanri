@@ -6,8 +6,8 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>{% block title %}My Process{% endblock %}</title>
+    <meta name="viewport" content="width=360, initial-scale=1, shrink-to-fit=no">
+    <title>{% block title %}盛付行程進捗管理{% endblock %}</title>
     <!-- Bootstrap -->
     <link href="/static/css/kouteikanri.css" rel="stylesheet">
     <link href="/static/css/bootstrap.min.css" rel="stylesheet">
@@ -25,6 +25,23 @@
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="/static/js/bootstrap.min.js"></script>
     <!-- jsを書く場所 -->
+    <script>
+      $('#btn_start').click(function() {
+        setTimeout(function(){
+          location.reload();
+        },100);
+      });
+      $('#btn_end').click(function() {
+        setTimeout(function(){
+          location.reload();
+        },100);
+      });
+      $('#btn_cancel').click(function() {
+        setTimeout(function(){
+          location.reload();
+        },100);
+      });
+    </script>
     {% block script %}
     {% endblock %}
   </body>

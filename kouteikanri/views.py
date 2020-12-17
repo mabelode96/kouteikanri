@@ -1,11 +1,16 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from .models import Process
-from .forms import KouteiEditForm, KouteiAddForm, MyModelForm
+from .forms import KouteiEditForm, MyModelForm
 from django.views.generic import ListView
 from django.db.models import Q, Max, Min, Sum, Avg, Count
 import datetime
 from django.db import connection
+
+
+# blank
+def blank(request):
+    return render(request, 'kouteikanri/blank.html')
 
 
 # 検索
@@ -26,7 +31,7 @@ def all_list(request):
         "sum(value) AS val_sum, "
         "sum(value * status) AS val_end_sum, "
         "sum(value) - sum(value * status) AS left_val, "
-        "count(value * status) AS left_cnt, "
+        "count(status) - sum(status) AS left_cnt, "
         "max(endy) AS endy_max, "
         "max(endj) AS endj_max, "
         "sum(processy) + sum(changey) - sum(processy * status) + sum(changey * status) AS left_time, "
@@ -223,19 +228,7 @@ def start_or_end(request, id=id):
             koutei.endj = datetime.datetime.now().astimezone()
             koutei.status = 1
             koutei.save()
-    # 一覧のアンカーにジャンプ
-    ancstr = str(koutei.id)
-    return redirect(
-        '{}#'.format(
-            reverse(
-                'kouteikanri:list',kwargs={
-                    'line': koutei.line,
-                    'date': koutei.date,
-                    'period': koutei.period
-                }
-            )
-        ) + ancstr
-    )
+    return render(request, 'kouteikanri/blank.html')
 
 
 # 生産中をキャンセル
@@ -259,10 +252,10 @@ def start_cancel(request, **kwargs):
                 koutei.startj = None
                 koutei.status = 0
                 update_list.append(koutei)
+                ancstr = str(koutei.id)
             # 生産中のデータを一括更新
             Process.objects.bulk_update(update_list, fields=["startj", "status"])
-        return redirect('kouteikanri:list', line, d, period)
-
+        return render(request, 'kouteikanri/blank.html')
 
 # すべての実績をリセット
 def reset_all(request, **kwargs):

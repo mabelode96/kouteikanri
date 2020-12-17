@@ -8,43 +8,43 @@
 
 {% block content %}
 
-<header class="site-header">
-    <table class="table-sm" align="center" style="width: 100%">
-        <tr>
-            <th style="padding: 10px">
-                <a href="{% url 'kouteikanri:top' %}" class="btn btn-primary" id="btn_bak">ライン選択に戻る</a>
+<header class="site-header" xmlns="http://www.w3.org/1999/html">
+    <table class="table-sm table-warning" style="width: 100%">
+        <tr align="left">
+            <th>
+                <a href="{% url 'kouteikanri:top' %}" class="btn-sm btn-primary" id="btn_bak" role="button">ライン選択へ</a>
             </th>
-            <th style="padding: 10px"><h4 align="right">{{ linef }}</h4></th>
-            <th style="padding: 10px"><h4 align="left">{{ periodf }}</h4></th>
-            <th style="padding: 10px"><h4 align="right">{{ datef }}製造</h4></th>
-            <th style="padding: 10px">
+            <th><h5>{{ linef }}</h5></th>
+            <th><h5>{{ periodf }}</h5></th>
+            <th><h5 align="right">{{ datef }}製造</h5></th>
+            <th>
                 <form action="{% url 'kouteikanri:reset_all' linef datef periodf %}" method="post">
                     {% csrf_token %}
                     <input type="text" name="line" value="{{ linef }}" hidden>
                     <input type="text" name="date" value="{{ datef }}" hidden>
                     <input type="text" name="period" value="{{ periodf }}" hidden>
                     <!-- リセットボタン hidden を削除すれば表示されます -->
-                    <input type="submit" value="リセット" class="btn-sm btn-danger">
+                    <input type="submit" value="リセット" class="btn-sm btn-danger" hidden>
                     <!-- リセットボタン ここまで -->
                 </form>
             </th>
         </tr>
     </table>
-    <table class="table-sm table-bordered" align="center" style="width: 98%">
+    <table class="table-sm table-bordered table-secondary" align="center">
         <thead>
-            <tr class="text-center" style="background-color: #F3E2A9; font-size:16px">
+            <tr class="text-center" style="font-size:16px;">
                 <th width="14%">生産高</th>
                 <th width="14%">能率</th>
                 <th width="18%"><span style="color:#4169E1;">終了</span> / 総数</th>
-                <th width="10%">終了<br>予定</th>
-                <th width="8%">切替<br>平均</th>
-                <th width="10%">実際<br>終了</th>
+                <th width="10%">終了予定</th>
+                <th width="8%">切替平均</th>
+                <th width="10%">実際終了</th>
                 <th width="16%">進捗</th>
                 <th width="10%" style="font-size: 14px">生産中を<br>キャンセル</th>
             </tr>
         </thead>
         <tbody>
-            <tr style="background-color: #FFFFFF; font-size:22px" align="center">
+            <tr style="background-color: #FFFFFF;" align="center">
                 <td>{{ sdstr }}</td>
                 <td>{{ nouritsu }}</td>
                 <td>
@@ -78,7 +78,11 @@
                         <input type="text" name="line" value="{{ linef }}" hidden>
                         <input type="text" name="date" value="{{ datef }}" hidden>
                         <input type="text" name="period" value="{{ periodf }}" hidden>
-                        <input type="submit" value="キャンセル" class="btn-sm btn-danger">
+                        {% if cntst == 0 %}
+                            <input type="submit" value="キャンセル" class="btn-sm btn-secondary" disabled>
+                        {% else %}
+                            <input type="submit" value="キャンセル" class="btn-sm btn-warning" id="btn_cancel">
+                        {% endif %}
                     </form>
                 </td>
             </tr>
@@ -87,24 +91,26 @@
 </header>
 
 <div class="site-content">
-    <table class="table-sm table-striped table-bordered" align="left">
+    <table class="table-sm table-striped table-bordered" align="left" style="width: 100%;">
         <thead class="table">
-            <tr class="text-center" style="font-size:16px">
-                <th width="3%">便</th>
-                <th width="5%">区分</th>
-                <th width="20%">製品名</th>
-                <th width="6%">数量</th>
-                <!--<th width="6%">開始<br>予定</th>-->
-                <th width="7%">能力<br>1h</th>
-                <th width="7%">終了<br>予定</th>
-                <th width="6%">生産<br>予定</th>
-                <th width="7%">開始<br>時間</th>
-                <th width="7%">終了<br>時間</th>
-                <th width="6%">生産<br>時間</th>
-                <th width="6%">差</th>
-                <th width="6%">切替<br>時間</th>
-                <th width="14%">操作</th>
+            <tr class="text-center">
+                <th width="8%;">開始終了</th>
+                <th>便</th>
+                <th>区分</th>
+                <th>製品名</th>
+                <th>数量</th>
+                <!--<th>開始<br>予定</th>-->
+                <th>能力1h</th>
+                <th>終了予定</th>
+                <th>生産予定</th>
+                <th>開始時間</th>
+                <th>終了時間</th>
+                <th>生産時間</th>
+                <th>差</th>
+                <th>切替時間</th>
+                <th width="8%;">操作</th>
             </tr>
+        </thead>
         <tbody>
             {% for koutei in kouteis %}
             {% if koutei.status == 0 %}
@@ -116,6 +122,32 @@
             {% else %}
                 <tr>
             {% endif %}
+                    <td class="text-center">
+                        <!-- 開始・終了ボタン -->
+                        <form action="{% url 'kouteikanri:start_or_end' id=koutei.id %}" method="get" class="form_start" target="_blank">
+                            {% if koutei.status == 1 %}
+                                <!-- 終了済 -->
+                                <input type="submit" class="btn btn-secondary" value="終了" disabled>
+                            {% elif koutei.status == 0 %}
+                                {% if koutei.endj %}
+                                    <!-- 通常は通らない　-->
+                                    <input type="submit" class="btn btn-danger" value="終了">
+                                {% else %}
+                                    {% if koutei.startj %}
+                                        <!-- 通常の終了のパターン（生産中） -->
+                                        <input type="submit" class="btn btn-danger" id="btn_end" value="終了">
+                                    {% else %}
+                                        <!-- 通常の開始のパターン -->
+                                        {% if cntst == 0 %}
+                                            <input type="submit" class="btn btn-success" id="btn_start" value="開始">
+                                        {% else %}
+                                            <input type="button" class="btn btn-success active" value="開始" data-toggle="modal" data-target="#testModal">
+                                        {% endif %}
+                                    {% endif %}
+                                {% endif %}
+                            {% endif %}
+                        </form>
+                    </td>
                     <td class="text-right">{% if koutei.bin %}{{ koutei.bin }}{% endif %}</td>
                     <td>{% if koutei.kubun %}{{koutei.kubun }}{% endif %}</td>
                     <td id="{{ koutei.id }}">{{ koutei.name }}</td>
@@ -145,35 +177,15 @@
                         {% endif %}
                     </td>
                     <td class="text-right">{% if koutei.changej %}{{ koutei.changej }}{% endif %}</td>
-                    <td class="text-right">
-                        <!-- 開始・終了ボタン -->
-                        {% if koutei.status == 1 %}
-                            <!-- 終了済 -->
-                            <a href="{% url 'kouteikanri:start_or_end' id=koutei.id %}" class="btn btn-secondary">終了</a>
-                        {% elif koutei.status == 0 %}
-                            {% if koutei.endj %}
-                                <!-- 通常は通らない　-->
-                                <a href="{% url 'kouteikanri:start_or_end' id=koutei.id %}" class="btn btn-danger">終了</a>
-                            {% else %}
-                                {% if koutei.startj %}
-                                    <!-- 通常の終了のパターン（生産中） -->
-                                    <a href="{% url 'kouteikanri:start_or_end' id=koutei.id %}" class="btn btn-danger">終了</a>
-                                {% else %}
-                                    <!-- 通常の開始のパターン -->
-                                    {% if cntst == 0 %}
-                                        <a href="{% url 'kouteikanri:start_or_end' id=koutei.id %}" class="btn btn-success">開始</a>
-                                    {% else %}
-                                        <button type="button" class="btn-success btn active" data-toggle="modal" data-target="#testModal">開始</button>
-                                    {% endif %}
-                                {% endif %}
-                            {% endif %}
-                        {% endif %}
+                    <td>
                         <!-- 編集ボタン -->
-                        {% if cntst == 0 %}
-                            <a href="{% url 'kouteikanri:edit' id=koutei.id %}" class="btn btn-primary">編集</a>
-                        {% else %}
-                            <button type="button" class="btn-primary btn active" data-toggle="modal" data-target="#testModal">編集</button>
-                        {% endif %}
+                        <form action="{% url 'kouteikanri:edit' id=koutei.id %}">
+                            {% if cntst == 0 %}
+                                <input type="submit" class="btn btn-primary" value="編集">
+                            {% else %}
+                                <input type="button" class="btn btn-primary active" value="編集" data-toggle="modal" data-target="#testModal">
+                            {% endif %}
+                        </form>
                     </td>
                 </tr>
             {% endfor %}
