@@ -151,12 +151,14 @@
                         {% if koutei.bin == 1 %}
                             <td class="text-right" bgcolor="khaki">
                         {% elif koutei.bin == 2 %}
-                            <td class="text-right" bgcolor="deeppink">
+                            <td class="text-right" bgcolor="coral">
                         {% elif koutei.bin == 3 %}
                             <td class="text-right" bgcolor="deepskyblue">
                         {% else %}
                             <td>
                         {% endif %}
+                    {% else %}
+                        <td>
                     {% endif %}
                         {{ koutei.bin }}
                     </td>
