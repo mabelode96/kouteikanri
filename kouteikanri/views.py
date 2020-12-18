@@ -38,7 +38,7 @@ def all_list(request):
         "FROM kouteikanri_process "
         "WHERE date='" + dt_str + "' "
         "GROUP BY line, period "
-        "ORDER BY period, line;"
+        "ORDER BY period DESC, line;"
     )
     emp_list=exec_query(sql_text)
     return render(request, 'kouteikanri/all.html', {'emp_list': emp_list, 'date': dt_str})
