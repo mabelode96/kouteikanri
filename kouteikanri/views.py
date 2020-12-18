@@ -37,7 +37,7 @@ def all_list(request):
         "sum(value * status) * 100 / sum(value) AS progress "
         "FROM kouteikanri_process "
         "WHERE date='" + dt_str + "' "
-        "GROUP BY line, period"
+        "GROUP BY line, period "
         "ORDER BY period, line;"
     )
     emp_list=exec_query(sql_text)
