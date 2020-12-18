@@ -123,7 +123,7 @@
             {% endif %}
                     <td class="text-center">
                         <!-- 開始・終了ボタン -->
-                        <form action="{% url 'kouteikanri:start_or_end' id=koutei.id %}" method="get" class="form_start" target="_blank">
+                        <form action="{% url 'kouteikanri:start_or_end' id=koutei.id %}" method="get" class="form_start">
                             {% if koutei.status == 1 %}
                                 <!-- 終了済 -->
                                 <input type="submit" class="btn btn-secondary" value="終了" disabled>
@@ -147,7 +147,19 @@
                             {% endif %}
                         </form>
                     </td>
-                    <td class="text-right">{% if koutei.bin %}{{ koutei.bin }}{% endif %}</td>
+                    {% if koutei.bin %}
+                        {% if koutei.bin == 1 %}
+                            <td class="text-right" bgcolor="khaki">
+                        {% elif koutei.bin == 2 %}
+                            <td class="text-right" bgcolor="deeppink">
+                        {% elif koutei.bin == 3 %}
+                            <td class="text-right" bgcolor="deepskyblue">
+                        {% else %}
+                            <td>
+                        {% endif %}
+                    {% endif %}
+                        {{ koutei.bin }}
+                    </td>
                     <td>{% if koutei.kubun %}{{koutei.kubun }}{% endif %}</td>
                     <td id="{{ koutei.id }}">{{ koutei.name }}</td>
                     <td class="text-right">{% if koutei.value %}{{ koutei.value }}{% endif %}</td>

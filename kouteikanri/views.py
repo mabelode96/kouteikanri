@@ -37,7 +37,8 @@ def all_list(request):
         "sum(value * status) * 100 / sum(value) AS progress "
         "FROM kouteikanri_process "
         "WHERE date='" + dt_str + "' "
-        "GROUP BY line, period;"
+        "GROUP BY line, period"
+        "ORDER BY period, line;"
     )
     emp_list=exec_query(sql_text)
     return render(request, 'kouteikanri/all.html', {'emp_list': emp_list, 'date': dt_str})
@@ -255,6 +256,7 @@ def start_cancel(request, **kwargs):
             # 生産中のデータを一括更新
             Process.objects.bulk_update(update_list, fields=["startj", "status"])
         return render(request, 'kouteikanri/blank.html')
+
 
 # すべての実績をリセット
 def reset_all(request, **kwargs):
