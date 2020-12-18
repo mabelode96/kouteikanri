@@ -4,41 +4,39 @@
 {% block title %}工程の編集{% endblock title %}
 
 {% block content %}
-
-    <table>
-        <thead>
-            <tr>
-                <td><h5>工程の編集</h5></td>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>
-                    <a href="./?next={{ request.META.HTTP_REFERER }}" class="btn btn-primary" role="button">戻る</a>
-                </td>
-                <td>
-                    {% if form.endj.value %}
-                        <form action="{% url 'kouteikanri:end_none' form.initial.id %}" method="post">
-                            {% csrf_token %}
-                            <input type="submit" value="終了を解除" class="btn-sm btn-danger">
-                        </form>
-                    {% endif %}
-                </td>
-            </tr>
-        </tbody>
-    </table>
+<table>
+    <thead>
+    <tr>
+        <td><h5>工程の編集</h5></td>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>
+            <a href="./?next={{ request.META.HTTP_REFERER }}" class="btn btn-primary" role="button">戻る</a>
+        </td>
+        <td>
+            {% if form.endj.value %}
+            <form action="{% url 'kouteikanri:end_none' form.initial.id %}" method="post">
+                {% csrf_token %}
+                <input type="submit" value="終了を解除" class="btn-sm btn-danger">
+            </form>
+            {% endif %}
+        </td>
+    </tr>
+    </tbody>
+</table>
 
 <hr>
 
-    <form action="./?next={{ request.META.HTTP_REFERER }}" method="post"
-          class="form-horizontal" role="form">
-        {% csrf_token %}
-        {{ form|bootstrap_horizontal }}
-        <div class="form-group">
-            <div class="col-sm-offset-2 col-sm-10">
-                <button type="submit" class="btn btn-primary">更新</button>
-            </div>
+<form action="./?next={{ request.META.HTTP_REFERER }}" method="post"
+      class="form-horizontal" role="form">
+    {% csrf_token %}
+    {{ form|bootstrap_horizontal }}
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <button type="submit" class="btn btn-primary">更新</button>
         </div>
-    </form>
-
+    </div>
+</form>
 {% endblock content %}

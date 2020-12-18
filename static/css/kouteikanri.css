@@ -3,15 +3,15 @@ margin: 0px;
 padding: 0px;
 }
 
-.site-header, .site-content{
-display: block;
+body{
+width: 95%;
+max-width: 1200px;
+min-width: 500px;
+margin: 0px auto;
 }
 
-body{
-width: 75%;
-max-width: 1200px;
-min-width: 600px;
-margin: 0px auto;
+.site-header, .site-content{
+display: block;
 }
 
 .site-header{
@@ -28,7 +28,7 @@ top: 0px;
 .site-content{
 position: absolute;
 z-index: 10;
-padding-top: 270px;
+padding-top: 200px;
 width: 96%;
 }
 

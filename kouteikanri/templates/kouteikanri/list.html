@@ -7,12 +7,11 @@
 {% endblock title %}
 
 {% block content %}
-
-<header class="site-header" xmlns="http://www.w3.org/1999/html">
+<header class="site-header">
     <table class="table-sm table-warning" style="width: 100%">
         <tr align="left">
             <th>
-                <a href="{% url 'kouteikanri:top' %}" class="btn-sm btn-primary" id="btn_bak" role="button">ライン選択へ</a>
+                <a href="{% url 'kouteikanri:top' %}" class="btn btn-primary" id="btn_bak" role="button">ライン選択へ</a>
             </th>
             <th><h5>{{ linef }}</h5></th>
             <th><h5>{{ periodf }}</h5></th>
@@ -44,7 +43,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr style="background-color: #FFFFFF;" align="center">
+            <tr style="background-color: #FFFFFF; font-size:20px;" align="center">
                 <td>{{ sdstr }}</td>
                 <td>{{ nouritsu }}</td>
                 <td>

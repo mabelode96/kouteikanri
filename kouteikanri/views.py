@@ -23,9 +23,8 @@ def top(request):
 # 参考url: https://qiita.com/t-iguchi/items/827865481e82bb32ad04
 def all_list(request):
     # 製造日は当日固定
-    # date = datetime.datetime.now().astimezone() - datetime.timedelta(hours=7)
-    # dt_str = date.strftime("%Y-%m-%d")
-    dt_str = '2020-12-08'
+    date = datetime.datetime.now().astimezone() - datetime.timedelta(hours=7)
+    dt_str = date.strftime("%Y-%m-%d")
     sql_text = (
         "SELECT line, period, "
         "sum(value) AS val_sum, "
