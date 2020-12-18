@@ -151,16 +151,16 @@
                         {% if koutei.bin == 1 %}
                             <td class="text-right" bgcolor="khaki">
                         {% elif koutei.bin == 2 %}
-                            <td class="text-right" bgcolor="coral">
+                            <td class="text-right" bgcolor="hotpink">
                         {% elif koutei.bin == 3 %}
                             <td class="text-right" bgcolor="deepskyblue">
                         {% else %}
                             <td>
                         {% endif %}
+                        {{ koutei.bin }}
                     {% else %}
                         <td>
                     {% endif %}
-                        {{ koutei.bin }}
                     </td>
                     <td>{% if koutei.kubun %}{{koutei.kubun }}{% endif %}</td>
                     <td id="{{ koutei.id }}">{{ koutei.name }}</td>
