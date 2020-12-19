@@ -29,7 +29,5 @@ def comp_time(end, left):
     h = int((lm - d * 1440) / 60)
     m = int((lm - d * 1440) - h * 60)
     s = ((lm - d * 1440) - h * 60) - m
-    print(lm, d, h, m, s)
-    print(datetime.timedelta(days=d, hours=h, minutes=m, seconds=s))
     td = et + datetime.timedelta(days=d, hours=h, minutes=m, seconds=s)
     return td

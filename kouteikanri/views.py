@@ -150,7 +150,6 @@ class KouteiList(ListView):
             Q(period__exact=self.kwargs['period']))
 
     def post(self, request, **kwargs):
-        print(request.POST)
         line = request.POST['line']
         date = request.POST['date']
         period = request.POST['period']
@@ -228,7 +227,8 @@ def start_or_end(request, id=id):
             koutei.endj = datetime.datetime.now().astimezone()
             koutei.status = 1
             koutei.save()
-    return render(request, 'kouteikanri/blank.html')
+    return redirect('kouteikanri:list', koutei.line, koutei.date, koutei.period)
+
 
 
 # 生産中をキャンセル
@@ -255,7 +255,7 @@ def start_cancel(request, **kwargs):
                 ancstr = str(koutei.id)
             # 生産中のデータを一括更新
             Process.objects.bulk_update(update_list, fields=["startj", "status"])
-        return render(request, 'kouteikanri/blank.html')
+        return redirect('kouteikanri:list', line, d, period)
 
 
 # すべての実績をリセット
