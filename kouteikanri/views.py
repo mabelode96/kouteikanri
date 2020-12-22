@@ -250,6 +250,7 @@ def start_cancel(request, **kwargs):
         if kouteis.count() > 0:
             for koutei in kouteis:
                 koutei.startj = None
+                koutei.changej = None
                 koutei.status = 0
                 update_list.append(koutei)
                 ancstr = str(koutei.id)
