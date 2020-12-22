@@ -15,16 +15,16 @@ def blank(request):
 
 # 検索
 def top(request):
-    f = MyModelForm()
+    # 初期値を設定
+    d = Process.objects.all().aggregate(Max('date'))
+    f = MyModelForm(initial={'date': d['date__max']})
     return render(request, 'kouteikanri/top.html', {'form1': f})
 
 
 # 全ライン一覧
 # 参考url: https://qiita.com/t-iguchi/items/827865481e82bb32ad04
 def all_list(request):
-    # 製造日は当日固定
-    date = datetime.datetime.now().astimezone() - datetime.timedelta(hours=7)
-    dt_str = date.strftime("%Y-%m-%d")
+    date = request.POST['date']
     sql_text = (
         "SELECT line, period, "
         "sum(value) AS val_sum, "
@@ -36,12 +36,12 @@ def all_list(request):
         "sum(processy) + sum(changey) - sum(processy * status) + sum(changey * status) AS left_time, "
         "sum(value * status) * 100 / sum(value) AS progress "
         "FROM kouteikanri_process "
-        "WHERE date='" + dt_str + "' "
+        "WHERE date='" + date + "' "
         "GROUP BY line, period "
         "ORDER BY period DESC, line;"
     )
     emp_list=exec_query(sql_text)
-    return render(request, 'kouteikanri/all.html', {'emp_list': emp_list, 'date': dt_str})
+    return render(request, 'kouteikanri/all.html', {'emp_list': emp_list, 'date': date})
 
 
 # cursor.descriptionでフィールド名を配列にセットして、resultsにフィールド名を付加
@@ -265,14 +265,9 @@ def reset_all(request, **kwargs):
         update_list = []
         line = request.POST['line']
         date = request.POST['date']
-        dt = datetime.datetime.strptime(date, '%Y年%m月%d日')
-        if dt is None:
-            d = datetime.datetime.now().strftime("%Y-%m-%d")
-        else:
-            d = dt.strftime("%Y-%m-%d")
         period = request.POST['period']
         kouteis = Process.objects.all().filter(
-            Q(line__exact=line) & Q(date__exact=d) & Q(period__exact=period)
+            Q(line__exact=line) & Q(date__exact=date) & Q(period__exact=period)
         )
         if kouteis.count() > 0:
             for koutei in kouteis:
@@ -283,7 +278,7 @@ def reset_all(request, **kwargs):
                 update_list.append(koutei)
             # 工程のデータを一括更新
             Process.objects.bulk_update(update_list, fields=["startj", "endj", "changej", "status"])
-        return redirect('kouteikanri:list', line, d, period)
+        return redirect('kouteikanri:list', line, date, period)
         # 戻ったほうが良い？
         # return redirect(request.META.get('HTTP_REFERER', '/'))
 

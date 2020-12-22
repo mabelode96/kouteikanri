@@ -11,7 +11,11 @@
     <table class="table-sm table-warning" style="width: 100%">
         <tr align="left">
             <th>
-                <a href="{% url 'kouteikanri:top' %}" class="btn btn-primary" id="btn_bak" role="button">ライン選択へ</a>
+                <form action="{% url 'kouteikanri:all' %}" method="post">
+                    {% csrf_token %}
+                    <input type="text" name="date" value="{{ datef|str_to_date }}" hidden>
+                    <input type="submit" value="全ライン一覧へ" class="btn btn-primary">
+                </form>
             </th>
             <th><h5>{{ linef }}</h5></th>
             <th><h5>{{ periodf }}</h5></th>
@@ -20,7 +24,7 @@
                 <form action="{% url 'kouteikanri:reset_all' linef datef periodf %}" method="post">
                     {% csrf_token %}
                     <input type="text" name="line" value="{{ linef }}" hidden>
-                    <input type="text" name="date" value="{{ datef }}" hidden>
+                    <input type="text" name="date" value="{{ datef|str_to_date }}" hidden>
                     <input type="text" name="period" value="{{ periodf }}" hidden>
                     <!-- リセットボタン hidden を削除すれば表示されます -->
                     <input type="submit" value="リセット" class="btn-sm btn-danger" hidden>

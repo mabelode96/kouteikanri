@@ -1,12 +1,10 @@
 from django.conf.urls import url
 from django.urls import path
-
 from . import views
 
 app_name = 'kouteikanri'
 
 urlpatterns = [
-    path('blank.html', views.blank, name='blank'),
     path('', views.top, name='top'),
     path('all/', views.all_list, name='all'),
     path('<str:line>/<date>/<str:period>/#<int:anchor>', views.KouteiList.as_view(), name='list'),
@@ -18,4 +16,5 @@ urlpatterns = [
     path('start_cancel/<str:line>/<date>/<str:period>/', views.start_cancel, name='start_cancel'),
     url(r'^end_none/(?P<id>\d+)/$', views.end_none, name='end_none'),
     path('reset_all/<str:line>/<date>/<str:period>/', views.reset_all, name='reset_all'),
+    path('blank.html', views.blank, name='blank'),
 ]

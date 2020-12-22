@@ -7,28 +7,13 @@
 {% block content %}
 <br>
 <h1 align="center">盛付工程進捗管理</h1>
-<form>
-    <a href="{% url 'kouteikanri:all' %}" class="btn btn-info" id="btn_bak">全ライン工程一覧へ</a>
-</form>
 <hr>
-<form action="{% url 'kouteikanri:list' None None None %}" method="post">
+<form action="{% url 'kouteikanri:all' %}" method="post">
     {% csrf_token %}
-    <div class="input-group-lg mb-3">
-        <div class="input-group-prepend">
-            <label class="input-group-text">ライン</label>
-            {{ form1.line }}
-        </div>
-    </div>
     <div class="input-group-lg mb-3">
         <div class="input-group-prepend">
             <label class="input-group-text">製造日</label>
             {{ form1.date }}
-        </div>
-    </div>
-    <div class="input-group-lg mb-3">
-        <div class="input-group-prepend">
-            <label class="input-group-text">時間帯</label>
-            {{ form1.period }}
         </div>
     </div>
     <div align="right">

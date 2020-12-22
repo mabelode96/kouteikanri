@@ -31,3 +31,9 @@ def comp_time(end, left):
     s = ((lm - d * 1440) - h * 60) - m
     td = et + datetime.timedelta(days=d, hours=h, minutes=m, seconds=s)
     return td
+
+
+@register.filter(name="str_to_date")
+def str_to_date(date_str):
+    d = datetime.datetime.strptime(date_str, "%Y年%m月%d日")
+    return d.strftime("%Y-%m-%d")
