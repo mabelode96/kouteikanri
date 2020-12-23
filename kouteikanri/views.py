@@ -230,7 +230,6 @@ def start_or_end(request, id=id):
     return redirect('kouteikanri:list', koutei.line, koutei.date, koutei.period)
 
 
-
 # 生産中をキャンセル
 def start_cancel(request, **kwargs):
     # POST

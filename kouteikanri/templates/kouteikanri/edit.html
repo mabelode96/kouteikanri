@@ -4,9 +4,7 @@
 {% block title %}工程の編集{% endblock title %}
 
 {% block content %}
-<table>
-    <thead></thead>
-    <tbody>
+<table class="table-sm">
     <tr>
         <td>
             <a href="./?next={{ request.META.HTTP_REFERER }}" class="btn btn-primary" role="button">戻る</a>
@@ -20,11 +18,8 @@
             {% endif %}
         </td>
     </tr>
-    </tbody>
 </table>
-
 <hr>
-
 <form action="./?next={{ request.META.HTTP_REFERER }}" method="post"
       class="form-horizontal" role="form">
     {% csrf_token %}
