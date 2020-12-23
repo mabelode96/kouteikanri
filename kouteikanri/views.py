@@ -238,7 +238,7 @@ def start_cancel(request, **kwargs):
         update_list = []
         line = request.POST['line']
         date = request.POST['date']
-        dt = datetime.datetime.strptime(date, '%Y年%m月%d日')
+        dt = datetime.datetime.strptime(date, '%Y年%#m月%#d日')
         if dt is None:
             d = datetime.datetime.now().strftime("%Y-%m-%d")
         else:
