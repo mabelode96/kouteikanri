@@ -24,8 +24,8 @@
     <table class="table table-striped table-bordered" style="width: 100%;">
         <thead class="table-sm" align="center">
         <tr>
-            <th><label for="line">ライン名</label></th>
             <th><label for="period">時間帯</label></th>
+            <th><label for="line">ライン名</label></th>
             <th><label for="val_sum">数量</label></th>
             <th><label for="left_val">残り(品)</label></th>
             <th><label for="left_time">残り時間</label></th>
@@ -40,34 +40,24 @@
         <tr>
             {% if data.period == '昼勤' %}
             <td bgcolor="mistyrose">
-                <div id="line">
-                    <a href="{% url 'kouteikanri:list' data.line date data.period %}">{{ data.line }}</a>
-                </div>
-            </td>
-            <td bgcolor="mistyrose">
                 <div id="period">{{ data.period }}</div>
             </td>
             {% else %}
             {% if data.period == '夜勤' %}
             <td bgcolor="azure">
-                <div id="line">
-                    <a href="{% url 'kouteikanri:list' data.line date data.period %}">{{ data.line }}</a>
-                </div>
-            </td>
-            <td bgcolor="azure">
                 <div id="period">{{ data.period }}</div>
             </td>
             {% else%}
             <td>
-                <div id="line">
-                    <a href="{% url 'kouteikanri:list' data.line date data.period %}">{{ data.line }}</a>
-                </div>
-            </td>
-            <td>
                 <div id="period">{{ data.period }}</div>
             </td>
             {% endif %}
             {% endif %}
+            <td>
+                <div id="line">
+                    <a href="{% url 'kouteikanri:list' data.line date data.period %}">{{ data.line }}</a>
+                </div>
+            </td>
             <td><div id="val_sum" align="right">{{ data.val_sum }}個</div></td>
             <td>
                 {% if data.left_cnt == 0 %}
