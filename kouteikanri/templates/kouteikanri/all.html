@@ -37,12 +37,36 @@
         <tbody>
         {% for data in emp_list %}
         <tr>
+            {% if data.period == '昼勤' %}
+            <td bgcolor="mistyrose">
+                <div id="line">
+                    <a href="{% url 'kouteikanri:list' data.line date data.period %}">{{ data.line }}</a>
+                </div>
+            </td>
+            <td bgcolor="mistyrose">
+                <div id="period">{{ data.period }}</div>
+            </td>
+            {% else %}
+            {% if data.period == '夜勤' %}
+            <td bgcolor="azure">
+                <div id="line">
+                    <a href="{% url 'kouteikanri:list' data.line date data.period %}">{{ data.line }}</a>
+                </div>
+            </td>
+            <td bgcolor="azure">
+                <div id="period">{{ data.period }}</div>
+            </td>
+            {% else%}
             <td>
                 <div id="line">
                     <a href="{% url 'kouteikanri:list' data.line date data.period %}">{{ data.line }}</a>
                 </div>
             </td>
-            <td><div id="period">{{ data.period }}</div></td>
+            <td>
+                <div id="period">{{ data.period }}</div>
+            </td>
+            {% endif %}
+            {% endif %}
             <td><div id="val_sum" align="right">{{ data.val_end_sum }} / {{ data.val_sum }}個</div></td>
             <td>
                 {% if data.left_cnt == 0 %}
