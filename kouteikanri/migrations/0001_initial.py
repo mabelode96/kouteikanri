@@ -38,8 +38,8 @@ class Migration(migrations.Migration):
                 ('startj', models.DateTimeField(blank=True, verbose_name='開始時間')),
                 ('endj', models.DateTimeField(blank=True, verbose_name='終了時間')),
                 ('changej', models.IntegerField(blank=True, verbose_name='切替時間')),
+                ('processj', models.IntegerField(blank=True, verbose_name='実際時間')),
                 ('status', models.IntegerField(default=0, verbose_name='status')),
-                ('kouteicd', models.CharField(blank=True, max_length=100, verbose_name='識別cd')),
             ],
         ),
         migrations.AlterModelTable(

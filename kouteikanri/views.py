@@ -1,5 +1,4 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.urls import reverse
 from .models import Process
 from .forms import KouteiEditForm, MyModelForm
 from django.views.generic import ListView
@@ -33,10 +32,11 @@ def all_list(request):
         "count(status) - sum(status) AS left_cnt, "
         "max(endy) AS endy_max, "
         "max(endj) AS endj_max, "
-        "sum(processy) + sum(changey) - sum(processy * status) + sum(changey * status) AS left_time, "
+        "(sum(processy) + sum(changey)) - (sum(processy * status) + sum(changey * status)) AS left_time, "
+        "(sum(processj) + sum(changej)) - (sum(processy * status) + sum(changey * status)) AS real_time, "
         "sum(value * status) * 100 / sum(value) AS progress "
         "FROM kouteikanri_process "
-        "WHERE date='" + date + "' "
+        "WHERE date='" + date + "' AND name <> '予備' "
         "GROUP BY line, period "
         "ORDER BY period DESC, line;"
     )
@@ -189,6 +189,7 @@ def end_none(request, id=id):
     if request.method == 'POST':
         koutei.endj = None
         # 終了を解除、開始はそのまま
+        koutei.processj = None
         koutei.status = 0
         koutei.save()
     return redirect('kouteikanri:list', koutei.line, koutei.date, koutei.period)
@@ -225,6 +226,7 @@ def start_or_end(request, id=id):
     else:
         if koutei.endj is None:
             koutei.endj = datetime.datetime.now().astimezone()
+            koutei.processj = get_stime(koutei.startj, koutei.endj)
             koutei.status = 1
             koutei.save()
     return redirect('kouteikanri:list', koutei.line, koutei.date, koutei.period)
@@ -254,7 +256,8 @@ def start_cancel(request, **kwargs):
                 update_list.append(koutei)
                 ancstr = str(koutei.id)
             # 生産中のデータを一括更新
-            Process.objects.bulk_update(update_list, fields=["startj", "status"])
+            Process.objects.bulk_update(
+                update_list, fields=["changej", "startj", "status"])
         return redirect('kouteikanri:list', line, d, period)
 
 

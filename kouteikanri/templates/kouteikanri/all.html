@@ -26,12 +26,13 @@
         <tr>
             <th><label for="line">ライン名</label></th>
             <th><label for="period">時間帯</label></th>
-            <th><label for="val_sum">終了数 / 総数</label></th>
-            <th><label for="left_val">残り</label></th>
-            <!-- <th><label for="left_time">残り<br>時間</label></th> -->
+            <th><label for="val_sum">数量</label></th>
+            <th><label for="left_val">残り(品)</label></th>
+            <th><label for="left_time">残り時間</label></th>
             <th><label for="endy_max">終了予定</label></th>
             <th><label for="comp_time">実際終了</label></th>
-            <th><label for="progress">進捗</label></th>
+            <th><label for="real_time">進捗</label></th>
+            <th><label for="progress">進捗率</label></th>
         </tr>
         </thead>
         <tbody>
@@ -67,20 +68,34 @@
             </td>
             {% endif %}
             {% endif %}
-            <td><div id="val_sum" align="right">{{ data.val_end_sum }} / {{ data.val_sum }}個</div></td>
+            <td><div id="val_sum" align="right">{{ data.val_sum }}個</div></td>
             <td>
                 {% if data.left_cnt == 0 %}
                 <div style="color: royalblue;" align="center">完了</div>
                 {% else %}
-                <div id="left_val" align="right">{{ data.left_val }}個({{ data.left_cnt }}品)</div>
+                <div id="left_val" align="right">{{ data.left_val }}個({{ data.left_cnt }})</div>
                 {% endif %}
             </td>
-            <!-- <td><div id="left_time" align="right">{{ data.left_time }}分</div></td> -->
+            <td><div id="left_time" align="right">{{ data.left_time }}分</div></td>
             <td><div id="endy_max" align="right">{{ data.endy_max|date:"G:i" }}</div></td>
             <td><div id="comp_time" align="right">{{ data.endj_max|comp_time:data.left_time|date:"G:i" }}</div></td>
+            <td>
+                {% if data.real_time == None %}
+                {% else %}
+                {% if data.real_time == 0 %}
+                <div id="real_time" align="right">±0分</div>
+                {% else %}
+                {% if data.real_time > 0 %}
+                <div id="real_time" align="right" style="color: red;">-{{ data.real_time }}分</div>
+                {% else %}
+                <div id="real_time" align="right" style="color: blue;">+{{ data.real_time|mul:-1 }}分</div>
+                {% endif %}
+                {% endif %}
+                {% endif %}
+            </td>
             <td style="width: 15%;">
                 <div id="progress" class="progress">
-                    <div class="progress-bar {% if data.progress == 100 %}bg-success{%else%}progress-bar-striped progress-bar-animated{% endif %}"
+                    <div class="progress-bar {% if data.progress == 100 %}bg-success{% else %}progress-bar-striped progress-bar-animated{% endif %}"
                          role="progressbar"
                          style="width: {{data.progress}}%;"
                          aria-valuenow="{{data.progress}}"
