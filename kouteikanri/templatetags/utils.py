@@ -43,3 +43,18 @@ def str_to_date(date_str):
 def date_to_str(date_str):
     d = datetime.datetime.strptime(date_str, "%Y-%m-%d")
     return d.strftime("%Y年%#m月%#d日")
+
+
+@register.filter(name="get_nouryoku")
+def get_nouryoku(value, process):
+    if value is not None:
+        if process is not None:
+            try:
+                n = round(value / (process / 60))
+                return n
+            except ZeroDivisionError:
+                return 0
+        else:
+            return 0
+    else:
+        return 0

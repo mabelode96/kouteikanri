@@ -110,6 +110,7 @@
                 <th>終了時間</th>
                 <th>生産時間</th>
                 <th>差</th>
+                <th>生産能力</th>
                 <th>切替時間</th>
                 <th width="8%;"></th>
             </tr>
@@ -193,6 +194,7 @@
                             {% endif %}
                         {% endif %}
                     </td>
+                    <td align="right">{{ koutei.value|get_nouryoku:koutei.processj }}</td>
                     <td class="text-right">{% if koutei.changej %}{{ koutei.changej }}{% endif %}</td>
                     <td>
                         <!-- 編集ボタン -->
