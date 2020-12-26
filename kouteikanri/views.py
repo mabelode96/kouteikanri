@@ -76,6 +76,7 @@ class KouteiList(ListView):
         ql = Q(line__exact=ln)
         qd = Q(date__exact=dt)
         qp = Q(period__exact=pr)
+        qs = Q(status__exact=1)
         # ライン名 ========================================================================
         ctx['linef'] = self.kwargs['line']
         # 製造日 ==========================================================================
@@ -100,13 +101,13 @@ class KouteiList(ListView):
         ctx['sdstr'] = sdstr
         # 能率 =============================================================================
         stfavg = Process.objects.all().filter(
-            ql & qd & qp & Q(status__exact=1)).aggregate(Avg('staff'))
+            ql & qd & qp & qs).aggregate(Avg('staff'))
         if stfavg['staff__avg'] is None:
             jin = 0
         else:
             jin = stfavg['staff__avg']
         sdEnd = Process.objects.all().filter(
-            ql & qd & qp & Q(status__exact=1)).aggregate(Sum('seisand'))
+            ql & qd & qp & qs).aggregate(Sum('seisand'))
         if sdEnd['seisand__sum'] is None:
             sdE = 0
         else:
@@ -136,10 +137,21 @@ class KouteiList(ListView):
         # 終了予測 ======================================================================
         ctx['comptime'] = comp_time(ln, dt, pr)
         # 進捗 ==========================================================================
-        if endy_max(ln, dt, pr) is None:
-            progress = 0
-        else:
-            progress = get_stime(comp_time(ln, dt, pr), endy_max(ln, dt, pr))
+#        if endy_max(ln, dt, pr) is None:
+#            progress = 0
+#        else:
+#            progress = get_stime(comp_time(ln, dt, pr), endy_max(ln, dt, pr))
+#        ctx['progress'] = progress
+        p_j = Process.objects.filter(
+            ql & qd & qp & ~Q(name__exact='予備')).aggregate(Sum('processj'))
+        c_j = Process.objects.filter(
+            ql & qd & qp & ~Q(name__exact='予備')).aggregate(Sum('changej'))
+        p_y = Process.objects.filter(
+            ql & qd & qp & qs & ~Q(name__exact='予備')).aggregate(Sum('processy'))
+        c_y = Process.objects.filter(
+            ql & qd & qp & qs & ~Q(name__exact='予備')).aggregate(Sum('changey'))
+        progress = (p_j['processj__sum'] + c_j['changej__sum']) - (
+                p_y['processy__sum'] + c_y['changey__sum'])
         ctx['progress'] = progress
         return ctx
 
@@ -154,6 +166,106 @@ class KouteiList(ListView):
         date = request.POST['date']
         period = request.POST['period']
         return redirect('kouteikanri:list', line, date, period)
+
+
+# 「総数」を計算する関数
+def value_sum(line, date, period):
+    koutei = Process.objects.filter(
+        Q(line__exact=line) & Q(date__exact=date) & Q(period__exact=period)
+    )
+    if koutei.count() == 0:
+        return 0
+    else:
+        return koutei.aggregate(Sum('value'))
+
+
+# 「終了数」を計算する関数
+def value_end(line, date, period):
+    koutei = Process.objects.filter(
+        Q(line__exact=line) & Q(date__exact=date) & Q(period__exact=period) &
+        Q(status__exact=1)
+    )
+    if koutei.count() == 0:
+        return 0
+    else:
+        return koutei.aggregate(Sum('value'))
+
+
+# 「切替平均」を計算する関数
+def changej_avg(line, date, period):
+    koutei = Process.objects.filter(
+        Q(line__exact=line) & Q(date__exact=date) & Q(period__exact=period)
+    )
+    if koutei.count() == 0:
+        return 0
+    else:
+        return koutei.aggregate(Avg('changej'))
+
+
+# 「終了予定」を取得する関数
+def endy_max(line, date, period):
+    koutei = Process.objects.filter(
+        Q(line__exact=line) & Q(date__exact=date) & Q(period__exact=period)
+    )
+    if koutei.count() == 0:
+        return None
+    else:
+        ym = koutei.aggregate(Max('endy'))
+        if ym['endy__max'] is None:
+            return None
+        else:
+            return ym['endy__max'].astimezone()
+
+
+# 「終了実績」を取得する関数
+def endj_max(line, date, period):
+    koutei = Process.objects.filter(
+        Q(line__exact=line) & Q(date__exact=date) & Q(period__exact=period)
+    )
+    if koutei.count() == 0:
+        return None
+    else:
+        jm = koutei.aggregate(Max('endj'))
+        if jm['endj__max'] is None:
+            return None
+        else:
+            return jm['endj__max'].astimezone()
+
+
+# 「残り生産時間」を計算する関数
+def left_time(line, date, period):
+    koutei = Process.objects.filter(
+        Q(line__exact=line) & Q(date__exact=date) & Q(period__exact=period) &
+        Q(status__exact=0)
+    )
+    sum_py = koutei.aggregate(Sum('processy'))
+    if sum_py['processy__sum'] is None:
+        py = 0
+    else:
+        py = sum_py['processy__sum']
+    sum_cy = koutei.aggregate(Sum('changey'))
+    if sum_cy['changey__sum'] is None:
+        cy = 0
+    else:
+        cy = sum_cy['changey__sum']
+    tt = py + cy
+    return datetime.timedelta(minutes=tt)
+
+
+# 「終了予測」を計算する関数
+def comp_time(line, date, period):
+    koutei = Process.objects.filter(
+        Q(line__exact=line) & Q(date__exact=date) & Q(period__exact=period) &
+        Q(status__exact=1)
+    )
+    if koutei.count() == 0:
+        return None
+    else:
+        ct = endy_max(line, date, period)
+        if ct is None:
+            return None
+        else:
+            return endj_max(line, date, period) + left_time(line, date, period)
 
 
 # 新規 or 編集
@@ -297,103 +409,3 @@ def get_stime(start_time, end_time):
     else:
         td = end_time - start_time
         return round((td.days * 1440) + (td.seconds / 60))
-
-
-# 「総数」を計算する関数
-def value_sum(line, date, period):
-    koutei = Process.objects.filter(
-        Q(line__exact=line) & Q(date__exact=date) & Q(period__exact=period)
-    )
-    if koutei.count() == 0:
-        return 0
-    else:
-        return koutei.aggregate(Sum('value'))
-
-
-# 「終了数」を計算する関数
-def value_end(line, date, period):
-    koutei = Process.objects.filter(
-        Q(line__exact=line) & Q(date__exact=date) & Q(period__exact=period) &
-        Q(status__exact=1)
-    )
-    if koutei.count() == 0:
-        return 0
-    else:
-        return koutei.aggregate(Sum('value'))
-
-
-# 「切替平均」を計算する関数
-def changej_avg(line, date, period):
-    koutei = Process.objects.filter(
-        Q(line__exact=line) & Q(date__exact=date) & Q(period__exact=period)
-    )
-    if koutei.count() == 0:
-        return 0
-    else:
-        return koutei.aggregate(Avg('changej'))
-
-
-# 「終了予定」を取得する関数
-def endy_max(line, date, period):
-    koutei = Process.objects.filter(
-        Q(line__exact=line) & Q(date__exact=date) & Q(period__exact=period)
-    )
-    if koutei.count() == 0:
-        return None
-    else:
-        ym = koutei.aggregate(Max('endy'))
-        if ym['endy__max'] is None:
-            return None
-        else:
-            return ym['endy__max'].astimezone()
-
-
-# 「終了実績」を取得する関数
-def endj_max(line, date, period):
-    koutei = Process.objects.filter(
-        Q(line__exact=line) & Q(date__exact=date) & Q(period__exact=period)
-    )
-    if koutei.count() == 0:
-        return None
-    else:
-        jm = koutei.aggregate(Max('endj'))
-        if jm['endj__max'] is None:
-            return None
-        else:
-            return jm['endj__max'].astimezone()
-
-
-# 「残り生産時間」を計算する関数
-def left_time(line, date, period):
-    koutei = Process.objects.filter(
-        Q(line__exact=line) & Q(date__exact=date) & Q(period__exact=period) &
-        Q(status__exact=0)
-    )
-    sum_py = koutei.aggregate(Sum('processy'))
-    if sum_py['processy__sum'] is None:
-        py = 0
-    else:
-        py = sum_py['processy__sum']
-    sum_cy = koutei.aggregate(Sum('changey'))
-    if sum_cy['changey__sum'] is None:
-        cy = 0
-    else:
-        cy = sum_cy['changey__sum']
-    tt = py + cy
-    return datetime.timedelta(minutes=tt)
-
-
-# 「終了予測」を計算する関数
-def comp_time(line, date, period):
-    koutei = Process.objects.filter(
-        Q(line__exact=line) & Q(date__exact=date) & Q(period__exact=period) &
-        Q(status__exact=1)
-    )
-    if koutei.count() == 0:
-        return None
-    else:
-        ct = endy_max(line, date, period)
-        if ct is None:
-            return None
-        else:
-            return endj_max(line, date, period) + left_time(line, date, period)

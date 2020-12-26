@@ -7,9 +7,9 @@ register = template.Library()
 @register.filter(name="seisantime")
 def seisantime(end, start):
     if end is None:
-        return 0
+        return None
     elif start is None:
-        return 0
+        return None
     else:
         td = end - start
         return int(td.seconds / 60)
@@ -55,6 +55,6 @@ def get_nouryoku(value, process):
             except ZeroDivisionError:
                 return 0
         else:
-            return 0
+            return None
     else:
-        return 0
+        return None
