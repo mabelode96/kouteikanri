@@ -76,9 +76,9 @@
                 <div id="real_time" align="right">±0分</div>
                 {% else %}
                 {% if data.real_time > 0 %}
-                <div id="real_time" align="right" style="color: blue;">+{{ data.real_time }}分</div>
-                {% else %}
                 <div id="real_time" align="right" style="color: red;">-{{ data.real_time|mul:-1 }}分</div>
+                {% else %}
+                <div id="real_time" align="right" style="color: blue;">+{{ data.real_time }}分</div>
                 {% endif %}
                 {% endif %}
                 {% endif %}
