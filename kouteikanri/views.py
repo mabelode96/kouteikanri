@@ -150,8 +150,23 @@ class KouteiList(ListView):
             ql & qd & qp & qs & ~Q(name__exact='予備')).aggregate(Sum('processy'))
         c_y = Process.objects.filter(
             ql & qd & qp & qs & ~Q(name__exact='予備')).aggregate(Sum('changey'))
-        progress = (p_j['processj__sum'] + c_j['changej__sum']) - (
-                p_y['processy__sum'] + c_y['changey__sum'])
+        if p_j['processj__sum'] is None:
+            pj = 0
+        else:
+            pj = p_j['processj__sum']
+        if c_j['changej__sum'] is None:
+            cj = 0
+        else:
+            cj = c_j['changej__sum']
+        if p_y['processy__sum'] is None:
+            py = 0
+        else:
+            py = p_y['processy__sum']
+        if c_y['changey__sum'] is None:
+            cy = 0
+        else:
+            cy = c_y['changey__sum']
+        progress = ( pj + cj) - (py + cy)
         ctx['progress'] = progress
         return ctx
 
