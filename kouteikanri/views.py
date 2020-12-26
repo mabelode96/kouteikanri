@@ -277,10 +277,12 @@ def reset_all(request, **kwargs):
                 koutei.startj = None
                 koutei.endj = None
                 koutei.changej = None
+                koutei.processj = None
                 koutei.status = 0
                 update_list.append(koutei)
             # 工程のデータを一括更新
-            Process.objects.bulk_update(update_list, fields=["startj", "endj", "changej", "status"])
+            Process.objects.bulk_update(
+                update_list, fields=["startj", "endj", "changej", "processj", "status"])
         return redirect('kouteikanri:list', line, date, period)
         # 戻ったほうが良い？
         # return redirect(request.META.get('HTTP_REFERER', '/'))
