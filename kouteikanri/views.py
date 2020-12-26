@@ -166,7 +166,7 @@ class KouteiList(ListView):
             cy = 0
         else:
             cy = c_y['changey__sum']
-        progress = ( pj + cj) - (py + cy)
+        progress = (py + cy) - ( pj + cj)
         ctx['progress'] = progress
         return ctx
 
