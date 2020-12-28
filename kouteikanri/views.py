@@ -22,26 +22,30 @@ def top(request):
 
 # 全ライン一覧
 # 参考url: https://qiita.com/t-iguchi/items/827865481e82bb32ad04
-def all_list(request):
-    date = request.POST['date']
-    sql_text = (
-        "SELECT line, period, "
-        "sum(value) AS val_sum, "
-        "sum(value * status) AS val_end_sum, "
-        "sum(value) - sum(value * status) AS left_val, "
-        "count(status) - sum(status) AS left_cnt, "
-        "max(endy) AS endy_max, "
-        "max(endj) AS endj_max, "
-        "(sum(processy) + sum(changey)) - (sum(processy * status) + sum(changey * status)) AS left_time, "
-        "(sum(processj) + sum(changej)) - (sum(processy * status) + sum(changey * status)) AS real_time, "
-        "sum(value * status) * 100 / sum(value) AS progress "
-        "FROM kouteikanri_process "
-        "WHERE date='" + date + "' AND name <> '予備' "
-        "GROUP BY line, period "
-        "ORDER BY period DESC, line;"
-    )
-    emp_list=exec_query(sql_text)
-    return render(request, 'kouteikanri/all.html', {'emp_list': emp_list, 'date': date})
+def all_list(request, **kwargs):
+    if request.method == 'POST':
+        date = request.POST['date']
+        sql_text = (
+                "SELECT line, period, "
+                "sum(value) AS val_sum, "
+                "sum(value * status) AS val_end_sum, "
+                "sum(value) - sum(value * status) AS left_val, "
+                "count(status) - sum(status) AS left_cnt, "
+                "max(endy) AS endy_max, "
+                "max(endj) AS endj_max, "
+                "(sum(processy) + sum(changey)) - (sum(processy * status) + sum(changey * status)) AS left_time, "
+                "(sum(processj * status) + sum(changej * status)) - (sum(processy * status) + sum(changey * status)) AS real_time, "
+                "sum(value * status) * 100 / sum(value) AS progress "
+                "FROM kouteikanri_process "
+                "WHERE date='" + date + "' AND name <> '予備' "
+                                        "GROUP BY line, period "
+                                        "ORDER BY period DESC, line;"
+        )
+        emp_list = exec_query(sql_text)
+        return render(request, 'kouteikanri/all.html', {'emp_list': emp_list, 'date': date})
+#    else:
+#        date = request.kwargs['line']
+#        return redirect('kouteikanri:all', date)
 
 
 # cursor.descriptionでフィールド名を配列にセットして、resultsにフィールド名を付加
@@ -137,37 +141,37 @@ class KouteiList(ListView):
         # 終了予測 ======================================================================
         ctx['comptime'] = comp_time(ln, dt, pr)
         # 進捗 ==========================================================================
-#        if endy_max(ln, dt, pr) is None:
-#            progress = 0
-#        else:
-#            progress = get_stime(comp_time(ln, dt, pr), endy_max(ln, dt, pr))
-#        ctx['progress'] = progress
-        p_j = Process.objects.filter(
-            ql & qd & qp & ~Q(name__exact='予備')).aggregate(Sum('processj'))
-        c_j = Process.objects.filter(
-            ql & qd & qp & ~Q(name__exact='予備')).aggregate(Sum('changej'))
-        p_y = Process.objects.filter(
-            ql & qd & qp & qs & ~Q(name__exact='予備')).aggregate(Sum('processy'))
-        c_y = Process.objects.filter(
-            ql & qd & qp & qs & ~Q(name__exact='予備')).aggregate(Sum('changey'))
-        if p_j['processj__sum'] is None:
-            pj = 0
+        if endy_max(ln, dt, pr) is None:
+            progress = 0
         else:
-            pj = p_j['processj__sum']
-        if c_j['changej__sum'] is None:
-            cj = 0
-        else:
-            cj = c_j['changej__sum']
-        if p_y['processy__sum'] is None:
-            py = 0
-        else:
-            py = p_y['processy__sum']
-        if c_y['changey__sum'] is None:
-            cy = 0
-        else:
-            cy = c_y['changey__sum']
-        progress = (py + cy) - (pj + cj)
+            progress = get_stime(comp_time(ln, dt, pr), endy_max(ln, dt, pr))
         ctx['progress'] = progress
+#        p_j = Process.objects.filter(
+#            ql & qd & qp & qs & ~Q(name__exact='予備')).aggregate(Sum('processj'))
+#        c_j = Process.objects.filter(
+#            ql & qd & qp & qs & ~Q(name__exact='予備')).aggregate(Sum('changej'))
+#        p_y = Process.objects.filter(
+#            ql & qd & qp & qs & ~Q(name__exact='予備')).aggregate(Sum('processy'))
+#        c_y = Process.objects.filter(
+#            ql & qd & qp & qs & ~Q(name__exact='予備')).aggregate(Sum('changey'))
+#        if p_j['processj__sum'] is None:
+#            pj = 0
+#        else:
+#            pj = p_j['processj__sum']
+#        if c_j['changej__sum'] is None:
+#            cj = 0
+#        else:
+#            cj = c_j['changej__sum']
+#        if p_y['processy__sum'] is None:
+#            py = 0
+#        else:
+#            py = p_y['processy__sum']
+#        if c_y['changey__sum'] is None:
+#            cy = 0
+#        else:
+#            cy = c_y['changey__sum']
+#        progress = (py + cy) - (pj + cj)
+#        ctx['progress'] = progress
         return ctx
 
     def get_queryset(self, **kwargs):
