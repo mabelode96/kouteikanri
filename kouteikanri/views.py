@@ -146,32 +146,6 @@ class KouteiList(ListView):
         else:
             progress = get_stime(comp_time(ln, dt, pr), endy_max(ln, dt, pr))
         ctx['progress'] = progress
-#        p_j = Process.objects.filter(
-#            ql & qd & qp & qs & ~Q(name__exact='予備')).aggregate(Sum('processj'))
-#        c_j = Process.objects.filter(
-#            ql & qd & qp & qs & ~Q(name__exact='予備')).aggregate(Sum('changej'))
-#        p_y = Process.objects.filter(
-#            ql & qd & qp & qs & ~Q(name__exact='予備')).aggregate(Sum('processy'))
-#        c_y = Process.objects.filter(
-#            ql & qd & qp & qs & ~Q(name__exact='予備')).aggregate(Sum('changey'))
-#        if p_j['processj__sum'] is None:
-#            pj = 0
-#        else:
-#            pj = p_j['processj__sum']
-#        if c_j['changej__sum'] is None:
-#            cj = 0
-#        else:
-#            cj = c_j['changej__sum']
-#        if p_y['processy__sum'] is None:
-#            py = 0
-#        else:
-#            py = p_y['processy__sum']
-#        if c_y['changey__sum'] is None:
-#            cy = 0
-#        else:
-#            cy = c_y['changey__sum']
-#        progress = (py + cy) - (pj + cj)
-#        ctx['progress'] = progress
         return ctx
 
     def get_queryset(self, **kwargs):
@@ -303,6 +277,10 @@ def edit(request, id=None):
             koutei = form.save(commit=False)
             koutei.line = request.POST['line']
             koutei.period = request.POST['period']
+            if koutei.endj is not None:
+                if get_stime is not None:
+                    koutei.processj = get_stime(get_stime, koutei.endj)
+                koutei.status = 1
             koutei.save()
             if 'next' in request.GET:
                 return redirect(request.GET['next'])
@@ -358,8 +336,8 @@ def start_or_end(request, id=id):
         if koutei.endj is None:
             koutei.endj = datetime.datetime.now().astimezone()
             koutei.processj = get_stime(koutei.startj, koutei.endj)
-            koutei.status = 1
-            koutei.save()
+        koutei.status = 1
+        koutei.save()
     return redirect('kouteikanri:list', koutei.line, koutei.date, koutei.period)
 
 
