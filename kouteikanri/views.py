@@ -278,8 +278,8 @@ def edit(request, id=None):
             koutei.line = request.POST['line']
             koutei.period = request.POST['period']
             if koutei.endj is not None:
-                if get_stime is not None:
-                    koutei.processj = get_stime(get_stime, koutei.endj)
+                if koutei.startj is not None:
+                    koutei.processj = get_stime(koutei.startj, koutei.endj)
                 koutei.status = 1
             koutei.save()
             if 'next' in request.GET:
