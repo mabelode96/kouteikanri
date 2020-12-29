@@ -53,9 +53,10 @@ class KouteiEditForm(ModelForm):
     startj = forms.DateTimeField(label='開始時間', required=False)
     endj = forms.DateTimeField(label='終了時間', required=False)
     changej = forms.IntegerField(label='切替時間', required=False)
-    processj = forms.IntegerField(label='生産時間', required=False)
-    status = forms.IntegerField(label='Status (0:開始前/生産中, 1:終了)', required=True,
-                                widget=forms.HiddenInput())
+    processj = forms.IntegerField(
+        label='生産時間', required=False, widget=forms.HiddenInput())
+    status = forms.IntegerField(
+        label='Status (0:開始前/生産中, 1:終了)', required=True, widget=forms.HiddenInput())
 
     class Meta:
         model = Process
