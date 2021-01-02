@@ -66,12 +66,17 @@ class KouteiEditForm(ModelForm):
 
 
 class KouteiAddForm(ModelForm):
-    name = forms.CharField(label='製品名', required=False, max_length=50,
+    line = forms.CharField(label='ライン名', required=True, widget=forms.HiddenInput())
+    period = forms.CharField(label='時間帯', required=True, widget=forms.HiddenInput())
+    date = forms.DateField(label='製造日', required=True, widget=forms.HiddenInput())
+    name = forms.CharField(label='製品名', required=True, max_length=50,
                            widget = forms.TextInput(attrs={'readonly': False}))
     bin = forms.IntegerField(label='便', required=False,
                            widget = forms.TextInput(attrs={'readonly': False}))
     kubun = forms.CharField(label='区分', required=False, max_length=10,
                            widget = forms.TextInput(attrs={'readonly': False}))
+    processy = forms.IntegerField(label='生産時間', required=True)
+    status = forms.IntegerField(label='Status', required=True, widget=forms.HiddenInput())
 
     class Meta:
         model = Process
@@ -79,5 +84,4 @@ class KouteiAddForm(ModelForm):
                   'hinban', 'price', 'kubun', 'name',
                   'seisanh', 'value', 'seisand', 'conveyor',
                   'staff', 'panmm', 'slicev', 'slicep',
-                  'changey', 'processy', 'starty', 'endy',
-                  'startj', 'endj', 'changej', 'processj', 'status')
+                  'changey', 'processy', 'starty', 'endy', 'status')

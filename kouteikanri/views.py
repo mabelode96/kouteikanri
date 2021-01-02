@@ -277,6 +277,7 @@ def edit(request, id=None):
         if form.is_valid():
             koutei = form.save(commit=False)
             koutei.line = request.POST['line']
+            koutei.date = request.POST['date']
             koutei.period = request.POST['period']
             if koutei.endj is not None:
                 if koutei.startj is not None:
