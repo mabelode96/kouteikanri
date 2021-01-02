@@ -36,12 +36,12 @@ class MyModelForm(forms.ModelForm):
 
 class KouteiEditForm(ModelForm):
     name = forms.CharField(label='製品名', required=False, max_length=50,
-                           widget = forms.TextInput(attrs={'readonly':'readonly'}))
+                           widget = forms.TextInput(attrs={'readonly': True}))
     date = forms.DateField(label='製造日', required=False, widget=forms.HiddenInput())
     bin = forms.IntegerField(label='便', required=False,
-                           widget = forms.TextInput(attrs={'readonly':'readonly'}))
+                           widget = forms.TextInput(attrs={'readonly': True}))
     kubun = forms.CharField(label='区分', required=False, max_length=10,
-                           widget = forms.TextInput(attrs={'readonly':'readonly'}))
+                           widget = forms.TextInput(attrs={'readonly': True}))
     line = LineChoiceField(
         queryset=Process.objects.order_by('line').distinct('line'),
         label='ライン名', to_field_name='line', empty_label=None)
@@ -66,6 +66,13 @@ class KouteiEditForm(ModelForm):
 
 
 class KouteiAddForm(ModelForm):
+    name = forms.CharField(label='製品名', required=False, max_length=50,
+                           widget = forms.TextInput(attrs={'readonly': False}))
+    bin = forms.IntegerField(label='便', required=False,
+                           widget = forms.TextInput(attrs={'readonly': False}))
+    kubun = forms.CharField(label='区分', required=False, max_length=10,
+                           widget = forms.TextInput(attrs={'readonly': False}))
+
     class Meta:
         model = Process
         fields = ('id', 'line', 'period', 'date', 'bin',

@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Process
-from .forms import KouteiEditForm, MyModelForm
+from .forms import KouteiEditForm, KouteiAddForm, MyModelForm
 from django.views.generic import ListView
 from django.db.models import Q, Max, Min, Sum, Avg, Count
 import datetime
@@ -266,12 +266,13 @@ def edit(request, id=None):
     # 編集
     if id:
         koutei = get_object_or_404(Process, pk=id)
+        form = KouteiEditForm(request.POST, instance=koutei)
     # 新規
     else:
         koutei = Process()
+        form = KouteiAddForm(request.POST, instance=koutei)
     # POST
     if request.method == 'POST':
-        form = KouteiEditForm(request.POST, instance=koutei)
         # バリデーションチェック
         if form.is_valid():
             koutei = form.save(commit=False)
@@ -286,7 +287,10 @@ def edit(request, id=None):
                 return redirect(request.GET['next'])
     # GET
     else:
-        form = KouteiEditForm(instance=koutei)
+        if id:
+            form = KouteiEditForm(instance=koutei)
+        else:
+            form = KouteiAddForm(instance=koutei)
         if 'next' in request.GET:
             return redirect(request.GET['next'])
     return render(request, 'kouteikanri/edit.html', dict(form=form, id=id))
