@@ -204,7 +204,7 @@
                         {% endif %}
                     </td>
                     <td class="text-right">{% if koutei.changej %}{{ koutei.changej }}{% endif %}</td>
-                    <td>
+                    <td class="text-center">
                         <!-- 編集ボタン -->
                         <form action="{% url 'kouteikanri:edit' id=koutei.id %}">
                             {% if cntst == 0 %}
