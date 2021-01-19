@@ -44,7 +44,7 @@ def all_list(request, **kwargs):
         emp_list = exec_query(sql_text)
         return render(request, 'kouteikanri/all.html', {'emp_list': emp_list, 'date': date})
 #    else:
-#        date = request.kwargs['line']
+#        date = request.kwargs['date']
 #        return redirect('kouteikanri:all', date)
 
 
