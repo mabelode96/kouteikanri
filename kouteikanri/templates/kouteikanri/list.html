@@ -7,15 +7,15 @@
 {% endblock title %}
 
 {% block content %}
-<header class="site-header">
+<header class="site-header" style="background: #FDF5E6;">
     <table class="table-sm table-warning" style="width: 100%">
         <tr align="left">
-            <th>
+            <th align="center">
                 <button class="btn btn-primary" onclick="window.location.reload();">
                     <i class="fas fa-sync"></i>
                 </button>
             </th>
-            <th>
+            <th align="left">
                 <form action="{% url 'kouteikanri:all' %}" method="post">
                     {% csrf_token %}
                     <input type="text" name="date" value="{{ datef|str_to_date }}" hidden>
@@ -24,7 +24,7 @@
             </th>
             <th><h5>{{ linef }}</h5></th>
             <th><h5>{{ periodf }}</h5></th>
-            <th><h5 align="right">{{ datef }}製造</h5></th>
+            <th align="right"><h5>{{ datef }}製造</h5></th>
             <th>
                 <form action="{% url 'kouteikanri:reset_all' linef datef periodf %}" method="post">
                     {% csrf_token %}
@@ -105,6 +105,7 @@
                 <th width="8%;"></th>
                 <th>便</th>
                 <th>区分</th>
+                <th style="font-size:11px;"><span style="color:#4169E1;">セット</span></th>
                 <th>製品名</th>
                 <th>数量</th>
                 <!--<th>開始予定</th>-->
@@ -172,7 +173,10 @@
                         <td>
                     {% endif %}
                     </td>
-                    <td>{% if koutei.kubun %}{{koutei.kubun }}{% endif %}</td>
+                    <td>{% if koutei.kubun %}{{ koutei.kubun }}{% endif %}</td>
+                    <td align="center" style="font-size:20px;">
+                        {% if koutei.set %}<span style="color:#4169E1;">○</span>{% endif %}
+                    </td>
                     <td id="{{ koutei.id }}">{{ koutei.name }}</td>
                     <td class="text-right">{% if koutei.value %}{{ koutei.value }}{% endif %}</td>
                     <td class="text-right">{% if koutei.seisanh %}{{ koutei.seisanh }}/h{% endif %}</td>

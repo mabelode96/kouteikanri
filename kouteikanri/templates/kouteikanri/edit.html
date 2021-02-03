@@ -13,7 +13,7 @@
             {% if form.endj.value %}
             <form action="{% url 'kouteikanri:end_none' form.initial.id %}" method="post">
                 {% csrf_token %}
-                <input type="submit" value="終了を解除" class="btn-sm btn-danger">
+                <input type="submit" value="終了を解除" class="btn btn-danger">
             </form>
             {% endif %}
         </td>

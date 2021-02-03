@@ -40,6 +40,7 @@ class Migration(migrations.Migration):
                 ('changej', models.IntegerField(blank=True, verbose_name='切替時間')),
                 ('processj', models.IntegerField(blank=True, verbose_name='実際時間')),
                 ('status', models.IntegerField(default=0, verbose_name='status')),
+                ('set', models.IntegerField(default=0, verbose_name='set')),
             ],
         ),
         migrations.AlterModelTable(

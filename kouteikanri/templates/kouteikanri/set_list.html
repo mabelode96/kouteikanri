@@ -1,0 +1,102 @@
+{% extends "kouteikanri/base.html" %}
+{% load mathfilters %}
+{% load utils %}
+
+{% block title %}
+{{ linef }} {{ periodf }} セット状況
+{% endblock title %}
+
+{% block content %}
+<header class="site-header" style="background:lavender;">
+    <table class="table-sm table-primary" style="width: 100%">
+        <tr align="left">
+            <th align="center">
+                <button class="btn btn-primary" onclick="window.location.reload();">
+                    <i class="fas fa-sync"></i>
+                </button>
+            </th>
+            <th align="left">
+                <form action="{% url 'kouteikanri:set_all' %}" method="post">
+                    {% csrf_token %}
+                    <input type="text" name="date2" value="{{ datef|str_to_date }}" hidden>
+                    <input type="submit" value="全ライン一覧へ" class="btn btn-info">
+                </form>
+            </th>
+            <th><h5>{{ linef }}</h5></th>
+            <th><h5>{{ periodf }}</h5></th>
+            <th align="right"><h5>{{ datef }}製造</h5></th>
+        </tr>
+    </table>
+    <table class="table-sm table-bordered table-secondary" style="width: 100%" align="center">
+        <thead>
+            <tr class="text-center" style="font-size:16px;">
+                <th width="25%">総数</th>
+                <th width="25%"><span style="color:#4169E1;">完了</span></th>
+                <th width="25%">残り</th>
+                <th width="25%">進捗</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr style="background-color: #FFFFFF; font-size:20px;" align="center">
+                <td>{{ setcnt }} 品</td>
+                <td><span style="color:#4169E1;">{{ setend }}</span> 品</td>
+                <td>{{ setcnt|sub:setend }} 品</td>
+                <td>{{ progress }} %</td>
+            </tr>
+        </tbody>
+    </table>
+</header>
+
+<div class="site-content">
+    <table class="table-sm table-striped table-bordered" align="left" style="width: 100%;">
+        <thead class="table">
+            <tr class="text-center">
+                <th width="12%;">セット<br>チェック</th>
+                <th>便</th>
+                <th>区分</th>
+                <th>製品名</th>
+                <th>数量</th>
+                <th>開始予定</th>
+                <th>盛付終了</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for koutei in kouteis %}
+            <tr>
+                <td class="text-center">
+                    <!-- 完了ボタン -->
+                    <form action="{% url 'kouteikanri:set_comp' id=koutei.id %}" method="get" class="form_start">
+                        {% if koutei.set == 0 %}
+                            <input type="submit" class="btn btn-success" value="完了">
+                        {% else %}
+                            <input type="submit" class="btn btn-secondary" value="解除">
+                        {% endif %}
+                    </form>
+                </td>
+                {% if koutei.bin %}
+                    {% if koutei.bin == 1 %}
+                        <td class="text-right" bgcolor="khaki">
+                    {% elif koutei.bin == 2 %}
+                        <td class="text-right" bgcolor="hotpink">
+                    {% elif koutei.bin == 3 %}
+                        <td class="text-right" bgcolor="deepskyblue">
+                    {% else %}
+                        <td>
+                    {% endif %}
+                    {{ koutei.bin }}
+                {% else %}
+                    <td>
+                {% endif %}
+                </td>
+                <td>{% if koutei.kubun %}{{ koutei.kubun }}{% endif %}</td>
+                <td id="{{ koutei.id }}">{{ koutei.name }}</td>
+                <td class="text-right">{% if koutei.value %}{{ koutei.value }}{% endif %}</td>
+                <td class="text-right">{{ koutei.starty|date:"G:i" }}</td>
+                <td align="center" style="font-size:20px;">{% if koutei.endj %}○{% endif %}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock content %}

@@ -30,5 +30,12 @@
         </button>
     </div>
 </form>
+<form action="{% url 'kouteikanri:set_all' %}" method="post">
+    {% csrf_token %}
+    <div align="right">
+        <input type="date" name="date2" id="date2" hidden>
+        <button type="submit" class="btn-sm btn-success">セットチェック</button>
+    </div>
+</form>
 
 {% endblock content %}

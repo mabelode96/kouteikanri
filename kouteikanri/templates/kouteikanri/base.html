@@ -45,6 +45,16 @@
           location.reload();
         },100);
       });
+      //セレクトボックスに連動させる
+      $(function(){
+        $('#date2').val($('#id_date').val());
+      });
+      $(function(){
+        $('#id_date').change(function(){
+          var text = $(this).val();
+          $('#date2').val(text);
+        });
+      });
     </script>
     {% block script %}
     {% endblock %}

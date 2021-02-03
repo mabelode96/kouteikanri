@@ -47,6 +47,24 @@ def all_list(request, **kwargs):
 #        date = request.kwargs['date']
 #        return redirect('kouteikanri:all', date)
 
+# セットチェック 全ライン一覧
+def set_all(request, **kwargs):
+    if request.method == 'POST':
+        date = request.POST['date2']
+        sql_text = (
+                "SELECT line, period, "
+                "count(set) AS all_cnt, "
+                "sum(set) AS end_cnt, "
+                "count(set) - sum(set) AS left_cnt, "
+                "sum(set) * 100 / count(set) AS progress "
+                "FROM kouteikanri_process "
+                "WHERE date='" + date + "' AND name <> '予備' "
+                                        "GROUP BY line, period "
+                                        "ORDER BY period DESC, line;"
+        )
+        emp_list = exec_query(sql_text)
+        return render(request, 'kouteikanri/set_all.html', {'emp_list': emp_list, 'date': date})
+
 
 # cursor.descriptionでフィールド名を配列にセットして、resultsにフィールド名を付加
 def exec_query(sql_txt):
@@ -94,8 +112,7 @@ class KouteiList(ListView):
         ctx['maxendy'] = endy_max(ln, dt, pr)
         # 終了数/総数 ========================================================================
         ctx['valsum'] = value_sum(ln, dt, pr)
-        ve = value_end(ln, dt, pr)
-        ctx['valend'] = ve
+        ctx['valend'] = value_end(ln, dt, pr)
         # 生産高 ===========================================================================
         sd = Process.objects.all().filter(ql & qd & qp).aggregate(Sum('seisand'))
         if sd['seisand__sum'] is None:
@@ -159,6 +176,49 @@ class KouteiList(ListView):
         date = request.POST['date']
         period = request.POST['period']
         return redirect('kouteikanri:list', line, date, period)
+
+
+# セット状況
+class SetList(ListView):
+    model = Process
+    context_object_name = 'kouteis'
+    template_name = 'kouteikanri/set_list.html'
+    paginate_by = 50
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ln = self.kwargs['line']
+        dt = self.kwargs['date']
+        pr = self.kwargs['period']
+        # ライン名 ========================================================================
+        ctx['linef'] = self.kwargs['line']
+        # 製造日 ==========================================================================
+        tstr = self.kwargs['date']
+        tdata = datetime.datetime.strptime(tstr, '%Y-%m-%d')
+        tdate = str(tdata.year)+'年'+str(tdata.month)+'月'+str(tdata.day)+'日'
+        ctx['datef'] = tdate
+        # 時間帯 ==========================================================================
+        ctx['periodf'] = self.kwargs['period']
+        # セット総数 =======================================================================
+        ctx['setcnt'] = set_cnt(ln, dt, pr)
+        # セット総数 =======================================================================
+        ctx['setend'] = set_end(ln, dt, pr)
+        # 進捗 ============================================================================
+        ctx['progress'] = set_prog(ln, dt, pr)
+        return ctx
+
+    def get_queryset(self, **kwargs):
+        return Process.objects.order_by('startj', 'starty').filter(
+            Q(line__exact=self.kwargs['line']) &
+            Q(date__exact=self.kwargs['date']) &
+            Q(period__exact=self.kwargs['period']) &
+            Q(hinban__gt=0))
+
+    def post(self, request, **kwargs):
+        line = request.POST['line']
+        date = request.POST['date']
+        period = request.POST['period']
+        return redirect('kouteikanri:set_list', line, date, period)
 
 
 # 「総数」を計算する関数
@@ -259,6 +319,50 @@ def comp_time(line, date, period):
             return None
         else:
             return endj_max(line, date, period) + left_time(line, date, period)
+
+
+# 「セット総数」を計算する関数
+def set_cnt(line, date, period):
+    koutei = Process.objects.filter(
+        Q(line__exact=line) & Q(date__exact=date) & Q(period__exact=period)
+    )
+    if koutei.count() == 0:
+        return 0
+    else:
+        cn = koutei.aggregate(Count('set'))
+        return cn['set__count']
+
+
+# 「セット完了」を計算する関数
+def set_end(line, date, period):
+    koutei = Process.objects.filter(
+        Q(line__exact=line) & Q(date__exact=date) & Q(period__exact=period) &
+        Q(status__exact=1)
+    )
+    if koutei.count() == 0:
+        return 0
+    else:
+        sm = koutei.aggregate(Sum('set'))
+        return sm['set__sum']
+
+
+# 「セット進捗率」
+def set_prog(line, date, period):
+    koutei = Process.objects.filter(
+        Q(line__exact=line) & Q(date__exact=date) & Q(period__exact=period)
+    )
+    if koutei.count() == 0:
+        return 0
+    else:
+        sm = koutei.aggregate(Sum('set'))
+        cn = koutei.aggregate(Count('set'))
+        if sm['set__sum'] is None:
+            return 0
+        else:
+            if cn['set__count'] is None:
+                return 0
+            else:
+                return round(sm['set__sum'] / cn['set__count'] * 100, 1)
 
 
 # 新規 or 編集
@@ -373,6 +477,19 @@ def start_cancel(request, **kwargs):
             Process.objects.bulk_update(
                 update_list, fields=["changej", "startj", "status"])
         return redirect('kouteikanri:list', line, d, period)
+
+
+# セット完了
+def set_comp(request, id=id):
+    koutei = get_object_or_404(Process, pk=id)
+    # 完了の処理
+    if koutei.set == 0:
+        koutei.set = 1
+    # 解除の処理
+    else:
+        koutei.set = 0
+    koutei.save()
+    return redirect('kouteikanri:set_list', koutei.line, koutei.date, koutei.period)
 
 
 # すべての実績をリセット
