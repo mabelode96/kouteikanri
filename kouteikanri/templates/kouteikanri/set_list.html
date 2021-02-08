@@ -92,7 +92,11 @@
                 <td id="{{ koutei.id }}">{{ koutei.name }}</td>
                 <td class="text-right">{% if koutei.value %}{{ koutei.value }}{% endif %}</td>
                 <td class="text-right">{{ koutei.starty|date:"G:i" }}</td>
-                <td align="center" style="font-size:20px;">{% if koutei.endj %}○{% endif %}</td>
+                <td align="center" style="font-size:20px;">
+                    {% if koutei.endj %}
+                    <i class="fas fa-check" style="color:red;"></i>
+                    {% endif %}
+                </td>
                 </tr>
             {% endfor %}
         </tbody>
