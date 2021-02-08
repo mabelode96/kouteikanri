@@ -58,7 +58,7 @@ def set_all(request, **kwargs):
                 "count(set) - sum(set) AS left_cnt, "
                 "sum(set) * 100 / count(set) AS progress "
                 "FROM kouteikanri_process "
-                "WHERE date='" + date + "' AND name <> '予備' "
+                "WHERE date='" + date + "' AND hinban IS NOT NULL "
                                         "GROUP BY line, period "
                                         "ORDER BY period DESC, line;"
         )
@@ -324,7 +324,8 @@ def comp_time(line, date, period):
 # 「セット総数」を計算する関数
 def set_cnt(line, date, period):
     koutei = Process.objects.filter(
-        Q(line__exact=line) & Q(date__exact=date) & Q(period__exact=period)
+        Q(line__exact=line) & Q(date__exact=date) & Q(period__exact=period) &
+        Q(hinban__gt=0)
     )
     if koutei.count() == 0:
         return 0
@@ -337,7 +338,7 @@ def set_cnt(line, date, period):
 def set_end(line, date, period):
     koutei = Process.objects.filter(
         Q(line__exact=line) & Q(date__exact=date) & Q(period__exact=period) &
-        Q(status__exact=1)
+        Q(status__exact=1) & Q(hinban__gt=0)
     )
     if koutei.count() == 0:
         return 0
@@ -349,7 +350,8 @@ def set_end(line, date, period):
 # 「セット進捗率」
 def set_prog(line, date, period):
     koutei = Process.objects.filter(
-        Q(line__exact=line) & Q(date__exact=date) & Q(period__exact=period)
+        Q(line__exact=line) & Q(date__exact=date) & Q(period__exact=period) &
+        Q(hinban__gt=0)
     )
     if koutei.count() == 0:
         return 0
