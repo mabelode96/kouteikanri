@@ -338,7 +338,7 @@ def set_cnt(line, date, period):
 def set_end(line, date, period):
     koutei = Process.objects.filter(
         Q(line__exact=line) & Q(date__exact=date) & Q(period__exact=period) &
-        Q(status__exact=1) & Q(hinban__gt=0)
+        Q(set__exact=1) & Q(hinban__gt=0)
     )
     if koutei.count() == 0:
         return 0

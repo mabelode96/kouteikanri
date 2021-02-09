@@ -35,3 +35,21 @@ width: 96%;
 width: 80%;
 font-size: 20px;
 }
+
+#pageend {
+position: fixed;
+bottom: 5%;
+left: 95%;
+cursor: pointer;
+-webkit-transition: all 500ms 0s ease;
+transition: all 500ms 0s ease;
+}
+
+#pagetop {
+position: fixed;
+bottom: 75%;
+left: 95%;
+cursor: pointer;
+-webkit-transition: all 500ms 0s ease;
+transition: all 500ms 0s ease;
+}

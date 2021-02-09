@@ -45,7 +45,7 @@
           location.reload();
         },100);
       });
-      //セレクトボックスに連動させる
+      // セレクトボックスに連動させる
       $(function(){
         $('#date2').val($('#id_date').val());
       });
@@ -54,6 +54,14 @@
           var text = $(this).val();
           $('#date2').val(text);
         });
+      });
+      // ページのトップに移動
+      $("#pagetop").click(function () {
+        $('html, body').animate({ scrollTop: 0 }, 500);
+      });
+      // ページのボトムに移動
+      $("#pageend").click(function () {
+        $('html, body').animate({ scrollTop: 500 }, 500);
       });
     </script>
     {% block script %}
