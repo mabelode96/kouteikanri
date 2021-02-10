@@ -47,7 +47,7 @@ transition: all 500ms 0s ease;
 
 #pagetop {
 position: fixed;
-bottom: 75%;
+bottom: 70%;
 left: 95%;
 cursor: pointer;
 -webkit-transition: all 500ms 0s ease;
