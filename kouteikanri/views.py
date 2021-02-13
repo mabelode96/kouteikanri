@@ -31,14 +31,14 @@ def all_list(request, **kwargs):
                 "sum(value * status) AS val_end_sum, "
                 "sum(value) - sum(value * status) AS left_val, "
                 "count(status) - sum(status) AS left_cnt, "
+                "min(starty) AS starty_min, "
                 "max(endy) AS endy_max, "
                 "max(endj) AS endj_max, "
                 "(sum(processy) + sum(changey)) - (sum(processy * status) + sum(changey * status)) AS left_time, "
                 "(sum(processj * status) + sum(changej * status)) - (sum(processy * status) + sum(changey * status)) AS real_time, "
                 "sum(value * status) * 100 / sum(value) AS progress "
                 "FROM kouteikanri_process "
-                "WHERE date='" + date + "' AND name <> '予備' "
-                                        "GROUP BY line, period "
+                "WHERE date='" + date + "' GROUP BY line, period "
                                         "ORDER BY period DESC, line;"
         )
         emp_list = exec_query(sql_text)

@@ -73,7 +73,15 @@
             </td>
             <td><div id="left_time" align="right">{{ data.left_time }}分</div></td>
             <td><div id="endy_max" align="right">{{ data.endy_max|date:"G:i" }}</div></td>
-            <td><div id="comp_time" align="right">{{ data.endj_max|comp_time:data.left_time|date:"G:i" }}</div></td>
+            <td>
+                <div id="comp_time" align="right">
+                    {% if data.endj_max %}
+                    {{ data.endj_max|comp_time:data.left_time|date:"G:i" }}
+                    {% else %}
+                    {{ data.starty_min|comp_time:data.left_time|date:"G:i" }}
+                    {% endif %}
+                </div>
+            </td>
             <td>
                 {% if data.real_time == None %}
                 {% else %}
