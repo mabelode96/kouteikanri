@@ -9,8 +9,8 @@
         <td>
             <a href="./?next={{ request.META.HTTP_REFERER }}" class="btn btn-primary" role="button">戻る</a>
         </td>
+        {% if form.endj.value %}
         <td>
-            {% if form.endj.value %}
             <form action="{% url 'kouteikanri:end_none' form.initial.id %}" method="post">
                 {% csrf_token %}
                 <input type="submit" value="終了を解除" class="btn btn-danger">
@@ -22,9 +22,9 @@
                 {% csrf_token %}
                 <input type="submit" value="再生産" class="btn btn-info">
             </form>
-            {% endif %}
         </td>
         -->
+        {% endif %}
     </tr>
 </table>
 <hr>
