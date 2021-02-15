@@ -42,7 +42,7 @@ def str_to_date(date_str):
 @register.filter(name="date_to_str")
 def date_to_str(date_str):
     d = datetime.datetime.strptime(date_str, "%Y-%m-%d")
-    return d.strftime("%Y年%#m月%#d日")
+    return str(d.year) + '年' + str(d.month) + '月' + str(d.day) + '日'
 
 
 @register.filter(name="get_nouryoku")
