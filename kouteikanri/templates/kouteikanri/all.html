@@ -83,18 +83,9 @@
                 </div>
             </td>
             <td>
-                {% if data.real_time == None %}
-                {% else %}
-                {% if data.real_time == 0 %}
-                <div id="real_time" align="right">±0分</div>
-                {% else %}
-                {% if data.real_time > 0 %}
-                <div id="real_time" align="right" style="color: red;">-{{ data.real_time }}分</div>
-                {% else %}
-                <div id="real_time" align="right" style="color: blue;">+{{ data.real_time|mul:-1 }}分</div>
-                {% endif %}
-                {% endif %}
-                {% endif %}
+                <div id="real_time" align="center">
+                    {% real_time data.endy_max data.endj_max data.left_time %}
+                </div>
             </td>
             <td style="width: 15%;">
                 <div id="progress" class="progress">
