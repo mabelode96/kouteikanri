@@ -387,7 +387,10 @@ def edit(request, id=None):
             koutei.period = request.POST['period']
             if koutei.endj is not None:
                 if koutei.startj is not None:
-                    koutei.processj = get_stime(koutei.startj, koutei.endj)
+                    if koutei.name == '予備':
+                        koutei.processj = koutei.processy
+                    else:
+                        koutei.processj = get_stime(koutei.startj, koutei.endj)
                 koutei.status = 1
             koutei.save()
             if 'next' in request.GET:
@@ -446,7 +449,10 @@ def start_or_end(request, id=id):
     else:
         if koutei.endj is None:
             koutei.endj = datetime.datetime.now().astimezone()
-            koutei.processj = get_stime(koutei.startj, koutei.endj)
+            if koutei.name == '予備':
+                koutei.processj = koutei.processy
+            else:
+                koutei.processj = get_stime(koutei.startj, koutei.endj)
         koutei.status = 1
         koutei.save()
     return redirect('kouteikanri:list', koutei.line, koutei.date, koutei.period)
