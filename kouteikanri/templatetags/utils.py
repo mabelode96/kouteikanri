@@ -78,9 +78,9 @@ def real_time(yotei, end, left):
     ts = yotei - td
     rt = int(ts.days * 1440 + ts.seconds / 60)
     if rt == 0:
-        rs = '遅れなし'
+        rs = '<span style="color:blue;">遅れなし</span>'
     elif rt < 0:
-        rs = str(rt * -1) + '分遅れ'
+        rs = '<span style="color:red;">' + str(rt * -1) + '分遅れ</span>'
     else:
-        rs = str(rt) + '分進み'
+        rs = '<span style="color:blue;">' + str(rt) + '分進み</span>'
     return rs

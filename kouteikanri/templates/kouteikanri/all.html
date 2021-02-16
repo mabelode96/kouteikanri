@@ -84,7 +84,9 @@
             </td>
             <td>
                 <div id="real_time" align="center">
+                    {% autoescape off %}
                     {% real_time data.endy_max data.endj_max data.left_time %}
+                    {% endautoescape %}
                 </div>
             </td>
             <td style="width: 15%;">
