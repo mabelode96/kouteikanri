@@ -6,7 +6,8 @@ from django.db import models
 # 生産数h,数量,生産高,コンベア,
 # 人員,パンミリ数,スライス枚数,スライス能力,
 # 切替予定,生産時間,開始予定,終了予定,
-# 開始時間,終了時間,切替実績,実際時間,status,set
+# 開始時間,終了時間,切替実績,実際時間,
+# status,set,fkey
 
 
 class Process(models.Model):
@@ -36,6 +37,7 @@ class Process(models.Model):
     processj = models.IntegerField('実際時間', blank=True)
     status = models.IntegerField('status', default=0)
     set = models.IntegerField('set', default=0)
+    fkey = models.CharField('fkey', blank=True, max_length=50)
 
     class Meta:
         db_table = 'kouteikanri_process'
