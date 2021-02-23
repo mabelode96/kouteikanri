@@ -404,16 +404,16 @@ def edit(request, id=None):
                 koutei.status = 0
             # fkey
             if koutei.fkey is not None:
-                l = len(koutei.fkey)
-                n = koutei.fkey[l:]
+                ln = len(koutei.fkey) - 1
+                nm = koutei.fkey[ln:]
                 if koutei.line is not None:
                     if koutei.hinban is not None:
                         if koutei.bin is not None:
                             koutei.fkey = koutei.line + '_' + str(koutei.bin) \
-                                          + str(koutei.hinban) + '_' + str(n)
+                                          + str(koutei.hinban) + '_' + str(nm)
                     else:
                         if koutei.name is not None:
-                            koutei.fkey = koutei.line + '_' + koutei.name + str(n)
+                            koutei.fkey = koutei.line + '_' + koutei.name + '_' + str(nm)
             # 保存
             koutei.save()
             if 'next' in request.GET:
