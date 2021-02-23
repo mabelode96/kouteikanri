@@ -385,6 +385,13 @@ def edit(request, id=None):
             koutei.line = request.POST['line']
             koutei.date = request.POST['date']
             koutei.period = request.POST['period']
+            # 数量に応じて生産高と生産数hを再計算
+            if koutei.value is not None:
+                if koutei.price is not None:
+                    koutei.seisand = koutei.value * koutei.price
+                if koutei.seisanh is not None and koutei.seisanh > 0:
+                    koutei.processy = round(koutei.value / koutei.seisanh * 60)
+            # 終了時間に応じて実際時間を計算しstatusを更新
             if koutei.endj is not None:
                 if koutei.startj is not None:
                     if koutei.name == '予備':
@@ -392,6 +399,22 @@ def edit(request, id=None):
                     else:
                         koutei.processj = get_stime(koutei.startj, koutei.endj)
                 koutei.status = 1
+            else:
+                koutei.processj = None
+                koutei.status = 0
+            # fkey
+            if koutei.fkey is not None:
+                l = len(koutei.fkey)
+                n = koutei.fkey[l:]
+                if koutei.line is not None:
+                    if koutei.hinban is not None:
+                        if koutei.bin is not None:
+                            koutei.fkey = koutei.line + '_' + str(koutei.bin) \
+                                          + str(koutei.hinban) + '_' + str(n)
+                    else:
+                        if koutei.name is not None:
+                            koutei.fkey = koutei.line + '_' + koutei.name + str(n)
+            # 保存
             koutei.save()
             if 'next' in request.GET:
                 return redirect(request.GET['next'])
