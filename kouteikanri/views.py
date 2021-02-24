@@ -445,7 +445,8 @@ def end_none(request, id=id):
 def delete(request, id):
     koutei = get_object_or_404(Process, pk=id)
     koutei.delete()
-    return redirect('kouteikanri:list', koutei.line, koutei.date, koutei.period)
+    # return redirect('kouteikanri:list', koutei.line, koutei.date, koutei.period)
+    return redirect(request.META.get('HTTP_REFERER', '/'))
 
 
 # 開始 or 終了
@@ -478,7 +479,8 @@ def start_or_end(request, id=id):
                 koutei.processj = get_stime(koutei.startj, koutei.endj)
         koutei.status = 1
         koutei.save()
-    return redirect('kouteikanri:list', koutei.line, koutei.date, koutei.period)
+    # return redirect('kouteikanri:list', koutei.line, koutei.date, koutei.period)
+    return redirect(request.META.get('HTTP_REFERER', '/'))
 
 
 # 生産中をキャンセル
@@ -503,12 +505,11 @@ def start_cancel(request, **kwargs):
                 koutei.changej = None
                 koutei.status = 0
                 update_list.append(koutei)
-                ancstr = str(koutei.id)
             # 生産中のデータを一括更新
             Process.objects.bulk_update(
                 update_list, fields=["changej", "startj", "status"])
-        return redirect('kouteikanri:list', line, d, period)
-
+        # return redirect('kouteikanri:list', line, d, period)
+        return redirect(request.META.get('HTTP_REFERER', '/'))
 
 # セット完了
 def set_comp(request, id=id):
@@ -520,8 +521,8 @@ def set_comp(request, id=id):
     else:
         koutei.set = 0
     koutei.save()
-    return redirect('kouteikanri:set_list', koutei.line, koutei.date, koutei.period)
-
+    # return redirect('kouteikanri:set_list', koutei.line, koutei.date, koutei.period)
+    return redirect(request.META.get('HTTP_REFERER', '/'))
 
 # すべての実績をリセット
 def reset_all(request, **kwargs):
@@ -545,9 +546,8 @@ def reset_all(request, **kwargs):
             # 工程のデータを一括更新
             Process.objects.bulk_update(
                 update_list, fields=["startj", "endj", "changej", "processj", "status"])
-        return redirect('kouteikanri:list', line, date, period)
-        # 戻ったほうが良い？
-        # return redirect(request.META.get('HTTP_REFERER', '/'))
+        # return redirect('kouteikanri:list', line, date, period)
+        return redirect(request.META.get('HTTP_REFERER', '/'))
 
 
 # 所要時間計算
