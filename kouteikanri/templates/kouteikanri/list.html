@@ -22,7 +22,7 @@
                     <input type="submit" value="全ライン一覧へ" class="btn btn-info">
                 </form>
             </th>
-            <th><h5>{{ linef }}</h5></th>
+            <th><h4>{{ linef }}</h4></th>
             <th><h5>{{ periodf }}</h5></th>
             <th align="right"><h5>{{ datef }}製造</h5></th>
             <th>
@@ -40,7 +40,7 @@
     </table>
     <table class="table-sm table-bordered table-secondary" style="width: 100%" align="center">
         <thead>
-            <tr class="text-center" style="font-size:16px;">
+            <tr class="text-center">
                 <th width="14%">生産高</th>
                 <th width="14%">能率</th>
                 <th width="18%"><span style="color:#4169E1;">終了</span> / 総数</th>
@@ -52,24 +52,24 @@
             </tr>
         </thead>
         <tbody>
-            <tr style="background-color: #FFFFFF; font-size:20px;" align="center">
-                <td>{{ sdstr }}</td>
-                <td>{{ nouritsu }}</td>
-                <td>
+            <tr style="background-color: #FFFFFF;" align="center">
+                <td><h5>{{ sdstr }}</h5></td>
+                <td><h5>{{ nouritsu }}</h5></td>
+                <td><h5>
                     {% if valend.value__sum %}
                         <span style="color:#4169E1;"> {{ valend.value__sum }} </span>
                     {% else %}0{% endif %} /
                     {% if valsum.value__sum %}{{ valsum.value__sum }}
                     {% else %}0{% endif %}
-                </td>
-                <td>{{ maxendy|date:"G:i" }}</td>
-                <td>
+                </h5></td>
+                <td><h5>{{ maxendy|date:"G:i" }}</h5></td>
+                <td><h5>
                     {% if chavg.changej__avg %}
                         {{ chavg.changej__avg|floatformat:1 }}
                     {% else %}0{% endif %}
-                </td>
-                <td>{{ comptime|date:"G:i" }}</td>
-                <td>
+                </h5></td>
+                <td><h5>{{ comptime|date:"G:i" }}</h5></td>
+                <td><h5>
                     {% if progress == 0 %}
                         <span style="color:#4169E1;">遅れなし</span>
                     {% else %}
@@ -79,7 +79,7 @@
                             <div class="text-danger" align="center">{{ progress|mul:-1 }}分遅れ</div>
                         {% endif %}
                     {% endif %}
-                </td>
+                </h5></td>
                 <td>
                     <form action="{% url 'kouteikanri:start_cancel' linef datef periodf %}" method="post">
                         {% csrf_token %}
@@ -105,7 +105,7 @@
                 <th width="8%;"></th>
                 <th>便</th>
                 <th>区分</th>
-                <th style="font-size:11px;"><span style="color:#4169E1;">セ<br>ッ<br>ト</span></th>
+                <th style="font-size:80%;"><span style="color:#4169E1;">セ<br>ッ<br>ト</span></th>
                 <th>製品名</th>
                 <th>数量</th>
                 <!--<th>開始予定</th>-->
