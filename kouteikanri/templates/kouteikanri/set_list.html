@@ -67,9 +67,9 @@
                     <!-- 完了ボタン -->
                     <form action="{% url 'kouteikanri:set_comp' id=koutei.id %}" method="get" class="form_start">
                         {% if koutei.set == 0 %}
-                            <input type="submit" class="btn btn-success" value="完了">
+                            <input type="submit" class="btn btn-success" id="btn_end" value="完了">
                         {% else %}
-                            <input type="submit" class="btn btn-secondary" value="解除">
+                            <input type="submit" class="btn btn-secondary" id="btn_start" value="解除">
                         {% endif %}
                     </form>
                 </td>

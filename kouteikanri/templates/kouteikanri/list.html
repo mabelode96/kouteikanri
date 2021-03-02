@@ -188,9 +188,6 @@
                     <td class="text-right">{{ koutei.startj|date:"G:i" }}</td>
                     <td class="text-right">{{ koutei.endj|date:"G:i" }}</td>
                     <td class="text-right">
-                        <!--{% if koutei.endj|seisantime:koutei.startj %}
-                            {{ koutei.endj|seisantime:koutei.startj }}
-                        {% endif %}-->
                         {% if koutei.processj %}
                             {{ koutei.processj }}
                         {% endif %}
@@ -211,23 +208,6 @@
                                 </div>
                             {% endif %}
                         {% endif%}
-                        <!--
-                        {% if koutei.endj %}
-                            {% if koutei.endj|seisantime:koutei.startj|sub:koutei.processy < 0 %}
-                                <div class="text-primary" align="right">
-                                    +{{ koutei.endj|seisantime:koutei.startj|sub:koutei.processy|mul:-1 }}
-                                </div>
-                            {% elif koutei.endj|seisantime:koutei.startj|sub:koutei.processy == 0 %}
-                                <div class="text-primary" align="right">
-                                    {{ koutei.endj|seisantime:koutei.startj|sub:koutei.processy|mul:-1 }}
-                                </div>
-                            {% else %}
-                                <div class="text-danger" align="right">
-                                    {{ koutei.endj|seisantime:koutei.startj|sub:koutei.processy|mul:-1 }}
-                                </div>
-                            {% endif %}
-                        {% endif %}
-                        -->
                     </td>
                     <td align="right">
                         {% if koutei.value|get_nouryoku:koutei.processj %}

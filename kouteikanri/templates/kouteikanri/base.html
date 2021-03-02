@@ -31,6 +31,11 @@
     <script src="/static/js/bootstrap.min.js"></script>
     <!-- jsを書く場所 -->
     <script>
+      // オートリロード
+      setTimeout(function () {
+        location.reload();
+      }, 30000);
+      // 開始・終了ボタン
       $('#btn_start').click(function() {
         setTimeout(function(){
           location.reload();
