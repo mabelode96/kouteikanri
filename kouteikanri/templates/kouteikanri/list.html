@@ -108,6 +108,9 @@
                 <th style="font-size:80%;"><span style="color:#4169E1;">セ<br>ッ<br>ト</span></th>
                 <th>製品名</th>
                 <th>数量</th>
+                {% if 'パン' in linef %}
+                <th style="font-size:80%;">ｽﾗｲｽ<br>枚数</th>
+                {% endif %}
                 <!--<th>開始予定</th>-->
                 <th>能力1h</th>
                 <th>終了予定</th>
@@ -181,6 +184,13 @@
                     </td>
                     <td id="{{ koutei.id }}">{{ koutei.name }}</td>
                     <td class="text-right">{% if koutei.value %}{{ koutei.value }}{% endif %}</td>
+                    {% if 'パン' in linef %}
+                        {% if koutei.slicev %}
+                            <td class="text-right">{{ koutei.slicev }}</td>
+                        {% else %}
+                            <td></td>
+                        {% endif %}
+                    {% endif %}
                     <td class="text-right">{% if koutei.seisanh %}{{ koutei.seisanh }}/h{% endif %}</td>
                     <!--<td class="text-right">{{ koutei.starty|date:"G:i" }}</td>-->
                     <td class="text-right">{{ koutei.endy|date:"G:i" }}</td>
