@@ -516,10 +516,13 @@ def set_comp(request, id=id):
     koutei = get_object_or_404(Process, pk=id)
     # 完了の処理
     if koutei.set == 0:
+        nw = datetime.datetime.now().astimezone()
         koutei.set = 1
+        koutei.setj = nw
     # 解除の処理
     else:
         koutei.set = 0
+        koutei.setj = None
     koutei.save()
     # return redirect('kouteikanri:set_list', koutei.line, koutei.date, koutei.period)
     return redirect(request.META.get('HTTP_REFERER', '/'))

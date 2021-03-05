@@ -41,7 +41,9 @@ class Migration(migrations.Migration):
                 ('processj', models.IntegerField(blank=True, verbose_name='実際時間')),
                 ('status', models.IntegerField(default=0, verbose_name='status')),
                 ('set', models.IntegerField(default=0, verbose_name='set')),
+                ('setj', models.DateTimeField(blank=True, verbose_name='準備時間')),
                 ('fkey', models.CharField(blank=True, max_length=50, verbose_name='fkey')),
+                ('comment', models.CharField(blank=True, max_length=255, verbose_name='comment')),
             ],
         ),
         migrations.AlterModelTable(

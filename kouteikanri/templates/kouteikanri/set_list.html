@@ -56,7 +56,8 @@
                 <th>区分</th>
                 <th>製品名</th>
                 <th>数量</th>
-                <th>開始予定</th>
+                <th>〆切時間</th>
+                <th>完了時間</th>
                 <th>盛付終了</th>
             </tr>
         </thead>
@@ -91,7 +92,8 @@
                 <td>{% if koutei.kubun %}{{ koutei.kubun }}{% endif %}</td>
                 <td id="{{ koutei.id }}">{{ koutei.name }}</td>
                 <td class="text-right">{% if koutei.value %}{{ koutei.value }}{% endif %}</td>
-                <td class="text-right">{{ koutei.starty|date:"G:i" }}</td>
+                <td class="text-right">{% close_time koutei.starty %}</td>
+                <td class="text-right">{{ koutei.setj|date:"G:i" }}</td>
                 <td align="center" style="font-size:20px;">
                     {% if koutei.endj %}
                     <i class="fas fa-check" style="color:red;"></i>

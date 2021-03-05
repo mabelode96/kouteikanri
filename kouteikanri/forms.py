@@ -57,12 +57,13 @@ class KouteiEditForm(ModelForm):
         label='生産時間', required=False, widget=forms.HiddenInput())
     status = forms.IntegerField(
         label='Status (0:開始前/生産中, 1:終了)', required=True, widget=forms.HiddenInput())
+    comment = forms.CharField(label='備考', required=False, max_length=255)
 
     class Meta:
         model = Process
         fields = ('id', 'name', 'bin', 'kubun',
                   'line', 'period', 'date', 'value', 'staff',
-                  'startj', 'endj', 'changej', 'processj', 'status')
+                  'startj', 'endj', 'changej', 'processj', 'comment', 'status')
 
 
 class KouteiAddForm(ModelForm):

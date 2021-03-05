@@ -84,3 +84,12 @@ def real_time(yotei, end, left):
     else:
         rs = '<span style="color:blue;">' + str(rt) + '分進み</span>'
     return rs
+
+
+@register.simple_tag
+def close_time(start):
+    if start is None:
+        return ''
+    else:
+        ct = start.astimezone() - datetime.timedelta(minutes=5)
+        return datetime.datetime.strftime(ct, '%H:%M')
