@@ -4,39 +4,48 @@
 {% block title %}工程の編集{% endblock title %}
 
 {% block content %}
-<table class="table-sm">
-    <tr>
-        <td>
-            <a href="./?next={{ request.META.HTTP_REFERER }}" class="btn btn-primary" role="button">戻る</a>
-        </td>
-        {% if form.endj.value %}
-        <td>
-            <form action="{% url 'kouteikanri:end_none' form.initial.id %}" method="post">
-                {% csrf_token %}
-                <input type="submit" value="終了を解除" class="btn btn-danger">
-            </form>
-        </td>
-        <!-- 未実装
-        <td>
-            <form action="{% url 'kouteikanri:end_none' form.initial.id %}" method="post">
-                {% csrf_token %}
-                <input type="submit" value="再生産" class="btn btn-info">
-            </form>
-        </td>
-        -->
-        {% endif %}
-    </tr>
-</table>
-<hr>
-<form action="./?next={{ request.META.HTTP_REFERER }}" method="post"
-      class="form-horizontal" role="form">
-    {% csrf_token %}
-    {{ form|bootstrap_horizontal }}
-    <div class="form-group">
-        <div class="col-sm-offset-2 col-sm-10">
-            <button type="submit" class="btn btn-primary">更新</button>
+<div class="container">
+    <table class="table-sm">
+        <tr>
+            <th></th>
+            <th></th>
+        </tr>
+        <tr>
+            <td>
+                <a href="./?next={{ request.META.HTTP_REFERER }}" class="btn btn-primary" role="button">戻る</a>
+            </td>
+
+            <td>
+                {% if form.endj.value %}
+                <form action="{% url 'kouteikanri:end_none' form.initial.id %}" method="post">
+                    {% csrf_token %}
+                    <input type="submit" value="終了を解除" class="btn btn-danger">
+                </form>
+                {% endif %}
+            </td>
+            <!-- 未実装
+            <td>
+                {% if form.endj.value %}
+                <form action="{% url 'kouteikanri:end_none' form.initial.id %}" method="post">
+                    {% csrf_token %}
+                    <input type="submit" value="再生産" class="btn btn-info">
+                </form>
+                {% endif %}
+            </td>
+            -->
+        </tr>
+    </table>
+    <hr>
+    <form action="./?next={{ request.META.HTTP_REFERER }}" method="post"
+          class="form-horizontal" role="form">
+        {% csrf_token %}
+        {{ form|bootstrap_horizontal }}
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <button type="submit" class="btn btn-primary">更新</button>
+            </div>
         </div>
-    </div>
-</form>
+    </form>
+</div>
 
 {% endblock content %}

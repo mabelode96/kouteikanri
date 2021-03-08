@@ -182,7 +182,13 @@
                         <i class="fas fa-check" style="color:#4169E1;"></i>
                         {% endif %}
                     </td>
-                    <td id="{{ koutei.id }}">{{ koutei.name }}</td>
+                    <td id="{{ koutei.id }}">
+                        {% if koutei.comment %}
+                        <a href="{% url 'kouteikanri:comment' koutei.id %}">{{ koutei.name }}</a>
+                        {% else %}
+                            {{ koutei.name }}
+                        {% endif %}
+                    </td>
                     <td class="text-right">{% if koutei.value %}{{ koutei.value }}{% endif %}</td>
                     {% if 'パン' in linef %}
                         {% if koutei.slicev %}

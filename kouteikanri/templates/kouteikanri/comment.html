@@ -1,0 +1,25 @@
+{% extends "kouteikanri/base.html" %}
+{% load bootstrap %}
+
+{% block title %}備考{% endblock title %}
+
+{% block content %}
+<div class="container">
+    <table class="table-sm">
+        <tr>
+            <th></th>
+            <th></th>
+        </tr>
+        <tr>
+            <td>
+                <a href="./?next={{ request.META.HTTP_REFERER }}" class="btn btn-primary" role="button">戻る</a>
+            </td>
+            <td></td>
+        </tr>
+    </table>
+    <hr>
+    <form class="form-horizontal" role="form">
+        {{ form|bootstrap_horizontal }}
+    </form>
+</div>
+{% endblock content %}

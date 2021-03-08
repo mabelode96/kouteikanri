@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Process
-from .forms import KouteiEditForm, KouteiAddForm, MyModelForm
+from .forms import KouteiEditForm, KouteiAddForm, MyModelForm, KouteiCommentForm
 from django.views.generic import ListView
 from django.db.models import Q, Max, Min, Sum, Avg, Count
 import datetime
@@ -562,3 +562,15 @@ def get_stime(start_time, end_time):
     else:
         td = end_time - start_time
         return round((td.days * 1440) + (td.seconds / 60))
+
+
+# 備考
+def comment(request, id):
+    koutei = get_object_or_404(Process, pk=id)
+    form = KouteiCommentForm(instance=koutei)
+
+    if 'next' in request.GET:
+        return redirect(request.GET['next'])
+    else:
+        return render(request, 'kouteikanri/comment.html', {'form': form})
+

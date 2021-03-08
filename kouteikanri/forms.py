@@ -36,12 +36,12 @@ class MyModelForm(forms.ModelForm):
 
 class KouteiEditForm(ModelForm):
     name = forms.CharField(label='製品名', required=False, max_length=50,
-                           widget = forms.TextInput(attrs={'readonly': True}))
+                           widget=forms.TextInput(attrs={'readonly': True}))
     date = forms.DateField(label='製造日', required=False, widget=forms.HiddenInput())
     bin = forms.IntegerField(label='便', required=False,
-                           widget = forms.TextInput(attrs={'readonly': True}))
+                           widget=forms.TextInput(attrs={'readonly': True}))
     kubun = forms.CharField(label='区分', required=False, max_length=10,
-                           widget = forms.TextInput(attrs={'readonly': True}))
+                           widget=forms.TextInput(attrs={'readonly': True}))
     line = LineChoiceField(
         queryset=Process.objects.order_by('line').distinct('line'),
         label='ライン名', to_field_name='line', empty_label=None)
@@ -57,7 +57,8 @@ class KouteiEditForm(ModelForm):
         label='生産時間', required=False, widget=forms.HiddenInput())
     status = forms.IntegerField(
         label='Status (0:開始前/生産中, 1:終了)', required=True, widget=forms.HiddenInput())
-    comment = forms.CharField(label='備考', required=False, max_length=255)
+    comment = forms.CharField(label='備考', required=False, max_length=255,
+                              widget=forms.Textarea)
 
     class Meta:
         model = Process
@@ -71,11 +72,11 @@ class KouteiAddForm(ModelForm):
     period = forms.CharField(label='時間帯', required=True, widget=forms.HiddenInput())
     date = forms.DateField(label='製造日', required=True, widget=forms.HiddenInput())
     name = forms.CharField(label='製品名', required=True, max_length=50,
-                           widget = forms.TextInput(attrs={'readonly': False}))
+                           widget=forms.TextInput(attrs={'readonly': False}))
     bin = forms.IntegerField(label='便', required=False,
-                           widget = forms.TextInput(attrs={'readonly': False}))
+                           widget=forms.TextInput(attrs={'readonly': False}))
     kubun = forms.CharField(label='区分', required=False, max_length=10,
-                           widget = forms.TextInput(attrs={'readonly': False}))
+                           widget=forms.TextInput(attrs={'readonly': False}))
     processy = forms.IntegerField(label='生産時間', required=True)
     status = forms.IntegerField(label='Status', required=True, widget=forms.HiddenInput())
 
@@ -86,3 +87,14 @@ class KouteiAddForm(ModelForm):
                   'seisanh', 'value', 'seisand', 'conveyor',
                   'staff', 'panmm', 'slicev', 'slicep',
                   'changey', 'processy', 'starty', 'endy', 'status')
+
+
+class KouteiCommentForm(forms.ModelForm):
+    name = forms.CharField(label='製品名', required=True, max_length=50,
+                           widget=forms.TextInput(attrs={'readonly': True}))
+    comment = forms.CharField(label='備考', required=False, max_length=255,
+                              widget=forms.Textarea(attrs={'readonly': True}))
+
+    class Meta:
+        model = Process
+        fields = ('id', 'name', 'comment',)
