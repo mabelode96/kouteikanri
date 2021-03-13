@@ -13,6 +13,7 @@ urlpatterns = [
     path('set/<str:line>/<date>/<str:period>/', views.SetList.as_view(), name='set_list'),
     url(r'^add/$', views.edit, name='add'),
     url(r'^edit/(?P<id>\d+)/$', views.edit, name='edit'),
+    url(r'^copy/(?P<id>\d+)/$', views.copy, name='copy'),
     url(r'^comment/(?P<id>\d+)/$', views.comment, name='comment'),
     url(r'^delete/(?P<id>\d+)/$', views.delete, name='delete'),
     url(r'^start_or_end/(?P<id>\d+)/$', views.start_or_end, name='start_or_end'),

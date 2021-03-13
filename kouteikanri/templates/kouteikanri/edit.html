@@ -9,12 +9,12 @@
         <tr>
             <th></th>
             <th></th>
+            <th></th>
         </tr>
         <tr>
             <td>
-                <a href="./?next={{ request.META.HTTP_REFERER }}" class="btn btn-primary" role="button">戻る</a>
+                <a href="{% url 'kouteikanri:list' form.initial.line form.initial.date form.initial.period %}" class="btn btn-primary" role="button">戻る</a>
             </td>
-
             <td>
                 {% if form.endj.value %}
                 <form action="{% url 'kouteikanri:end_none' form.initial.id %}" method="post">
@@ -23,21 +23,19 @@
                 </form>
                 {% endif %}
             </td>
-            <!-- 未実装
             <td>
                 {% if form.endj.value %}
-                <form action="{% url 'kouteikanri:end_none' form.initial.id %}" method="post">
+                <form action="{% url 'kouteikanri:copy' form.initial.id %}" method="get">
                     {% csrf_token %}
                     <input type="submit" value="再生産" class="btn btn-info">
                 </form>
                 {% endif %}
             </td>
-            -->
         </tr>
     </table>
     <hr>
-    <form action="./?next={{ request.META.HTTP_REFERER }}" method="post"
-          class="form-horizontal" role="form">
+    <form action="./?next={% url 'kouteikanri:list' form.initial.line form.initial.date form.initial.period %}"
+          method="post" class="form-horizontal" role="form">
         {% csrf_token %}
         {{ form|bootstrap_horizontal }}
         <div class="form-group">

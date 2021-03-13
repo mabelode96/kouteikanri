@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Process
 from .forms import KouteiEditForm, KouteiAddForm, MyModelForm, KouteiCommentForm
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView
 from django.db.models import Q, Max, Min, Sum, Avg, Count
 import datetime
 from django.db import connection
@@ -43,6 +43,8 @@ def all_list(request, **kwargs):
         )
         emp_list = exec_query(sql_text)
         return render(request, 'kouteikanri/all.html', {'emp_list': emp_list, 'date': date})
+
+
 #    else:
 #        date = request.kwargs['date']
 #        return redirect('kouteikanri:all', date)
@@ -104,7 +106,7 @@ class KouteiList(ListView):
         # 製造日 ==========================================================================
         tstr = self.kwargs['date']
         tdata = datetime.datetime.strptime(tstr, '%Y-%m-%d')
-        tdate = str(tdata.year)+'年'+str(tdata.month)+'月'+str(tdata.day)+'日'
+        tdate = str(tdata.year) + '年' + str(tdata.month) + '月' + str(tdata.day) + '日'
         ctx['datef'] = tdate
         # 時間帯 ==========================================================================
         ctx['periodf'] = self.kwargs['period']
@@ -195,7 +197,7 @@ class SetList(ListView):
         # 製造日 ==========================================================================
         tstr = self.kwargs['date']
         tdata = datetime.datetime.strptime(tstr, '%Y-%m-%d')
-        tdate = str(tdata.year)+'年'+str(tdata.month)+'月'+str(tdata.day)+'日'
+        tdate = str(tdata.year) + '年' + str(tdata.month) + '月' + str(tdata.day) + '日'
         ctx['datef'] = tdate
         # 時間帯 ==========================================================================
         ctx['periodf'] = self.kwargs['period']
@@ -429,6 +431,68 @@ def edit(request, id=None):
     return render(request, 'kouteikanri/edit.html', dict(form=form, id=id))
 
 
+# 再生産
+def copy(request, id=None):
+    # POST
+    koutei = Process()
+    form = KouteiAddForm(request.POST, instance=koutei)
+    if request.method == 'POST':
+        koutei_line = Process.objects.filter(
+            Q(line__exact=request.POST['line']) &
+            Q(date__exact=request.POST['date']) &
+            Q(period__exact=request.POST['period']) &
+            Q(name__exact=request.POST['name'])
+        )
+        nm = koutei_line.count() + 1
+        # バリデーションチェック
+        if form.is_valid():
+            koutei = form.save(commit=False)
+            koutei.line = request.POST['line']
+            koutei.date = request.POST['date']
+            koutei.period = request.POST['period']
+            # 数量に応じて生産高と生産数hを再計算
+            if koutei.value is not None:
+                if koutei.price is not None:
+                    koutei.seisand = koutei.value * koutei.price
+                if koutei.seisanh is not None and koutei.seisanh > 0:
+                    koutei.processy = round(koutei.value / koutei.seisanh * 60)
+            # 開始状態にする
+            koutei.startj = datetime.datetime.now().astimezone()
+            koutei.status = 0
+            # fkey
+            if koutei.fkey is not None:
+                # ln = len(koutei.fkey) - 1
+                # nm = koutei.fkey[ln:] + 1
+                if koutei.line is not None:
+                    if koutei.hinban is not None:
+                        if koutei.bin is not None:
+                            koutei.fkey = koutei.line + '_' + str(koutei.bin) \
+                                          + str(koutei.hinban) + '_' + str(nm)
+                    else:
+                        if koutei.name is not None:
+                            koutei.fkey = koutei.line + '_' + koutei.name + '_' + str(nm)
+            # 保存
+            koutei.save()
+            if 'next' in request.GET:
+                return redirect(request.GET['next'])
+        return redirect('kouteikanri:list', request.POST['line'], request.POST['date'], request.POST['period'])
+    # GET
+    else:
+        koutei = get_object_or_404(Process, pk=id)
+        initial_dict = dict(
+            line=koutei.line, date=koutei.date, period=koutei.period,
+            bin=koutei.bin, hinban=koutei.hinban, price=koutei.price,
+            kubun='再生産', name=koutei.name, seisanh=koutei.seisanh,
+            value=0, seisand=0, conveyor=koutei.conveyor, staff=koutei.staff,
+            panmm=koutei.panmm, slicev=0, slicep=koutei.slicep,
+            changey=koutei.changey, processy=0, status=0
+        )
+        form = KouteiAddForm(initial=initial_dict)
+        if 'next' in request.GET:
+            return redirect(request.GET['next'])
+    return render(request, 'kouteikanri/edit.html', dict(form=form))
+
+
 # 終了解除
 def end_none(request, id=id):
     koutei = get_object_or_404(Process, pk=id)
@@ -446,7 +510,7 @@ def delete(request, id):
     koutei = get_object_or_404(Process, pk=id)
     koutei.delete()
     # return redirect('kouteikanri:list', koutei.line, koutei.date, koutei.period)
-    return redirect(request.META.get('HTTP_REFERER', '/'))
+    return redirect(request.META.get('HTTP_REFERER', '/', ))
 
 
 # 開始 or 終了
@@ -480,7 +544,7 @@ def start_or_end(request, id=id):
         koutei.status = 1
         koutei.save()
     # return redirect('kouteikanri:list', koutei.line, koutei.date, koutei.period)
-    return redirect(request.META.get('HTTP_REFERER', '/'))
+    return redirect(request.META.get('HTTP_REFERER', '/', ))
 
 
 # 生産中をキャンセル
@@ -509,7 +573,8 @@ def start_cancel(request, **kwargs):
             Process.objects.bulk_update(
                 update_list, fields=["changej", "startj", "status"])
         # return redirect('kouteikanri:list', line, d, period)
-        return redirect(request.META.get('HTTP_REFERER', '/'))
+        return redirect(request.META.get('HTTP_REFERER', '/', ))
+
 
 # セット完了
 def set_comp(request, id=id):
@@ -525,7 +590,8 @@ def set_comp(request, id=id):
         koutei.setj = None
     koutei.save()
     # return redirect('kouteikanri:set_list', koutei.line, koutei.date, koutei.period)
-    return redirect(request.META.get('HTTP_REFERER', '/'))
+    return redirect(request.META.get('HTTP_REFERER', '/', ))
+
 
 # すべての実績をリセット
 def reset_all(request, **kwargs):
@@ -550,7 +616,7 @@ def reset_all(request, **kwargs):
             Process.objects.bulk_update(
                 update_list, fields=["startj", "endj", "changej", "processj", "status"])
         # return redirect('kouteikanri:list', line, date, period)
-        return redirect(request.META.get('HTTP_REFERER', '/'))
+        return redirect(request.META.get('HTTP_REFERER', '/', ))
 
 
 # 所要時間計算
@@ -573,4 +639,3 @@ def comment(request, id):
         return redirect(request.GET['next'])
     else:
         return render(request, 'kouteikanri/comment.html', {'form': form})
-
