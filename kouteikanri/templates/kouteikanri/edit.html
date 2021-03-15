@@ -25,10 +25,12 @@
             </td>
             <td>
                 {% if form.endj.value %}
+                {% if form.hinban.value %}
                 <form action="{% url 'kouteikanri:copy' form.initial.id %}" method="get">
                     {% csrf_token %}
                     <input type="submit" value="再生産" class="btn btn-info">
                 </form>
+                {% endif %}
                 {% endif %}
             </td>
         </tr>

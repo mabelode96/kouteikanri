@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Process
-from .forms import KouteiEditForm, KouteiAddForm, MyModelForm, KouteiCommentForm
-from django.views.generic import ListView, DetailView
+from .forms import KouteiEditForm, KouteiAddForm, MyModelForm, KouteiCommentForm, KouteiCopyForm
+from django.views.generic import ListView
 from django.db.models import Q, Max, Min, Sum, Avg, Count
 import datetime
 from django.db import connection
@@ -43,11 +43,9 @@ def all_list(request, **kwargs):
         )
         emp_list = exec_query(sql_text)
         return render(request, 'kouteikanri/all.html', {'emp_list': emp_list, 'date': date})
-
-
-#    else:
-#        date = request.kwargs['date']
-#        return redirect('kouteikanri:all', date)
+    else:
+        # 通らないはず
+        return redirect('kouteikanri:all', {'date': '2021-01-01'})
 
 # セットチェック 全ライン一覧
 def set_all(request, **kwargs):
@@ -375,10 +373,12 @@ def edit(request, id=None):
     if id:
         koutei = get_object_or_404(Process, pk=id)
         form = KouteiEditForm(request.POST, instance=koutei)
+        template = 'kouteikanri/edit.html'
     # 新規
     else:
         koutei = Process()
         form = KouteiAddForm(request.POST, instance=koutei)
+        template = 'kouteikanri/add.html'
     # POST
     if request.method == 'POST':
         # バリデーションチェック
@@ -424,18 +424,20 @@ def edit(request, id=None):
     else:
         if id:
             form = KouteiEditForm(instance=koutei)
+            template = 'kouteikanri/edit.html'
         else:
             form = KouteiAddForm(instance=koutei)
+            template = 'kouteikanri/add.html'
         if 'next' in request.GET:
             return redirect(request.GET['next'])
-    return render(request, 'kouteikanri/edit.html', dict(form=form, id=id))
+    return render(request, template, dict(form=form, id=id))
 
 
 # 再生産
 def copy(request, id=None):
     # POST
     koutei = Process()
-    form = KouteiAddForm(request.POST, instance=koutei)
+    form = KouteiCopyForm(request.POST, instance=koutei)
     if request.method == 'POST':
         koutei_line = Process.objects.filter(
             Q(line__exact=request.POST['line']) &
@@ -461,8 +463,6 @@ def copy(request, id=None):
             koutei.status = 0
             # fkey
             if koutei.fkey is not None:
-                # ln = len(koutei.fkey) - 1
-                # nm = koutei.fkey[ln:] + 1
                 if koutei.line is not None:
                     if koutei.hinban is not None:
                         if koutei.bin is not None:
@@ -487,7 +487,7 @@ def copy(request, id=None):
             panmm=koutei.panmm, slicev=0, slicep=koutei.slicep,
             changey=koutei.changey, processy=0, status=0
         )
-        form = KouteiAddForm(initial=initial_dict)
+        form = KouteiCopyForm(initial=initial_dict)
         if 'next' in request.GET:
             return redirect(request.GET['next'])
     return render(request, 'kouteikanri/edit.html', dict(form=form))
