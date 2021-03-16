@@ -63,12 +63,26 @@
                     <a href="{% url 'kouteikanri:list' data.line date data.period %}">{{ data.line }}</a>
                 </div>
             </td>
-            <td><div id="val_sum" align="right">{{ data.val_sum }}個</div></td>
+            <td>
+                <div id="val_sum" align="right">
+                    {% if data.val_sum %}
+                    {{ data.val_sum }}個
+                    {% else %}
+                    0個
+                    {% endif %}
+                </div>
+            </td>
             <td>
                 {% if data.left_cnt == 0 %}
                 <div style="color: royalblue;" align="center">完了</div>
                 {% else %}
-                <div id="left_val" align="right">{{ data.left_val }}個({{ data.left_cnt }})</div>
+                <div id="left_val" align="right">
+                    {% if data.left_val %}
+                    {{ data.left_val }}個({{ data.left_cnt }})
+                    {% else %}
+                    0個({{ data.left_cnt }})
+                    {% endif %}
+                </div>
                 {% endif %}
             </td>
             <td><div id="left_time" align="right">{{ data.left_time }}分</div></td>
@@ -97,7 +111,10 @@
                          aria-valuenow="{{data.progress}}"
                          aria-valuemin="0"
                          aria-valuemax="100">
+                        {% if data.progress %}
                         {{ data.progress }}%
+                        {% else %}
+                        {% endif %}
                     </div>
                 </div>
             </td>
