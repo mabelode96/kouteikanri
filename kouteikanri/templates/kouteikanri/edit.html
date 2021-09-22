@@ -4,6 +4,10 @@
 {% block title %}工程の編集{% endblock title %}
 
 {% block content %}
+{% load bootstrap4 %}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
+{{ form.media }}
 <div class="container">
     <table class="table-sm">
         <tr>

@@ -1,3 +1,4 @@
+import bootstrap_datepicker_plus as datetimepicker
 from django import forms
 from django.forms import ModelForm, ModelChoiceField
 from .models import Process
@@ -52,9 +53,35 @@ class KouteiEditForm(ModelForm):
         label='時間帯', to_field_name='period', empty_label=None)
     value = forms.IntegerField(label='数量', required=False)
     staff = forms.IntegerField(label='人員', required=False)
-    startj = forms.DateTimeField(label='開始時間', required=False)
-    endj = forms.DateTimeField(label='終了時間', required=False)
-    changej = forms.IntegerField(label='切替時間', required=False)
+    startj = forms.DateTimeField(
+        label='開始時間',
+        required=False,
+        disabled=False,
+        widget=datetimepicker.DateTimePickerInput(
+            format='%Y-%m-%d %H:%M:%S',
+            options={
+                'locale': 'ja',
+                'dayViewHeaderFormat': 'YYYY年 MMMM',
+            }
+        )
+    )
+    endj = forms.DateTimeField(
+        label='終了時間',
+        required=False,
+        disabled=False,
+        widget=datetimepicker.DateTimePickerInput(
+            format='%Y-%m-%d %H:%M:%S',
+            options={
+                'locale': 'ja',
+                'dayViewHeaderFormat': 'YYYY年 MMMM',
+            }
+        )
+    )
+    changej = forms.IntegerField(
+        label='切替時間',
+        required=False,
+        widget=forms.NumberInput()
+    )
     processj = forms.IntegerField(
         label='生産時間', required=False, widget=forms.HiddenInput())
     status = forms.IntegerField(

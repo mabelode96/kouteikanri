@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'bootstrap4',
     'bootstrapform',
     'mathfilters',
+    'bootstrap_datepicker_plus',
     'kouteikanri',
 ]
 
