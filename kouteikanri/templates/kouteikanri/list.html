@@ -25,6 +25,7 @@
             <th><h4>{{ linef }}</h4></th>
             <th><h5>{{ periodf }}</h5></th>
             <th align="right"><h5>{{ datef }}製造</h5></th>
+            <th><div class="alert-primary" align="center"><h4>{{ new_date|date:"H:i" }}</h4></div></th>
             <th>
                 <form action="{% url 'kouteikanri:reset_all' linef datef periodf %}" method="post">
                     {% csrf_token %}

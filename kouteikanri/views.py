@@ -163,6 +163,7 @@ class KouteiList(ListView):
         else:
             progress = get_stime(comp_time(ln, dt, pr), endy_max(ln, dt, pr))
         ctx['progress'] = progress
+        ctx["new_date"] = datetime.datetime.now()
         return ctx
 
     def get_queryset(self, **kwargs):
