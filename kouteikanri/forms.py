@@ -1,8 +1,7 @@
-import bootstrap_datepicker_plus as datetimepicker
+from bootstrap_datepicker_plus.widgets import DateTimePickerInput
 from django import forms
 from django.forms import ModelForm, ModelChoiceField
 from .models import Process
-
 
 class LineChoiceField(ModelChoiceField):
     def label_from_instance(self, obj):
@@ -57,7 +56,7 @@ class KouteiEditForm(ModelForm):
         label='開始時間',
         required=False,
         disabled=False,
-        widget=datetimepicker.DateTimePickerInput(
+        widget=DateTimePickerInput(
             format='%Y-%m-%d %H:%M:%S',
             options={
                 'locale': 'ja',
@@ -69,7 +68,7 @@ class KouteiEditForm(ModelForm):
         label='終了時間',
         required=False,
         disabled=False,
-        widget=datetimepicker.DateTimePickerInput(
+        widget=DateTimePickerInput(
             format='%Y-%m-%d %H:%M:%S',
             options={
                 'locale': 'ja',

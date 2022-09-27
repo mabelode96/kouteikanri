@@ -1,0 +1,35 @@
+{% extends "kouteikanri/base.html" %}
+
+{% block title %}
+ファイルアップロード
+{% endblock title %}
+
+{% block content %}
+<br>
+<div class="row">
+    <div class="col-sm-6 offset-sm-3">
+        <form action="" method="POST" enctype="multipart/form-data">
+            <h4>盛付工程表アップロード</h4>
+            <br>
+            <br>
+            {% csrf_token %}
+            <p><input type="file" accept=".xlsx" name="excel" value="" required></p>
+            <p><input type="submit" name="btn_upload" value="実行" class="btn btn-primary"></p>
+        </form>
+        {% if value %}
+        <p>{{ value }}</p>
+        {% endif %}
+        {% for message in messages %}
+            <div {% if message.tags %}class="{{ message.tags }}"{% endif %}>
+                {{ message }}
+            </div>
+        {% endfor %}
+        <div align="right">
+            <br>
+            <a href="{% url 'kouteikanri:top' %}"
+               class="btn btn-info" id="btn_bak" role="button">戻る</a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

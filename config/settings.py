@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 
 from pathlib import Path
 import os
+from django.contrib.messages import constants as messages
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -28,9 +29,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -39,10 +38,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'bootstrap4',
+    'bootstrap_datepicker_plus',
     'bootstrapform',
     'mathfilters',
-    'bootstrap_datepicker_plus',
     'kouteikanri',
+#    'import_export',
 ]
 
 
@@ -85,7 +85,6 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
-
 
 # PostgreSQL を使用 (環境に応じて修正する)
 DATABASES = {
@@ -136,7 +135,6 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
-
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
@@ -144,3 +142,11 @@ STATICFILES_DIRS = [
 ]
 
 STATIC_ROOT = '/root/kouteikanri/static'
+
+
+MESSAGE_TAGS = {
+    messages.INFO: 'alert alert-info',
+    messages.SUCCESS: 'alert alert-success',
+    # messages.WARNING: 'alert alert-warning',
+    messages.ERROR: 'alert alert-danger',
+}

@@ -22,4 +22,5 @@ urlpatterns = [
     url(r'^set_comp/(?P<id>\d+)/$', views.set_comp, name='set_comp'),
     path('reset_all/<str:line>/<date>/<str:period>/', views.reset_all, name='reset_all'),
     path('blank.html', views.blank, name='blank'),
+    path('upload/', views.upload, name='upload'),
 ]

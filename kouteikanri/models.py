@@ -7,7 +7,7 @@ from django.db import models
 # 人員,パンミリ数,スライス枚数,スライス能力,
 # 切替予定,生産時間,開始予定,終了予定,
 # 開始時間,終了時間,切替実績,実際時間,
-# status,set,fkey
+# status,set,fkey,comment
 
 
 class Process(models.Model):

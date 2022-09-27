@@ -1,10 +1,12 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Process
 from .forms import KouteiEditForm, KouteiAddForm, MyModelForm, KouteiCommentForm, KouteiCopyForm
-from django.views.generic import ListView
+from django.views.generic import ListView, FormView
 from django.db.models import Q, Max, Min, Sum, Avg, Count
 import datetime
 from django.db import connection
+import openpyxl
+from django.contrib import messages
 
 
 # blank
@@ -46,6 +48,7 @@ def all_list(request, **kwargs):
     else:
         # 通らないはず
         return redirect('kouteikanri:all', {'date': '2021-01-01'})
+
 
 # セットチェック 全ライン一覧
 def set_all(request, **kwargs):
@@ -405,7 +408,10 @@ def edit(request, id=None):
             else:
                 koutei.processj = None
                 koutei.status = 0
+            # ========================================================================
             # fkey
+            # 製品の生産ラインを変更したとき元々同じ製品があった場合fkeyが重複するのでは？
+            # ========================================================================
             if koutei.fkey is not None:
                 ln = len(koutei.fkey) - 1
                 nm = koutei.fkey[ln:]
@@ -417,6 +423,7 @@ def edit(request, id=None):
                     else:
                         if koutei.name is not None:
                             koutei.fkey = koutei.line + '_' + koutei.name + '_' + str(nm)
+            # ========================================================================
             # 保存
             koutei.save()
             if 'next' in request.GET:
@@ -635,8 +642,167 @@ def get_stime(start_time, end_time):
 def comment(request, id):
     koutei = get_object_or_404(Process, pk=id)
     form = KouteiCommentForm(instance=koutei)
-
     if 'next' in request.GET:
         return redirect(request.GET['next'])
     else:
         return render(request, 'kouteikanri/comment.html', {'form': form})
+
+
+def upload(request):
+    context = {}
+    if request.method == 'POST' and request.FILES['excel']:
+        excel = request.FILES['excel']
+        if not excel.name[-4:] == 'xlsx':
+            print(excel.name[-4:])
+            messages.error(request, "Excelファイル(*.xlsx)を選択してください")
+            return render(request, 'kouteikanri/upload.html', context)
+        # Excelの読み込み
+        wb = openpyxl.load_workbook(excel)
+        for ws in wb.worksheets:
+            # シートの最終行を取得
+            sheet_max_row = ws.max_row
+            # ライン名, 時間帯, 製造日を抽出
+            line = ws.title
+            date_str = ws.cell(1, 1).value
+            if not date_str[:3] == "製造日":
+                messages.error(request, "シート" + ws.title + "は工程表ではありません")
+                continue
+            else:
+                messages.info(request, "ライン「" + ws.title + "」の工程をアップロード")
+            period = date_str[-2:]
+            date_trm = str(date_str[4:date_str.index('(')])
+            date_y = str(date_trm[0:4])
+            date_m = str(date_trm[date_trm.index('年') + 1:date_trm.index('月')])
+            date_d = str(date_trm[date_trm.index('月') + 1:date_trm.index('日')])
+            date_ymd = datetime.date(int(date_y), int(date_m), int(date_d))
+            name_list = []
+            update_list = []
+            # 開始実績がないデータに削除フラグを立てる
+            koutei_delete = Process.objects.filter(
+                Q(line__exact=line) &
+                Q(date__exact=date_ymd) &
+                Q(period__exact=period) &
+                Q(startj__isnull=True) &
+                Q(status__exact=0)
+            )
+            if koutei_delete.count() > 0:
+                for koutei in koutei_delete:
+                    koutei.status = -1
+                    update_list.append(koutei)
+                # データベースを更新
+                Process.objects.bulk_update(update_list, fields=["status"])
+            # 行をループ
+            for j in range(6, sheet_max_row + 1):
+                # 製品名が空白でなければ処理
+                bin = ws.cell(row=j, column=2).value
+                hinban = ws.cell(row=j, column=3).value
+                name = ws.cell(row=j, column=6).value
+                starty = ws.cell(row=j, column=17).value
+                if name == '合計':
+                    messages.warning(request, "　")
+                else:
+                    # 開始予定と同じ終了予定のデータがあれば工程が連続していると判断し合算処理
+                    koutei_gassan = Process.objects.filter(
+                        Q(line__exact=line) &
+                        Q(date__exact=date_ymd) &
+                        Q(period__exact=period) &
+                        Q(bin__exact=bin) &
+                        Q(name__exact=name) &
+                        Q(endy__exact=starty) &
+                        Q(endj__isnull=True)
+                    )
+                    if koutei_gassan.count() == 1:
+                        messages.warning(request, "　合算：" + name)
+                        koutei = Process.objects.get(
+                            line=line, date=date_ymd, period=period,
+                            bin=bin, name=name, endy=starty
+                        )
+                        koutei.kubun = '確定'
+                        koutei.seisanh = ws.cell(row=j, column=7).value
+                        koutei.value = koutei.value + ws.cell(row=j, column=8).value
+                        koutei.seisand = koutei.seisand + ws.cell(row=j, column=9).value
+                        koutei.processy = koutei.processy + ws.cell(row=j, column=16).value
+                        koutei.endy = ws.cell(row=j, column=18).value
+                        koutei.status = 0
+                        koutei.save()
+                    else:
+                        # fkey
+                        name_list.append(name)
+                        if hinban is not None:
+                            fkey = line + '_' + str(bin) + str(hinban) + '_' + str(name_list.count(name))
+                        else:
+                            fkey = line + '_' + name + '_' + str(name_list.count(name))
+                        koutei_fkey = Process.objects.filter(
+                            Q(date__exact=date_ymd) &
+                            Q(period__exact=period) &
+                            Q(fkey__exact=fkey)
+                        )
+                        # 同じfkeyのデータがDBにない場合
+                        if koutei_fkey.count() == 0:
+                            # 新規追加
+                            messages.warning(request, "　追加：" + name)
+                            Process.objects.create(
+                                line=line,
+                                period=period,
+                                date=date_ymd,
+                                bin=bin,
+                                hinban=ws.cell(row=j, column=3).value,
+                                price=ws.cell(row=j, column=4).value,
+                                kubun=ws.cell(row=j, column=5).value,
+                                name=name,
+                                seisanh=ws.cell(row=j, column=7).value,
+                                value=ws.cell(row=j, column=8).value,
+                                seisand=ws.cell(row=j, column=9).value,
+                                conveyor=ws.cell(row=j, column=10).value,
+                                staff=ws.cell(row=j, column=11).value,
+                                panmm=ws.cell(row=j, column=12).value,
+                                slicev=ws.cell(row=j, column=13).value,
+                                slicep=ws.cell(row=j, column=14).value,
+                                changey=ws.cell(row=j, column=15).value,
+                                processy=ws.cell(row=j, column=16).value,
+                                starty=ws.cell(row=j, column=17).value,
+                                endy=ws.cell(row=j, column=18).value,
+                                status=0,
+                                fkey=fkey
+                            )
+                        # 同じfkeyのデータがDBにある場合
+                        elif koutei_fkey.count() == 1:
+                            koutei = Process.objects.get(date=date_ymd, period=period, fkey=fkey)
+                            # 予測過剰は更新しない
+                            messages.warning(request, "　更新：" + name)
+                            if koutei.kubun == '予測' and koutei.endj is not None \
+                                    and koutei.value > ws.cell(row=j, column=8).value:
+                                messages.warning(request, "　　予測過剰")
+                            else:
+                                koutei.kubun = ws.cell(row=j, column=5).value
+                                koutei.seisanh = ws.cell(row=j, column=7).value
+                                koutei.value = ws.cell(row=j, column=8).value
+                                koutei.seisand = ws.cell(row=j, column=9).value
+                            # 常に更新する
+                            koutei.price = ws.cell(row=j, column=4).value
+                            koutei.conveyor = ws.cell(row=j, column=10).value
+                            koutei.staff = ws.cell(row=j, column=11).value
+                            koutei.panmm = ws.cell(row=j, column=12).value
+                            koutei.slicev = ws.cell(row=j, column=13).value
+                            koutei.slicep = ws.cell(row=j, column=14).value
+                            koutei.changey = ws.cell(row=j, column=15).value
+                            koutei.processy = ws.cell(row=j, column=16).value
+                            koutei.starty = ws.cell(row=j, column=17).value
+                            koutei.endy = ws.cell(row=j, column=18).value
+                            koutei.status = 0
+                            koutei.save()
+                        else:
+                            messages.error(
+                                request,
+                                "　" + name + "には" + str(koutei_fkey.count()) +
+                                "件の検索キーが存在しています"
+                            )
+            # 削除フラグが残っているデータを削除
+            koutei_delete = Process.objects.filter(Q(status__exact=-1))
+            if koutei_delete.count() > 0:
+                for koutei in koutei_delete:
+                    koutei.delete()
+
+        messages.success(request, "ファイルのアップロードが終了しました")
+
+    return render(request, 'kouteikanri/upload.html', context)
