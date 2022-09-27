@@ -649,13 +649,12 @@ def comment(request, id):
 
 
 def upload(request):
-    context = {}
     if request.method == 'POST' and request.FILES['excel']:
         excel = request.FILES['excel']
         if not excel.name[-4:] == 'xlsx':
             print(excel.name[-4:])
             messages.error(request, "Excelファイル(*.xlsx)を選択してください")
-            return render(request, 'kouteikanri/upload.html', context)
+            return render(request, 'kouteikanri/upload.html')
         # Excelの読み込み
         wb = openpyxl.load_workbook(excel)
         for ws in wb.worksheets:
@@ -805,4 +804,4 @@ def upload(request):
 
         messages.success(request, "ファイルのアップロードが終了しました")
 
-    return render(request, 'kouteikanri/upload.html', context)
+    return render(request, 'kouteikanri/upload.html')
