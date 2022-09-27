@@ -727,11 +727,11 @@ def upload(request):
                         koutei.save()
                     else:
                         # fkey
-                        name_list.append(name)
+                        name_list.append(name + str(bin))
                         if hinban is not None:
-                            fkey = line + '_' + str(bin) + str(hinban) + '_' + str(name_list.count(name))
+                            fkey = line + '_' + str(bin) + str(hinban) + '_' + str(name_list.count(name + str(bin)))
                         else:
-                            fkey = line + '_' + name + '_' + str(name_list.count(name))
+                            fkey = line + '_' + name + '_' + str(name_list.count(name + str(bin)))
                         koutei_fkey = Process.objects.filter(
                             Q(date__exact=date_ymd) &
                             Q(period__exact=period) &
