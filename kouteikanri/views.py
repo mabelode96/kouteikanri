@@ -788,7 +788,8 @@ def upload(request):
                             koutei.processy = ws.cell(row=j, column=16).value
                             koutei.starty = ws.cell(row=j, column=17).value
                             koutei.endy = ws.cell(row=j, column=18).value
-                            koutei.status = 0
+                            if koutei.status == -1:
+                                koutei.status = 0
                             koutei.save()
                         else:
                             messages.error(
