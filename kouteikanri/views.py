@@ -720,6 +720,7 @@ def upload(request):
                         koutei.seisanh = ws.cell(row=j, column=7).value
                         koutei.value = koutei.value + ws.cell(row=j, column=8).value
                         koutei.seisand = koutei.seisand + ws.cell(row=j, column=9).value
+                        koutei.slicev = koutei.slicev + ws.cell(row=j, column=13).value
                         koutei.processy = koutei.processy + ws.cell(row=j, column=16).value
                         koutei.endy = ws.cell(row=j, column=18).value
                         koutei.status = 0
