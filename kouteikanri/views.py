@@ -718,8 +718,10 @@ def upload(request):
                         )
                         koutei.kubun = '確定'
                         koutei.seisanh = ws.cell(row=j, column=7).value
-                        koutei.value = koutei.value + ws.cell(row=j, column=8).value
-                        koutei.seisand = koutei.seisand + ws.cell(row=j, column=9).value
+                        if koutei.value:
+                            if ws.cell(row=j, column=8).value:
+                                koutei.value = koutei.value + ws.cell(row=j, column=8).value
+                                koutei.seisand = koutei.seisand + ws.cell(row=j, column=9).value
                         if koutei.slicev:
                             if ws.cell(row=j, column=13).value:
                                 koutei.slicev = koutei.slicev + ws.cell(row=j, column=13).value
@@ -730,7 +732,7 @@ def upload(request):
                     else:
                         # fkey
                         name_list.append(name + str(bin))
-                        if hinban is not None:
+                        if hinban:
                             fkey = line + '_' + str(bin) + str(hinban) + '_' + str(name_list.count(name + str(bin)))
                         else:
                             fkey = line + '_' + name + '_' + str(name_list.count(name + str(bin)))
