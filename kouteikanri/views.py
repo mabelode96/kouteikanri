@@ -692,7 +692,6 @@ def upload(request):
                 Process.objects.bulk_update(update_list, fields=["status"])
             # 行をループ
             for j in range(6, sheet_max_row + 1):
-                # 製品名が空白でなければ処理
                 bin = ws.cell(row=j, column=2).value
                 hinban = ws.cell(row=j, column=3).value
                 name = ws.cell(row=j, column=6).value
@@ -707,8 +706,7 @@ def upload(request):
                         Q(period__exact=period) &
                         Q(bin__exact=bin) &
                         Q(name__exact=name) &
-                        Q(endy__exact=starty) &
-                        Q(endj__isnull=True)
+                        Q(endy__exact=starty)
                     )
                     if koutei_gassan.count() == 1:
                         messages.warning(request, "　合算：" + name)
@@ -718,13 +716,13 @@ def upload(request):
                         )
                         koutei.kubun = '確定'
                         koutei.seisanh = ws.cell(row=j, column=7).value
-                        #if koutei.value:
-                        #    if ws.cell(row=j, column=8).value:
-                        koutei.value = koutei.value + ws.cell(row=j, column=8).value
-                        koutei.seisand = koutei.seisand + ws.cell(row=j, column=9).value
-                        #if koutei.slicev:
-                        #    if ws.cell(row=j, column=13).value:
-                        #        koutei.slicev = koutei.slicev + ws.cell(row=j, column=13).value
+                        if koutei.value:
+                            if ws.cell(row=j, column=8).value:
+                                koutei.value = koutei.value + ws.cell(row=j, column=8).value
+                                koutei.seisand = koutei.seisand + ws.cell(row=j, column=9).value
+                        if koutei.slicev:
+                            if ws.cell(row=j, column=13).value:
+                                koutei.slicev = koutei.slicev + ws.cell(row=j, column=13).value
                         koutei.processy = koutei.processy + ws.cell(row=j, column=16).value
                         koutei.endy = ws.cell(row=j, column=18).value
                         koutei.save()
