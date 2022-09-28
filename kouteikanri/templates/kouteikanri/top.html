@@ -6,62 +6,63 @@
 
 {% block content %}
 <br>
-<table class="table-sm" style="width: 100%" align="center">
-    <tr>
-        <td>
-            <button class="btn" onclick="window.location.reload();">
-                <i class="fas fa-sync fa-2x" style="color: #007bff;"></i>
-            </button>
-        </td>
-        <td align="right">
-            <a href="{% url 'kouteikanri:upload' %}"
-               class="btn-sm btn-danger" id="btn_upload" role="button">管理メニュー</a>
-        </td>
-    </tr>
-</table>
-<br>
-<h1 align="center">盛付工程進捗状況</h1>
-<br>
-<br>
-<br>
-<br>
-<table class="table-sm" style="width: 100%" align="center">
-    <tr>
-        <td>　</td>
-    </tr>
-    <tr>
-        <td>
-            <form action="{% url 'kouteikanri:all' %}" method="post">
-            {% csrf_token %}
-            <div class="input-group-lg mb-3">
-                <div class="input-group-prepend">
-                    <label class="input-group-text">製造日</label>
-                    {{ form1.date }}
-                </div>
-            </div>
-        </td>
-    </tr>
-    <tr>
-        <td>
-            <div align="left">
-                <button type="submit" class="btn btn-primary btn-lg">
-                    <i class="fas fa-search" style="font-size:100%;"></i> 検索
+<div class="col-sm-10 offset-sm-1">
+    <table class="table-sm" style="width: 100%" align="center">
+        <tr>
+            <td>
+                <button class="btn" onclick="window.location.reload();">
+                    <i class="fas fa-sync fa-2x" style="color: #007bff;"></i>
                 </button>
-            </div>
-            </form>
-        </td>
-    </tr>
-    <tr>
-        <td>
-            <form action="{% url 'kouteikanri:set_all' %}" method="post">
+            </td>
+            <td align="right">
+                <a href="{% url 'kouteikanri:upload' %}"
+                   class="btn-sm btn-danger" id="btn_upload" role="button">管理メニュー</a>
+            </td>
+        </tr>
+    </table>
+    <br>
+    <h1 align="center">盛付工程進捗状況</h1>
+    <br>
+    <br>
+    <br>
+    <br>
+    <table class="table-sm" style="width: 100%" align="center">
+        <tr>
+            <td>　</td>
+        </tr>
+        <tr>
+            <td>
+                <form action="{% url 'kouteikanri:all' %}" method="post">
                 {% csrf_token %}
-                <div align="right">
-                    <input type="date" name="date2" id="date2" hidden>
-                    <button type="submit" class="btn btn-success">セットチェック</button>
+                <div class="input-group-lg mb-3">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text">製造日</label>
+                        {{ form1.date }}
+                    </div>
                 </div>
-            </form>
-        </td>
-    </tr>
-</table>
-
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div align="left">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-search" style="font-size:100%;"></i> 検索
+                    </button>
+                </div>
+                </form>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <form action="{% url 'kouteikanri:set_all' %}" method="post">
+                    {% csrf_token %}
+                    <div align="right">
+                        <input type="date" name="date2" id="date2" hidden>
+                        <button type="submit" class="btn btn-success">セットチェック</button>
+                    </div>
+                </form>
+            </td>
+        </tr>
+    </table>
+</div>
 {% endblock content %}

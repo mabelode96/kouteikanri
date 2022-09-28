@@ -3,23 +3,16 @@ margin: 0px;
 padding: 0px;
 }
 
-body{
-width: 95%;
-max-width: 1200px;
-min-width: 500px;
-margin: 0px auto;
-}
-
 .site-header, .site-content{
 display: block;
+box-sizing: border-box;
 }
 
 .site-header{
 position: fixed;
 z-index: 20;
-width: 96%;
-box-sizing: border-box;
-padding: 1em;
+width: 100%;
+padding: 0px;
 text-align: center;
 top: 0px;
 }
@@ -28,7 +21,7 @@ top: 0px;
 position: absolute;
 z-index: 10;
 padding-top: 250px;
-width: 96%;
+width: 100%;
 }
 
 #id_line, #id_date, #id_period{
