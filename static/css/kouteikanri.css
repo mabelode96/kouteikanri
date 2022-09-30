@@ -20,8 +20,8 @@ top: 0px;
 .site-content{
 position: absolute;
 z-index: 10;
-padding-top: 250px;
 width: 100%;
+padding-top: 250px;
 }
 
 #id_line, #id_date, #id_period{

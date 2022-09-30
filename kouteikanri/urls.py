@@ -21,6 +21,6 @@ urlpatterns = [
     url(r'^end_none/(?P<id>\d+)/$', views.end_none, name='end_none'),
     url(r'^set_comp/(?P<id>\d+)/$', views.set_comp, name='set_comp'),
     path('reset_all/<str:line>/<date>/<str:period>/', views.reset_all, name='reset_all'),
-    path('blank.html', views.blank, name='blank'),
     path('upload/', views.upload, name='upload'),
+    path('blank.html', views.blank, name='blank'),
 ]

@@ -807,4 +807,3 @@ def upload(request):
                     koutei.delete()
         messages.success(request, "ファイルのアップロードが終了しました")
     return render(request, 'kouteikanri/upload.html')
-

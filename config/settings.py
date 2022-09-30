@@ -85,7 +85,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
-# PostgreSQL を使用 (環境に応じて修正する)
+# PostgreSQL を使用 (環境に応じて修正すること)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',

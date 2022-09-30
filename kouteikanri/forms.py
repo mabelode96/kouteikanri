@@ -179,4 +179,3 @@ class KouteiCommentForm(forms.ModelForm):
     class Meta:
         model = Process
         fields = ('id', 'name', 'comment',)
-
