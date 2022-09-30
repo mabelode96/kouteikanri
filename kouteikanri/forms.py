@@ -3,6 +3,7 @@ from django import forms
 from django.forms import ModelForm, ModelChoiceField
 from .models import Process
 
+
 class LineChoiceField(ModelChoiceField):
     def label_from_instance(self, obj):
         return obj.line

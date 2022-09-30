@@ -704,7 +704,6 @@ def upload(request):
                         Q(line__exact=line) &
                         Q(date__exact=date_ymd) &
                         Q(period__exact=period) &
-                        Q(bin__exact=bin) &
                         Q(name__exact=name) &
                         Q(endy__exact=starty)
                     )
@@ -712,7 +711,7 @@ def upload(request):
                         messages.warning(request, "　合算：" + name)
                         koutei = Process.objects.get(
                             line=line, date=date_ymd, period=period,
-                            bin=bin, name=name, endy=starty
+                            name=name, endy=starty
                         )
                         koutei.kubun = '確定'
                         koutei.seisanh = ws.cell(row=j, column=7).value

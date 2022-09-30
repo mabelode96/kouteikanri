@@ -42,7 +42,6 @@ INSTALLED_APPS = [
     'bootstrapform',
     'mathfilters',
     'kouteikanri',
-#    'import_export',
 ]
 
 
