@@ -1,4 +1,4 @@
-from bootstrap_datepicker_plus.widgets import DateTimePickerInput
+import bootstrap_datepicker_plus as datetimepicker
 from django import forms
 from django.forms import ModelForm, ModelChoiceField
 from .models import Process
@@ -39,12 +39,17 @@ class KouteiEditForm(ModelForm):
     name = forms.CharField(label='製品名', required=False, max_length=50,
                            widget=forms.TextInput(attrs={'readonly': True}))
     date = forms.DateField(label='製造日', required=False, widget=forms.HiddenInput())
-    bin = forms.IntegerField(label='便', required=False,
-                           widget=forms.TextInput(attrs={'readonly': True}))
-    hinban = forms.IntegerField(label='品番', required=False,
-                           widget=forms.HiddenInput())
-    kubun = forms.CharField(label='区分', required=False, max_length=10,
-                           widget=forms.TextInput(attrs={'readonly': True}))
+    bin = forms.IntegerField(
+        label='便', required=False, widget=forms.TextInput(attrs={'readonly': True})
+    )
+    hinban = forms.IntegerField(
+        label='品番', required=False, widget=forms.HiddenInput()
+    )
+    kubun = forms.CharField(
+        label='区分', required=False, max_length=10, widget=forms.TextInput(
+            attrs={'readonly': True}
+        )
+    )
     line = LineChoiceField(
         queryset=Process.objects.order_by('line').distinct('line'),
         label='ライン名', to_field_name='line', empty_label=None)
@@ -57,7 +62,7 @@ class KouteiEditForm(ModelForm):
         label='開始時間',
         required=False,
         disabled=False,
-        widget=DateTimePickerInput(
+        widget=datetimepicker.DateTimePickerInput(
             format='%Y-%m-%d %H:%M:%S',
             options={
                 'locale': 'ja',
@@ -69,7 +74,7 @@ class KouteiEditForm(ModelForm):
         label='終了時間',
         required=False,
         disabled=False,
-        widget=DateTimePickerInput(
+        widget=datetimepicker.DateTimePickerInput(
             format='%Y-%m-%d %H:%M:%S',
             options={
                 'locale': 'ja',

@@ -1,0 +1,7 @@
+Django==3.2.15
+django-bootstrap-datepicker-plus==3.0.5
+django-bootstrap-form==3.4
+django-bootstrap4==22.2
+django-mathfilters==1.0.0
+openpyxl==3.0.10
+psycopg2-binary==2.9.3

@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Process
 from .forms import KouteiEditForm, KouteiAddForm, MyModelForm, KouteiCommentForm, KouteiCopyForm
-from django.views.generic import ListView, FormView
+from django.views.generic import ListView
 from django.db.models import Q, Max, Min, Sum, Avg, Count
 import datetime
 from django.db import connection
@@ -24,7 +24,7 @@ def top(request):
 
 # 全ライン一覧
 # 参考url: https://qiita.com/t-iguchi/items/827865481e82bb32ad04
-def all_list(request, **kwargs):
+def all_list(request):
     if request.method == 'POST':
         date = request.POST['date']
         sql_text = (
@@ -51,7 +51,7 @@ def all_list(request, **kwargs):
 
 
 # セットチェック 全ライン一覧
-def set_all(request, **kwargs):
+def set_all(request):
     if request.method == 'POST':
         date = request.POST['date2']
         sql_text = (
@@ -175,7 +175,8 @@ class KouteiList(ListView):
             Q(date__exact=self.kwargs['date']) &
             Q(period__exact=self.kwargs['period']))
 
-    def post(self, request, **kwargs):
+    @staticmethod
+    def post(request):
         line = request.POST['line']
         date = request.POST['date']
         period = request.POST['period']
@@ -218,7 +219,8 @@ class SetList(ListView):
             Q(period__exact=self.kwargs['period']) &
             Q(hinban__gt=0))
 
-    def post(self, request, **kwargs):
+    @staticmethod
+    def post(request):
         line = request.POST['line']
         date = request.POST['date']
         period = request.POST['period']
@@ -556,7 +558,7 @@ def start_or_end(request, id=id):
 
 
 # 生産中をキャンセル
-def start_cancel(request, **kwargs):
+def start_cancel(request):
     # POST
     if request.method == 'POST':
         update_list = []
@@ -602,7 +604,7 @@ def set_comp(request, id=id):
 
 
 # すべての実績をリセット
-def reset_all(request, **kwargs):
+def reset_all(request):
     # POST
     if request.method == 'POST':
         update_list = []
@@ -692,7 +694,7 @@ def upload(request):
                 Process.objects.bulk_update(update_list, fields=["status"])
             # 行をループ
             for j in range(6, sheet_max_row + 1):
-                bin = ws.cell(row=j, column=2).value
+                binn = ws.cell(row=j, column=2).value
                 hinban = ws.cell(row=j, column=3).value
                 name = ws.cell(row=j, column=6).value
                 starty = ws.cell(row=j, column=17).value
@@ -745,7 +747,7 @@ def upload(request):
                                 line=line,
                                 period=period,
                                 date=date_ymd,
-                                bin=bin,
+                                bin=binn,
                                 hinban=ws.cell(row=j, column=3).value,
                                 price=ws.cell(row=j, column=4).value,
                                 kubun=ws.cell(row=j, column=5).value,
@@ -803,7 +805,5 @@ def upload(request):
             if koutei_delete.count() > 0:
                 for koutei in koutei_delete:
                     koutei.delete()
-
         messages.success(request, "ファイルのアップロードが終了しました")
-
     return render(request, 'kouteikanri/upload.html')
