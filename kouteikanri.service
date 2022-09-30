@@ -1,0 +1,12 @@
+[Unit]
+Description=uWSGI daemon
+After=network.target
+
+[Service]
+User=root
+Group=root
+WorkingDirectory=/root/kouteikanri
+ExecStart=/usr/local/bin/uwsgi --ini /root/kouteikanri/uwsgi.ini
+
+[Install]
+WantedBy=multi-user.target
