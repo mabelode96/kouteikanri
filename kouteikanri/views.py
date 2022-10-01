@@ -36,7 +36,7 @@ def all_list(request):
                 "min(starty) AS starty_min, "
                 "max(endy) AS endy_max, "
                 "max(endj) AS endj_max, "
-                "(sum(processy) + sum(changey)) - (sum(processy * status) + sum(changey * status)) AS left_time, "
+                "(sum(processy) + sum(changey)) - sum(processy * status) - sum(changey * status) AS left_time, "
                 "(sum(processj * status) + sum(changej * status)) - (sum(processy * status) + sum(changey * status)) AS real_time, "
                 "sum(value * status) * 100 / sum(value) AS progress "
                 "FROM kouteikanri_process "
@@ -706,6 +706,7 @@ def upload(request):
                         Q(line__exact=line) &
                         Q(date__exact=date_ymd) &
                         Q(period__exact=period) &
+                        Q(bin__exact=binn) &
                         Q(name__exact=name) &
                         Q(endy__exact=starty)
                     )
@@ -713,7 +714,7 @@ def upload(request):
                         messages.warning(request, "　合算：" + name)
                         koutei = Process.objects.get(
                             line=line, date=date_ymd, period=period,
-                            name=name, endy=starty
+                            bin=binn, name=name, endy=starty
                         )
                         koutei.kubun = '確定'
                         koutei.seisanh = ws.cell(row=j, column=7).value
@@ -729,11 +730,11 @@ def upload(request):
                         koutei.save()
                     else:
                         # fkey
-                        name_list.append(name + str(bin))
+                        name_list.append(name + str(binn))
                         if hinban:
-                            fkey = line + '_' + str(bin) + str(hinban) + '_' + str(name_list.count(name + str(bin)))
+                            fkey = line + '_' + str(binn) + str(hinban) + '_' + str(name_list.count(name + str(binn)))
                         else:
-                            fkey = line + '_' + name + '_' + str(name_list.count(name + str(bin)))
+                            fkey = line + '_' + name + '_' + str(name_list.count(name + str(binn)))
                         koutei_fkey = Process.objects.filter(
                             Q(date__exact=date_ymd) &
                             Q(period__exact=period) &
