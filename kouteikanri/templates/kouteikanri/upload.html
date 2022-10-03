@@ -16,7 +16,7 @@
             <br>
             {% csrf_token %}
             <p><input type="file" accept=".xlsx" name="excel" value="" required></p>
-            <p><input type="submit" name="btn_upload" value="実行" class="btn btn-primary"></p>
+            <p><input type="submit" name="btn_upload" value="実行" class="btn btn-primary" onclick=""></p>
         </form>
         {% if value %}
         <p>{{ value }}</p>

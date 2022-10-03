@@ -558,7 +558,7 @@ def start_or_end(request, id=id):
 
 
 # 生産中をキャンセル
-def start_cancel(request):
+def start_cancel(request, **kwargs):
     # POST
     if request.method == 'POST':
         update_list = []
@@ -604,7 +604,7 @@ def set_comp(request, id=id):
 
 
 # すべての実績をリセット
-def reset_all(request):
+def reset_all(request, **kwargs):
     # POST
     if request.method == 'POST':
         update_list = []
