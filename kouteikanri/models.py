@@ -1,5 +1,5 @@
 from django.db import models
-
+from model_utils import FieldTracker
 
 # ライン名, 時間帯,製造日, 便,
 # 品番, 単価, 区分, 製品名,
@@ -40,6 +40,8 @@ class Process(models.Model):
     setj = models.DateTimeField('準備時間', blank=True)
     fkey = models.CharField('fkey', blank=True, max_length=50)
     comment = models.CharField('comment', blank=True, max_length=255)
+
+    tracker = FieldTracker()
 
     class Meta:
         db_table = 'kouteikanri_process'

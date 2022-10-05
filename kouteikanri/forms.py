@@ -122,8 +122,30 @@ class KouteiAddForm(ModelForm):
     slicep = forms.IntegerField(label='スライス能力', required=False, widget=forms.HiddenInput())
     changey = forms.IntegerField(label='切替予定', required=False, widget=forms.HiddenInput())
     processy = forms.IntegerField(label='生産時間', required=True)
-    starty = forms.DateTimeField(label='開始予定', required=False)
-    endy = forms.DateTimeField(label='終了予定', required=False)
+    starty = forms.DateTimeField(
+        label='開始時間',
+        required=False,
+        disabled=False,
+        widget=datetimepicker.DateTimePickerInput(
+            format='%Y-%m-%d %H:%M:%S',
+            options={
+                'locale': 'ja',
+                'dayViewHeaderFormat': 'YYYY年 MMMM',
+            }
+        )
+    )
+    endy = forms.DateTimeField(
+        label='終了時間',
+        required=False,
+        disabled=False,
+        widget=datetimepicker.DateTimePickerInput(
+            format='%Y-%m-%d %H:%M:%S',
+            options={
+                'locale': 'ja',
+                'dayViewHeaderFormat': 'YYYY年 MMMM',
+            }
+        )
+    )
     status = forms.IntegerField(label='Status', required=True, widget=forms.HiddenInput())
 
     class Meta:
@@ -157,8 +179,30 @@ class KouteiCopyForm(ModelForm):
     slicep = forms.IntegerField(label='スライス能力', required=False, widget=forms.HiddenInput())
     changey = forms.IntegerField(label='切替予定', required=False)
     processy = forms.IntegerField(label='生産時間', required=True, widget=forms.HiddenInput())
-    starty = forms.DateTimeField(label='開始予定', required=False)
-    endy = forms.DateTimeField(label='終了予定', required=False)
+    starty = forms.DateTimeField(
+        label='開始時間',
+        required=False,
+        disabled=False,
+        widget=datetimepicker.DateTimePickerInput(
+            format='%Y-%m-%d %H:%M:%S',
+            options={
+                'locale': 'ja',
+                'dayViewHeaderFormat': 'YYYY年 MMMM',
+            }
+        )
+    )
+    endy = forms.DateTimeField(
+        label='終了時間',
+        required=False,
+        disabled=False,
+        widget=datetimepicker.DateTimePickerInput(
+            format='%Y-%m-%d %H:%M:%S',
+            options={
+                'locale': 'ja',
+                'dayViewHeaderFormat': 'YYYY年 MMMM',
+            }
+        )
+    )
     status = forms.IntegerField(label='Status', required=True, widget=forms.HiddenInput())
 
     class Meta:

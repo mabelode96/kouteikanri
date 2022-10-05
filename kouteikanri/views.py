@@ -410,22 +410,42 @@ def edit(request, id=None):
             else:
                 koutei.processj = None
                 koutei.status = 0
-            # ========================================================================
-            # fkey
-            # 製品の生産ラインを変更したとき元々同じ製品があった場合fkeyが重複するのでは？
-            # ========================================================================
-            if koutei.fkey is not None:
-                ln = len(koutei.fkey) - 1
-                nm = koutei.fkey[ln:]
-                if koutei.line is not None:
-                    if koutei.hinban is not None:
-                        if koutei.bin is not None:
-                            koutei.fkey = koutei.line + '_' + str(koutei.bin) \
-                                          + str(koutei.hinban) + '_' + str(nm)
-                    else:
-                        if koutei.name is not None:
-                            koutei.fkey = koutei.line + '_' + koutei.name + '_' + str(nm)
-            # ========================================================================
+            # =============================================================================
+            # 例えば fkey の末尾 1 の工程のラインを変更したとき末尾 2 以降の工程があった場合には
+            # 付番しなおす必要がある
+            # =============================================================================
+            update_list = []
+            i = 1
+            old_line = koutei.tracker.previous('line')
+            old_period = koutei.tracker.previous('period')
+            koutei_old = Process.objects.filter(
+                Q(line__exact=old_line) &
+                Q(date__exact=koutei.date) &
+                Q(period__exact=old_period) &
+                Q(bin__exact=koutei.bin) &
+                Q(hinban=koutei.name)
+            )
+            if koutei_old.count() > 0:
+                for koutei in koutei_old:
+                    koutei.fkey = i
+                    i = i + 1
+                    update_list.append(koutei)
+                # データベースを更新
+                Process.objects.bulk_update(update_list, fields=["fkey"])
+            # =============================================================================
+            # ライン, 時間帯の変更があった場合と予備追加の場合のみfkeyを新規に付番する
+            # =============================================================================
+            if koutei.fkey is None or koutei.line is not old_line \
+                    or koutei.period is not old_period:
+                koutei_f = Process.objects.filter(
+                    Q(line__exact=koutei.line) &
+                    Q(date__exact=koutei.date) &
+                    Q(period__exact=koutei.period) &
+                    Q(bin__exact=koutei.bin) &
+                    Q(hinban=koutei.name)
+                )
+                nm = koutei_f.count() + 1
+                koutei.fkey = nm
             # 保存
             koutei.save()
             if 'next' in request.GET:
@@ -449,13 +469,13 @@ def copy(request, id=None):
     koutei = Process()
     form = KouteiCopyForm(request.POST, instance=koutei)
     if request.method == 'POST':
-        koutei_line = Process.objects.filter(
+        koutei_f = Process.objects.filter(
             Q(line__exact=request.POST['line']) &
             Q(date__exact=request.POST['date']) &
             Q(period__exact=request.POST['period']) &
             Q(name__exact=request.POST['name'])
         )
-        nm = koutei_line.count() + 1
+        nm = koutei_f.count() + 1
         # バリデーションチェック
         if form.is_valid():
             koutei = form.save(commit=False)
@@ -471,16 +491,7 @@ def copy(request, id=None):
             # 開始状態にする
             koutei.startj = datetime.datetime.now().astimezone()
             koutei.status = 0
-            # fkey
-            if koutei.fkey is not None:
-                if koutei.line is not None:
-                    if koutei.hinban is not None:
-                        if koutei.bin is not None:
-                            koutei.fkey = koutei.line + '_' + str(koutei.bin) \
-                                          + str(koutei.hinban) + '_' + str(nm)
-                    else:
-                        if koutei.name is not None:
-                            koutei.fkey = koutei.line + '_' + koutei.name + '_' + str(nm)
+            koutei.fkey = nm
             # 保存
             koutei.save()
             if 'next' in request.GET:
@@ -650,6 +661,7 @@ def comment(request, id):
         return render(request, 'kouteikanri/comment.html', {'form': form})
 
 
+# アップロード
 def upload(request):
     if request.method == 'POST' and request.FILES['excel']:
         excel = request.FILES['excel']
@@ -695,7 +707,6 @@ def upload(request):
             # 行をループ
             for j in range(6, sheet_max_row + 1):
                 binn = ws.cell(row=j, column=2).value
-                hinban = ws.cell(row=j, column=3).value
                 name = ws.cell(row=j, column=6).value
                 starty = ws.cell(row=j, column=17).value
                 if name == '合計':
@@ -731,13 +742,13 @@ def upload(request):
                     else:
                         # fkey
                         name_list.append(name + str(binn))
-                        if hinban:
-                            fkey = line + '_' + str(binn) + str(hinban) + '_' + str(name_list.count(name + str(binn)))
-                        else:
-                            fkey = line + '_' + name + '_' + str(name_list.count(name + str(binn)))
+                        fkey = name_list.count(name + str(binn))
                         koutei_fkey = Process.objects.filter(
+                            Q(line__exact=line) &
                             Q(date__exact=date_ymd) &
                             Q(period__exact=period) &
+                            Q(bin__exact=binn) &
+                            Q(name__exact=name) &
                             Q(fkey__exact=fkey)
                         )
                         # 同じfkeyのデータがDBにない場合
@@ -770,12 +781,18 @@ def upload(request):
                             )
                         # 同じfkeyのデータがDBにある場合
                         elif koutei_fkey.count() == 1:
-                            koutei = Process.objects.get(date=date_ymd, period=period, fkey=fkey)
+                            koutei = Process.objects.get(
+                                line=line,
+                                date=date_ymd,
+                                period=period,
+                                bin=binn,
+                                name=name, fkey=fkey
+                            )
                             # 予測過剰は更新しない
                             messages.warning(request, "　更新：" + name)
                             if koutei.kubun == '予測' and koutei.endj is not None \
                                     and koutei.value > ws.cell(row=j, column=8).value:
-                                messages.warning(request, "　　予測過剰")
+                                messages.error(request, "　　予測過剰")
                             else:
                                 koutei.kubun = ws.cell(row=j, column=5).value
                                 koutei.seisanh = ws.cell(row=j, column=7).value
