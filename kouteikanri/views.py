@@ -40,8 +40,9 @@ def all_list(request):
                 "(sum(processj * status) + sum(changej * status)) - (sum(processy * status) + sum(changey * status)) AS real_time, "
                 "sum(value * status) * 100 / sum(value) AS progress "
                 "FROM kouteikanri_process "
-                "WHERE date='" + date + "' GROUP BY line, period "
-                                        "ORDER BY period DESC, line;"
+                "WHERE date='" + date +
+                "' GROUP BY line, period "
+                "ORDER BY period DESC, line;"
         )
         emp_list = exec_query(sql_text)
         return render(request, 'kouteikanri/all.html', {'emp_list': emp_list, 'date': date})
@@ -56,10 +57,10 @@ def set_all(request):
         date = request.POST['date2']
         sql_text = (
                 "SELECT line, period, "
-                    "count(set) AS all_cnt, "
-                    "sum(set) AS end_cnt, "
-                    "count(set) - sum(set) AS left_cnt, "
-                    "sum(set) * 100 / count(set) AS progress "
+                "count(set) AS all_cnt, "
+                "sum(set) AS end_cnt, "
+                "count(set) - sum(set) AS left_cnt, "
+                "sum(set) * 100 / count(set) AS progress "
                 "FROM kouteikanri_process "
                 "WHERE date='" + date + "' AND hinban IS NOT NULL "
                 "GROUP BY line, period "
@@ -230,7 +231,9 @@ class SetList(ListView):
 # 「総数」を計算する関数
 def value_sum(line, date, period):
     koutei = Process.objects.filter(
-        Q(line__exact=line) & Q(date__exact=date) & Q(period__exact=period)
+        Q(line__exact=line) &
+        Q(date__exact=date) &
+        Q(period__exact=period)
     )
     if koutei.count() == 0:
         return 0
@@ -241,7 +244,9 @@ def value_sum(line, date, period):
 # 「終了数」を計算する関数
 def value_end(line, date, period):
     koutei = Process.objects.filter(
-        Q(line__exact=line) & Q(date__exact=date) & Q(period__exact=period) &
+        Q(line__exact=line) &
+        Q(date__exact=date) &
+        Q(period__exact=period) &
         Q(status__exact=1)
     )
     if koutei.count() == 0:
@@ -253,7 +258,9 @@ def value_end(line, date, period):
 # 「切替平均」を計算する関数
 def changej_avg(line, date, period):
     koutei = Process.objects.filter(
-        Q(line__exact=line) & Q(date__exact=date) & Q(period__exact=period)
+        Q(line__exact=line) &
+        Q(date__exact=date) &
+        Q(period__exact=period)
     )
     if koutei.count() == 0:
         return 0
@@ -264,7 +271,9 @@ def changej_avg(line, date, period):
 # 「終了予定」を取得する関数
 def endy_max(line, date, period):
     koutei = Process.objects.filter(
-        Q(line__exact=line) & Q(date__exact=date) & Q(period__exact=period)
+        Q(line__exact=line) &
+        Q(date__exact=date) &
+        Q(period__exact=period)
     )
     if koutei.count() == 0:
         return None
@@ -279,7 +288,9 @@ def endy_max(line, date, period):
 # 「終了実績」を取得する関数
 def endj_max(line, date, period):
     koutei = Process.objects.filter(
-        Q(line__exact=line) & Q(date__exact=date) & Q(period__exact=period)
+        Q(line__exact=line) &
+        Q(date__exact=date) &
+        Q(period__exact=period)
     )
     if koutei.count() == 0:
         return None
@@ -294,7 +305,9 @@ def endj_max(line, date, period):
 # 「残り生産時間」を計算する関数
 def left_time(line, date, period):
     koutei = Process.objects.filter(
-        Q(line__exact=line) & Q(date__exact=date) & Q(period__exact=period) &
+        Q(line__exact=line) &
+        Q(date__exact=date) &
+        Q(period__exact=period) &
         Q(status__exact=0)
     )
     sum_py = koutei.aggregate(Sum('processy'))
@@ -314,7 +327,9 @@ def left_time(line, date, period):
 # 「終了予測」を計算する関数
 def comp_time(line, date, period):
     koutei = Process.objects.filter(
-        Q(line__exact=line) & Q(date__exact=date) & Q(period__exact=period) &
+        Q(line__exact=line) &
+        Q(date__exact=date) &
+        Q(period__exact=period) &
         Q(status__exact=1)
     )
     if koutei.count() == 0:
@@ -592,8 +607,12 @@ def start_cancel(request, **kwargs):
             d = dt.strftime("%Y-%m-%d")
         period = request.POST['period']
         kouteis = Process.objects.all().filter(
-            Q(line__exact=line) & Q(date__exact=d) & Q(period__exact=period) &
-            Q(status__exact=0) & Q(endj__isnull=True))
+            Q(line__exact=line) &
+            Q(date__exact=d) &
+            Q(period__exact=period) &
+            Q(status__exact=0) &
+            Q(endj__isnull=True)
+        )
         if kouteis.count() > 0:
             for koutei in kouteis:
                 koutei.startj = None
@@ -633,7 +652,9 @@ def reset_all(request, **kwargs):
         date = request.POST['date']
         period = request.POST['period']
         kouteis = Process.objects.all().filter(
-            Q(line__exact=line) & Q(date__exact=date) & Q(period__exact=period)
+            Q(line__exact=line) &
+            Q(date__exact=date) &
+            Q(period__exact=period)
         )
         if kouteis.count() > 0:
             for koutei in kouteis:
