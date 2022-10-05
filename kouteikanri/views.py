@@ -56,14 +56,14 @@ def set_all(request):
         date = request.POST['date2']
         sql_text = (
                 "SELECT line, period, "
-                "count(set) AS all_cnt, "
-                "sum(set) AS end_cnt, "
-                "count(set) - sum(set) AS left_cnt, "
-                "sum(set) * 100 / count(set) AS progress "
+                    "count(set) AS all_cnt, "
+                    "sum(set) AS end_cnt, "
+                    "count(set) - sum(set) AS left_cnt, "
+                    "sum(set) * 100 / count(set) AS progress "
                 "FROM kouteikanri_process "
                 "WHERE date='" + date + "' AND hinban IS NOT NULL "
-                                        "GROUP BY line, period "
-                                        "ORDER BY period DESC, line;"
+                "GROUP BY line, period "
+                "ORDER BY period DESC, line;"
         )
         emp_list = exec_query(sql_text)
         return render(request, 'kouteikanri/set_all.html', {'emp_list': emp_list, 'date': date})
@@ -130,8 +130,7 @@ class KouteiList(ListView):
             jin = 0
         else:
             jin = stfavg['staff__avg']
-        sdEnd = Process.objects.all().filter(
-            ql & qd & qp & qs).aggregate(Sum('seisand'))
+        sdEnd = Process.objects.all().filter(ql & qd & qp & qs).aggregate(Sum('seisand'))
         if sdEnd['seisand__sum'] is None:
             sdE = 0
         else:
@@ -173,7 +172,8 @@ class KouteiList(ListView):
         return Process.objects.order_by('startj', 'starty').filter(
             Q(line__exact=self.kwargs['line']) &
             Q(date__exact=self.kwargs['date']) &
-            Q(period__exact=self.kwargs['period']))
+            Q(period__exact=self.kwargs['period'])
+        )
 
     @staticmethod
     def post(request):
@@ -418,13 +418,29 @@ def edit(request, id=None):
                 koutei.processj = None
                 koutei.status = 0
             # =============================================================================
+            # ライン, 時間帯の変更があった場合と予備追加の場合のみfkeyを新規に付番する
+            # =============================================================================
+            old_line = koutei.tracker.previous('line')
+            old_period = koutei.tracker.previous('period')
+            if koutei.fkey is None or koutei.line is not old_line \
+                    or koutei.period is not old_period:
+                koutei_f = Process.objects.filter(
+                    Q(line__exact=koutei.line) &
+                    Q(date__exact=koutei.date) &
+                    Q(period__exact=koutei.period) &
+                    Q(bin__exact=koutei.bin) &
+                    Q(name=koutei.name)
+                )
+                nm = koutei_f.count() + 1
+                koutei.fkey = nm
+            # 保存
+            koutei.save()
+            # =============================================================================
             # 例えば fkey の末尾 1 の工程のラインを変更したとき末尾 2 以降の工程があった場合には
             # 付番しなおす必要がある
             # =============================================================================
             update_list = []
             i = 1
-            old_line = koutei.tracker.previous('line')
-            old_period = koutei.tracker.previous('period')
             koutei_old = Process.objects.filter(
                 Q(line__exact=old_line) &
                 Q(date__exact=koutei.date) &
@@ -440,23 +456,10 @@ def edit(request, id=None):
                 # データベースを更新
                 Process.objects.bulk_update(update_list, fields=["fkey"])
             # =============================================================================
-            # ライン, 時間帯の変更があった場合と予備追加の場合のみfkeyを新規に付番する
-            # =============================================================================
-            if koutei.fkey is None or koutei.line is not old_line \
-                    or koutei.period is not old_period:
-                koutei_f = Process.objects.filter(
-                    Q(line__exact=koutei.line) &
-                    Q(date__exact=koutei.date) &
-                    Q(period__exact=koutei.period) &
-                    Q(bin__exact=koutei.bin) &
-                    Q(name=koutei.name)
-                )
-                nm = koutei_f.count() + 1
-                koutei.fkey = nm
-            # 保存
-            koutei.save()
             if 'next' in request.GET:
                 return redirect(request.GET['next'])
+        else:
+            print("validation error: id=" + id)
     # GET
     else:
         if id:
