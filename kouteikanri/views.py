@@ -330,7 +330,9 @@ def comp_time(line, date, period):
 # 「セット総数」を計算する関数
 def set_cnt(line, date, period):
     koutei = Process.objects.filter(
-        Q(line__exact=line) & Q(date__exact=date) & Q(period__exact=period) &
+        Q(line__exact=line) &
+        Q(date__exact=date) &
+        Q(period__exact=period) &
         Q(hinban__gt=0)
     )
     if koutei.count() == 0:
@@ -343,8 +345,11 @@ def set_cnt(line, date, period):
 # 「セット完了」を計算する関数
 def set_end(line, date, period):
     koutei = Process.objects.filter(
-        Q(line__exact=line) & Q(date__exact=date) & Q(period__exact=period) &
-        Q(set__exact=1) & Q(hinban__gt=0)
+        Q(line__exact=line) &
+        Q(date__exact=date) &
+        Q(period__exact=period) &
+        Q(set__exact=1) &
+        Q(hinban__gt=0)
     )
     if koutei.count() == 0:
         return 0
@@ -356,7 +361,9 @@ def set_end(line, date, period):
 # 「セット進捗率」
 def set_prog(line, date, period):
     koutei = Process.objects.filter(
-        Q(line__exact=line) & Q(date__exact=date) & Q(period__exact=period) &
+        Q(line__exact=line) &
+        Q(date__exact=date) &
+        Q(period__exact=period) &
         Q(hinban__gt=0)
     )
     if koutei.count() == 0:
@@ -423,7 +430,7 @@ def edit(request, id=None):
                 Q(date__exact=koutei.date) &
                 Q(period__exact=old_period) &
                 Q(bin__exact=koutei.bin) &
-                Q(hinban=koutei.name)
+                Q(name=koutei.name)
             )
             if koutei_old.count() > 0:
                 for koutei in koutei_old:
@@ -442,7 +449,7 @@ def edit(request, id=None):
                     Q(date__exact=koutei.date) &
                     Q(period__exact=koutei.period) &
                     Q(bin__exact=koutei.bin) &
-                    Q(hinban=koutei.name)
+                    Q(name=koutei.name)
                 )
                 nm = koutei_f.count() + 1
                 koutei.fkey = nm
