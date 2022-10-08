@@ -753,7 +753,7 @@ def upload(request):
                         Q(endy__exact=starty)
                     )
                     if koutei_gassan.count() == 1:
-                        messages.warning(request, "　合算：" + name)
+                        messages.warning(request, "　　合算：" + name)
                         koutei = Process.objects.get(
                             line=line,
                             date=date_ymd,
@@ -789,7 +789,7 @@ def upload(request):
                         # 同じfkeyのデータがDBにない場合
                         if koutei_fkey.count() == 0:
                             # 新規追加
-                            messages.warning(request, "　追加：" + name)
+                            messages.warning(request, "　　追加：" + name)
                             Process.objects.create(
                                 line=line,
                                 period=period,
@@ -824,10 +824,10 @@ def upload(request):
                                 name=name, fkey=fkey
                             )
                             # 予測過剰は更新しない
-                            messages.warning(request, "　更新：" + name)
+                            messages.warning(request, "　　更新：" + name)
                             if koutei.kubun == '予測' and koutei.endj is not None \
                                     and koutei.value > ws.cell(row=j, column=8).value:
-                                messages.error(request, "　　予測過剰")
+                                messages.error(request, "　　　予測過剰")
                             else:
                                 koutei.kubun = ws.cell(row=j, column=5).value
                                 koutei.seisanh = ws.cell(row=j, column=7).value
