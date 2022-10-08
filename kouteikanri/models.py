@@ -38,8 +38,8 @@ class Process(models.Model):
     status = models.IntegerField('status', default=0)
     set = models.IntegerField('set', default=0)
     setj = models.DateTimeField('準備時間', blank=True)
-    fkey = models.CharField('fkey', blank=True, max_length=50)
     comment = models.CharField('comment', blank=True, max_length=255)
+    fkey = models.IntegerField('fkey', blank=True)
 
     tracker = FieldTracker()
 

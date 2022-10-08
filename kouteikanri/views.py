@@ -474,7 +474,7 @@ def edit(request, id=None):
             if 'next' in request.GET:
                 return redirect(request.GET['next'])
         else:
-            print("validation error: id=" + id)
+            print("validation error: id=" + str(id))
     # GET
     else:
         if id:
