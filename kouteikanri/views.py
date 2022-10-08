@@ -856,9 +856,8 @@ def upload(request):
             # 削除フラグが残っているデータを削除
             koutei_delete = Process.objects.filter(Q(status__exact=-1))
             if koutei_delete.count() > 0:
-                messages.error(request, "削除された工程")
                 for koutei in koutei_delete:
-                    messages.warning(request, "　削除：" + koutei.name)
+                    messages.error(request, "　削除：" + koutei.name)
                     koutei.delete()
         messages.success(request, "ファイルのアップロードが終了しました")
     return render(request, 'kouteikanri/upload.html')
