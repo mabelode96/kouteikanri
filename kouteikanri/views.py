@@ -750,6 +750,7 @@ def upload(request):
                         Q(period__exact=period) &
                         Q(bin__exact=binn) &
                         Q(name__exact=name) &
+                        Q(hinban__isnull=False) &
                         Q(endy__exact=starty)
                     )
                     if koutei_gassan.count() == 1:
@@ -760,6 +761,7 @@ def upload(request):
                             period=period,
                             bin=binn,
                             name=name,
+                            hinban__isnull=False,
                             endy=starty
                         )
                         koutei.kubun = '確定'
