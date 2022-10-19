@@ -743,6 +743,9 @@ def upload(request):
                 if name == '合計':
                     messages.warning(request, "　")
                 else:
+                    # fkey
+                    name_list.append(name + str(binn))
+                    fkey = name_list.count(name + str(binn))
                     # 開始予定と同じ終了予定のデータがあれば工程が連続していると判断し合算処理
                     koutei_gassan = Process.objects.filter(
                         Q(line__exact=line) &
@@ -753,7 +756,7 @@ def upload(request):
                         Q(hinban__isnull=False) &
                         Q(endy__exact=starty)
                     )
-                    if koutei_gassan.count() == 1:
+                    if koutei_gassan.count() == 1 and fkey > 1:
                         messages.warning(request, "　　合算：" + name)
                         koutei = Process.objects.get(
                             line=line,
@@ -777,9 +780,6 @@ def upload(request):
                         koutei.endy = ws.cell(row=j, column=18).value
                         koutei.save()
                     else:
-                        # fkey
-                        name_list.append(name + str(binn))
-                        fkey = name_list.count(name + str(binn))
                         koutei_fkey = Process.objects.filter(
                             Q(line__exact=line) &
                             Q(date__exact=date_ymd) &
