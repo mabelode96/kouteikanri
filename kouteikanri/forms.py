@@ -22,10 +22,12 @@ class PeriodChoiceField(ModelChoiceField):
 class MyModelForm(forms.ModelForm):
     line = LineChoiceField(
         queryset=Process.objects.all().distinct('line'),
-        label='ライン名', to_field_name='line', empty_label='選択してください')
+        label='ライン名', to_field_name='line', empty_label='選択してください'
+    )
     date = DateChoiceField(
         queryset=Process.objects.all().distinct('date').order_by('-date'),
-        label='製造日', to_field_name='date', empty_label='選択してください')
+        label='製造日', to_field_name='date', empty_label='選択してください'
+    )
     period = PeriodChoiceField(
         queryset=Process.objects.all().distinct('period'),
         label='時間帯', to_field_name='period', empty_label='選択してください')
@@ -36,8 +38,10 @@ class MyModelForm(forms.ModelForm):
 
 
 class KouteiEditForm(ModelForm):
-    name = forms.CharField(label='製品名', required=False, max_length=50,
-                           widget=forms.TextInput(attrs={'readonly': True}))
+    name = forms.CharField(
+        label='製品名', required=False, max_length=50,
+        widget=forms.TextInput(attrs={'readonly': True})
+    )
     date = forms.DateField(label='製造日', required=False, widget=forms.HiddenInput())
     bin = forms.IntegerField(
         label='便', required=False, widget=forms.TextInput(attrs={'readonly': True})
@@ -46,9 +50,8 @@ class KouteiEditForm(ModelForm):
         label='品番', required=False, widget=forms.HiddenInput()
     )
     kubun = forms.CharField(
-        label='区分', required=False, max_length=10, widget=forms.TextInput(
-            attrs={'readonly': True}
-        )
+        label='区分', required=False, max_length=10,
+        widget=forms.TextInput(attrs={'readonly': True})
     )
     line = LineChoiceField(
         queryset=Process.objects.order_by('line').distinct('line'),
@@ -92,8 +95,9 @@ class KouteiEditForm(ModelForm):
     status = forms.IntegerField(
         label='Status (0:開始前/生産中, 1:終了)', required=True,
         widget=forms.HiddenInput())
-    comment = forms.CharField(label='備考', required=False, max_length=255,
-                              widget=forms.Textarea)
+    comment = forms.CharField(
+        label='備考', required=False, max_length=255, widget=forms.Textarea
+    )
 
     class Meta:
         model = Process
@@ -165,10 +169,14 @@ class KouteiCopyForm(ModelForm):
     bin = forms.IntegerField(label='便', required=False, widget=forms.HiddenInput())
     hinban = forms.IntegerField(label='品番', required=False, widget=forms.HiddenInput())
     price = forms.FloatField(label='単価', required=False, widget=forms.HiddenInput())
-    name = forms.CharField(label='製品名', required=True, max_length=50,
-                           widget=forms.TextInput(attrs={'readonly': True}))
-    kubun = forms.CharField(label='区分', required=False, max_length=10,
-                            widget=forms.TextInput(attrs={'readonly': True}))
+    name = forms.CharField(
+        label='製品名', required=True, max_length=50,
+        widget=forms.TextInput(attrs={'readonly': True})
+    )
+    kubun = forms.CharField(
+        label='区分', required=False, max_length=10,
+        widget=forms.TextInput(attrs={'readonly': True})
+    )
     seisanh = forms.IntegerField(label='生産数h', required=False, widget=forms.HiddenInput())
     value = forms.IntegerField(label='数量', required=False)
     seisand = forms.FloatField(label='生産高', required=False, widget=forms.HiddenInput())
@@ -215,10 +223,14 @@ class KouteiCopyForm(ModelForm):
 
 
 class KouteiCommentForm(forms.ModelForm):
-    name = forms.CharField(label='製品名', required=True, max_length=50,
-                           widget=forms.TextInput(attrs={'readonly': True}))
-    comment = forms.CharField(label='備考', required=False, max_length=255,
-                              widget=forms.Textarea(attrs={'readonly': True}))
+    name = forms.CharField(
+        label='製品名', required=True, max_length=50,
+        widget=forms.TextInput(attrs={'readonly': True})
+    )
+    comment = forms.CharField(
+        label='備考', required=False, max_length=255,
+        widget=forms.Textarea(attrs={'readonly': True})
+    )
 
     class Meta:
         model = Process
