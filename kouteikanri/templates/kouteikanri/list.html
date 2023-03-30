@@ -112,6 +112,7 @@
                     <th>数量</th>
                     {% if 'パン' in linef %}
                     <th style="font-size:80%;"><span style="color:navy;">ｽﾗｲｽ<br>枚数</span></th>
+                    <th style="font-size:80%;"><span style="color:navy;">ｽﾗｲｽ<br>能力</span></th>
                     {% endif %}
                     <!--<th>開始予定</th>-->
                     <th>能力1h</th>
@@ -197,6 +198,13 @@
                             {% if koutei.slicev %}
                                 <td class="text-right">
                                     <span style="color:navy;">{{ koutei.slicev }}</span>
+                                </td>
+                            {% else %}
+                                <td></td>
+                            {% endif %}
+                            {% if koutei.slicep %}
+                                <td class="text-right">
+                                    <span style="color:navy;">{{ koutei.slicep }}</span>
                                 </td>
                             {% else %}
                                 <td></td>
