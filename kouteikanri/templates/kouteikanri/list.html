@@ -20,6 +20,7 @@
                     <form action="{% url 'kouteikanri:all' %}" method="post">
                         {% csrf_token %}
                         <input type="text" name="date" value="{{ datef|str_to_date }}" hidden>
+                        <input type="text" name="period" value="{{ periodf }}" hidden>
                         <input type="submit" value="全ライン一覧へ" class="btn btn-info">
                     </form>
                 </th>

@@ -10,9 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
+from .local import *
 from pathlib import Path
 import os
-from django.contrib.messages import constants as messages
+from django.contrib.messages import constants as messagesf
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -85,18 +86,6 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
-# PostgreSQL を使用 (環境に応じて修正すること)
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': '12.23.1.198',
-        'PORT': '5432',
-    }
-}
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
@@ -144,8 +133,8 @@ STATIC_ROOT = '/root/kouteikanri/static'
 
 
 MESSAGE_TAGS = {
-    messages.INFO: 'alert alert-info',
-    messages.SUCCESS: 'alert alert-success',
+    messagesf.INFO: 'alert alert-info',
+    messagesf.SUCCESS: 'alert alert-success',
     # messages.WARNING: 'alert alert-warning',
-    messages.ERROR: 'alert alert-danger',
+    messagesf.ERROR: 'alert alert-danger',
 }

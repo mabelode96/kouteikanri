@@ -18,7 +18,7 @@ def blank(request):
 def top(request):
     # 初期値を設定
     d = Process.objects.all().aggregate(Max('date'))
-    f = MyModelForm(initial={'date': d['date__max']})
+    f = MyModelForm(initial={'date': d['date__max'], 'period': '昼勤'})
     return render(request, 'kouteikanri/top.html', {'form1': f})
 
 
@@ -27,6 +27,7 @@ def top(request):
 def all_list(request):
     if request.method == 'POST':
         date = request.POST['date']
+        period = request.POST['period']
         sql_text = (
                 "SELECT line, period, "
                 "sum(value) AS val_sum, "
@@ -41,20 +42,22 @@ def all_list(request):
                 "sum(value * status) * 100 / sum(value) AS progress "
                 "FROM kouteikanri_process "
                 "WHERE date='" + date +
+                "' AND period='" + period +
                 "' GROUP BY line, period "
                 "ORDER BY period DESC, line;"
         )
         emp_list = exec_query(sql_text)
-        return render(request, 'kouteikanri/all.html', {'emp_list': emp_list, 'date': date})
+        return render(request, 'kouteikanri/all.html', {'emp_list': emp_list, 'date': date, 'period': period})
     else:
         # 通らないはず
-        return redirect('kouteikanri:all', {'date': '2021-01-01'})
+        return redirect('kouteikanri:all', {'date': '2021-01-01', 'period': '昼勤'})
 
 
 # セットチェック 全ライン一覧
 def set_all(request):
     if request.method == 'POST':
         date = request.POST['date2']
+        period = request.POST['period2']
         sql_text = (
                 "SELECT line, period, "
                 "count(set) AS all_cnt, "
@@ -62,12 +65,15 @@ def set_all(request):
                 "count(set) - sum(set) AS left_cnt, "
                 "sum(set) * 100 / count(set) AS progress "
                 "FROM kouteikanri_process "
-                "WHERE date='" + date + "' AND hinban IS NOT NULL "
+                "WHERE date='" + date +
+                "' AND period='" + period +
+                "' AND hinban IS NOT NULL "
                 "GROUP BY line, period "
                 "ORDER BY period DESC, line;"
         )
         emp_list = exec_query(sql_text)
-        return render(request, 'kouteikanri/set_all.html', {'emp_list': emp_list, 'date': date})
+        return render(request, 'kouteikanri/set_all.html', {
+            'emp_list': emp_list, 'date': date, 'period': period})
 
 
 # cursor.descriptionでフィールド名を配列にセットして、resultsにフィールド名を付加

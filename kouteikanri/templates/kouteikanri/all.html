@@ -5,6 +5,7 @@
 {% block title %}全ライン工程一覧{% endblock title %}
 
 {% block content %}
+<br>
 <h2 align="center">全ライン工程一覧</h2>
 <br>
 <table class="all_table" style="width: 98%;">
@@ -19,7 +20,7 @@
                class="btn btn-info" id="btn_bak" role="button">製造日選択へ</a>
         </td>
         <td align="right">
-            <h3>製造日: {{ date|date_to_str }}</h3>
+            <h3>製造日: {{ date|date_to_str }}　【{{period}}】</h3>
         </td>
     </tr>
 </table>
