@@ -17,8 +17,10 @@ def blank(request):
 # 検索
 def top(request):
     # 初期値を設定
-    d = Process.objects.all().aggregate(Max('date'))
-    f = MyModelForm(initial={'date': d['date__max'], 'period': '昼勤'})
+    # d = Process.objects.all().aggregate(Max('date'))
+    # f = MyModelForm(initial={'date': d['date__max'], 'period': '昼勤'})
+    d = datetime.datetime.today().strftime("%Y-%m-%d")
+    f = MyModelForm(initial={'date': d, 'period': '昼勤'})
     return render(request, 'kouteikanri/top.html', {'form1': f})
 
 
