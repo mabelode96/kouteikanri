@@ -24,8 +24,8 @@
                         <input type="submit" value="全ライン一覧へ" class="btn btn-info">
                     </form>
                 </th>
-                <th><h4>{{ linef }}</h4></th>
-                <th><h4>【 {{ periodf }} 】</h4></th>
+                <th><h5>{{ linef }}</h5></th>
+                <th><h5>【{{ periodf }}】</h5></th>
                 <th>
                     {% if periodf == '昼勤' %}
                     <a href="{% url 'kouteikanri:list' linef datef|str_to_date '夜勤' %}"
@@ -35,8 +35,8 @@
                        class="btn btn-outline-danger">昼勤へ</a>
                     {% endif %}
                 </th>
-                <th align="right"><h4>{{ datef }}製造</h4></th>
-                <th><div class="alert-primary" align="center"><h4>{{ new_date|date:"H:i" }}</h4></div></th>
+                <th align="right"><h5>{{ datef }}製造</h5></th>
+                <th><div class="alert-primary" align="center"><h5>{{ new_date|date:"H:i" }}</h5></div></th>
                 <th>
                     <form action="{% url 'kouteikanri:reset_all' linef datef periodf %}" method="post">
                         {% csrf_token %}
