@@ -18,7 +18,20 @@
                class="btn btn-info" id="btn_bak" role="button">製造日選択へ</a>
         </td>
         <td align="right">
-            <h4>製造日: {{ date|date_to_str }}　【{{period}}】</h4>
+            <h4>製造日: {{ date|date_to_str }}　【{{ period }}】</h4>
+        </td>
+        <td align="right">
+            <form action="{% url 'kouteikanri:all' %}" method="post">
+                {% csrf_token %}
+                <input type="date" name="date" id="date" value="{{ date }}" hidden>
+                {% if period == '夜勤' %}
+                <input type="text" name="period" id="period" value="昼勤" hidden>
+                <button type="submit" class="btn btn-outline-danger">昼勤へ</button>
+                {% else %}
+                <input type="text" name="period" id="period" value="夜勤" hidden>
+                <button type="submit" class="btn btn-outline-primary">夜勤へ</button>
+                {% endif %}
+            </form>
         </td>
     </tr>
 </table>
@@ -41,21 +54,13 @@
         <tbody>
         {% for data in emp_list %}
         <tr>
-            {% if data.period == '昼勤' %}
-            <td bgcolor="mistyrose">
-                <div id="period">{{ data.period }}</div>
-            </td>
-            {% else %}
             {% if data.period == '夜勤' %}
             <td bgcolor="azure">
-                <div id="period">{{ data.period }}</div>
-            </td>
-            {% else%}
-            <td>
-                <div id="period">{{ data.period }}</div>
-            </td>
+            {% else %}
+            <td bgcolor="mistyrose">
             {% endif %}
-            {% endif %}
+                <div id="periodf">{{ data.period }}</div>
+            </td>
             <td>
                 <div id="line">
                     <a href="{% url 'kouteikanri:list' data.line date data.period %}">{{ data.line }}</a>
