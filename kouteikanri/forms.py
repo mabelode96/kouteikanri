@@ -60,6 +60,7 @@ class KouteiEditForm(ModelForm):
         queryset=Process.objects.order_by('period').distinct('period'),
         label='時間帯', to_field_name='period', empty_label=None)
     value = forms.IntegerField(label='数量', required=False)
+    seisanh = forms.IntegerField(label='生産数/h', required=False)
     staff = forms.IntegerField(label='人員', required=False)
     startj = forms.DateTimeField(
         label='開始時間',
@@ -102,7 +103,7 @@ class KouteiEditForm(ModelForm):
     class Meta:
         model = Process
         fields = ('id', 'hinban', 'name', 'bin', 'kubun',
-                  'line', 'period', 'date', 'value', 'staff',
+                  'line', 'period', 'date', 'value', 'seisanh', 'staff',
                   'startj', 'endj', 'changej', 'processj', 'comment', 'status')
 
 
