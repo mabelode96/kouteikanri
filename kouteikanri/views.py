@@ -281,8 +281,7 @@ def endy_max(line, date, period):
     koutei = Process.objects.filter(
         Q(line__exact=line) &
         Q(date__exact=date) &
-        Q(period__exact=period) &
-        Q(status__exact=0)
+        Q(period__exact=period)
     )
     if koutei.count() == 0:
         return None
