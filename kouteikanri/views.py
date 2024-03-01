@@ -587,7 +587,6 @@ def start_or_end(request, id=id):
         # 開始時間を更新
         koutei.startj = nw
         koutei.save()
-    # 終了の処理
     else:
         if koutei.endj is None:
             koutei.endj = datetime.datetime.now().astimezone()
@@ -747,6 +746,9 @@ def upload(request):
             for j in range(6, sheet_max_row + 1):
                 binn = ws.cell(row=j, column=2).value
                 name = ws.cell(row=j, column=6).value
+                chy = ws.cell(row=j, column=15).value
+                if chy is None:
+                    chy = 0
                 starty = ws.cell(row=j, column=17).value
                 if name == '合計':
                     messages.warning(request, "　")
@@ -817,7 +819,7 @@ def upload(request):
                                 panmm=ws.cell(row=j, column=12).value,
                                 slicev=ws.cell(row=j, column=13).value,
                                 slicep=ws.cell(row=j, column=14).value,
-                                changey=ws.cell(row=j, column=15).value,
+                                changey=chy,
                                 processy=ws.cell(row=j, column=16).value,
                                 starty=ws.cell(row=j, column=17).value,
                                 endy=ws.cell(row=j, column=18).value,

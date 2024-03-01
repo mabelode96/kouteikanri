@@ -27,7 +27,7 @@ class Process(models.Model):
     panmm = models.CharField('パンミリ数', blank=True, max_length=50)
     slicev = models.IntegerField('スライス枚数', blank=True)
     slicep = models.IntegerField('スライス能力', blank=True)
-    changey = models.IntegerField('切替予定', blank=True)
+    changey = models.IntegerField('切替予定', default=0)
     processy = models.IntegerField('生産時間', blank=True)
     starty = models.DateTimeField('開始予定', blank=True)
     endy = models.DateTimeField('終了予定', blank=True)

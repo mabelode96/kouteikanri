@@ -110,8 +110,8 @@
                 <div id="progress" class="progress">
                     <div class="progress-bar {% if data.progress == 100 %}bg-success{% else %}progress-bar-striped progress-bar-animated{% endif %}"
                          role="progressbar"
-                         style="width: {{data.progress}}%;"
-                         aria-valuenow="{{data.progress}}"
+                         style="width: {{ data.progress }}%;"
+                         aria-valuenow="{{ data.progress }}"
                          aria-valuemin="0"
                          aria-valuemax="100">
                         {% if data.progress %}
