@@ -746,9 +746,11 @@ def upload(request):
             for j in range(6, sheet_max_row + 1):
                 binn = ws.cell(row=j, column=2).value
                 name = ws.cell(row=j, column=6).value
-                chy = ws.cell(row=j, column=15).value
-                if chy is None:
+                # 切替予定がNoneなら0に置換する
+                if ws.cell(row=j, column=15).value is None:
                     chy = 0
+                else:
+                    chy = ws.cell(row=j, column=15).value
                 starty = ws.cell(row=j, column=17).value
                 if name == '合計':
                     messages.warning(request, "　")
@@ -852,7 +854,7 @@ def upload(request):
                             koutei.panmm = ws.cell(row=j, column=12).value
                             koutei.slicev = ws.cell(row=j, column=13).value
                             koutei.slicep = ws.cell(row=j, column=14).value
-                            koutei.changey = ws.cell(row=j, column=15).value
+                            koutei.changey = chy
                             koutei.processy = ws.cell(row=j, column=16).value
                             koutei.starty = ws.cell(row=j, column=17).value
                             koutei.endy = ws.cell(row=j, column=18).value
