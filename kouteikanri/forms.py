@@ -62,6 +62,7 @@ class KouteiEditForm(ModelForm):
     value = forms.IntegerField(label='数量', required=False)
     seisanh = forms.IntegerField(label='生産数/h', required=False)
     staff = forms.IntegerField(label='人員', required=False)
+    slicev = forms.IntegerField(label='スライス枚数', required=False)
     startj = forms.DateTimeField(
         label='開始時間',
         required=False,
@@ -102,8 +103,8 @@ class KouteiEditForm(ModelForm):
 
     class Meta:
         model = Process
-        fields = ('id', 'hinban', 'name', 'bin', 'kubun',
-                  'line', 'period', 'date', 'value', 'seisanh', 'staff',
+        fields = ('id', 'hinban', 'name', 'bin', 'kubun', 'line',
+                  'period', 'date', 'value', 'seisanh', 'staff', 'slicev',
                   'startj', 'endj', 'changej', 'processj', 'comment', 'status')
 
 

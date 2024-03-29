@@ -9,11 +9,6 @@ import openpyxl
 from django.contrib import messages
 
 
-# blank
-def blank(request):
-    return render(request, 'kouteikanri/blank.html')
-
-
 # 検索
 def top(request):
     # 初期値を設定
