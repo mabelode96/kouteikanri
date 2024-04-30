@@ -134,6 +134,7 @@
                     <th>生産時間</th>
                     <th>差</th>
                     <th>生産能力</th>
+                    <th>工数</th>
                     <th>切替時間</th>
                     <th width="8%;"></th>
                 </tr>
@@ -252,6 +253,13 @@
                         <td align="right">
                             {% if koutei.value|get_nouryoku:koutei.processj %}
                                 {{ koutei.value|get_nouryoku:koutei.processj }}
+                            {% endif %}
+                        </td>
+                        <td class="text-right">
+                            {% if koutei.hinban %}
+                                {% if koutei.processj %}
+                                    {{ koutei.staff|mul:koutei.processj|mul:60|intdiv:koutei.value }}
+                                {% endif %}
                             {% endif %}
                         </td>
                         <td class="text-right">{% if koutei.changej %}{{ koutei.changej }}{% endif %}</td>
