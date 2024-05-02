@@ -114,7 +114,7 @@
         <table class="table-sm table-striped table-bordered" align="left" style="width: 100%;">
             <thead class="table">
                 <tr class="text-center">
-                    <th width="8%;"></th>
+                    <th width="6%;"></th>
                     <th>便</th>
                     <th>区分</th>
                     <th><span style="color:#4169E1;">準備</span></th>
@@ -136,7 +136,7 @@
                     <th>生産能力</th>
                     <th>工数</th>
                     <th>切替時間</th>
-                    <th width="8%;"></th>
+                    <th width="6%;"></th>
                 </tr>
             </thead>
             <tbody>
@@ -155,21 +155,21 @@
                             <form action="{% url 'kouteikanri:start_or_end' id=koutei.id %}" method="get" class="form_start">
                                 {% if koutei.status == 1 %}
                                     <!-- 終了済 -->
-                                    <input type="submit" class="btn btn-secondary" value="終了" disabled>
+                                    <input type="submit" class="btn btn-sm btn-secondary" value="終了" disabled>
                                 {% elif koutei.status == 0 %}
                                     {% if koutei.endj %}
                                         <!-- 通常は通らない　-->
-                                        <input type="submit" class="btn btn-danger" value="終了">
+                                        <input type="submit" class="btn btn-sm btn-danger" value="終了">
                                     {% else %}
                                         {% if koutei.startj %}
                                             <!-- 通常の終了のパターン（生産中） -->
-                                            <input type="submit" class="btn btn-danger" id="btn_end" value="終了">
+                                            <input type="submit" class="btn btn-sm btn-danger" id="btn_end" value="終了">
                                         {% else %}
                                             <!-- 通常の開始のパターン -->
                                             {% if cntst == 0 %}
-                                                <input type="submit" class="btn btn-success" id="btn_start" value="開始">
+                                                <input type="submit" class="btn btn-sm btn-success" id="btn_start" value="開始">
                                             {% else %}
-                                                <input type="button" class="btn btn-success active" value="開始" data-toggle="modal" data-target="#testModal">
+                                                <input type="button" class="btn btn-sm btn-success active" value="開始" data-toggle="modal" data-target="#testModal">
                                             {% endif %}
                                         {% endif %}
                                     {% endif %}
@@ -221,7 +221,7 @@
                                 <td></td>
                             {% endif %}
                         {% endif %}
-                        <td class="text-right">{% if koutei.seisanh %}{{ koutei.seisanh }}/h{% endif %}</td>
+                        <td class="text-right">{% if koutei.seisanh %}{{ koutei.seisanh }}{% endif %}</td>
                     <td class="text-right">{% if koutei.conveyor %}{{ koutei.conveyor }}{% endif %}</td>
                         <!--<td class="text-right">{{ koutei.starty|date:"G:i" }}</td>-->
                         <td class="text-right">{{ koutei.endy|date:"G:i" }}</td>
@@ -267,9 +267,9 @@
                             <!-- 編集ボタン -->
                             <form action="{% url 'kouteikanri:edit' id=koutei.id %}">
                                 {% if cntst == 0 %}
-                                    <input type="submit" class="btn btn-primary" value="編集">
+                                    <input type="submit" class="btn btn-sm btn-primary" value="編集">
                                 {% else %}
-                                    <input type="button" class="btn btn-primary active" value="編集" data-toggle="modal" data-target="#testModal">
+                                    <input type="button" class="btn btn-sm btn-primary active" value="編集" data-toggle="modal" data-target="#testModal">
                                 {% endif %}
                             </form>
                         </td>
