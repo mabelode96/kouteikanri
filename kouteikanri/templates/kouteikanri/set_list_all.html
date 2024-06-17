@@ -3,7 +3,7 @@
 {% load utils %}
 
 {% block title %}
-{{ linef }} {{ periodf }} セット状況
+{{ periodf }} セット状況
 {% endblock title %}
 
 {% block content %}
@@ -11,20 +11,15 @@
     <header class="site-header" style="background:lavender;">
         <table class="table-sm table-primary" style="width: 100%">
             <tr align="left">
-                <th align="center">
+                <!--th align="center">
                     <button class="btn" onclick="window.location.reload();" id="btn_reload">
                         <i class="fas fa-sync fa-2x" style="color: #007bff;"></i>
                     </button>
-                </th>
+                </th-->
                 <th align="left">
-                    <form action="{% url 'kouteikanri:set_all' %}" method="post">
-                        {% csrf_token %}
-                        <input type="text" name="date" value="{{ datef|str_to_date }}" hidden>
-                        <input type="text" name="period" value="{{ periodf }}" hidden>
-                        <input type="submit" value="全ライン一覧へ" class="btn btn-info">
-                    </form>
+                    <a href="{% url 'kouteikanri:top' %}"
+                        class="btn btn-info" id="btn_bak" role="button">製造日選択へ</a>
                 </th>
-                <th><h4>{{ linef }}</h4></th>
                 <th><h4>【{{ periodf }}】</h4></th>
                 <th align="right"><h4>{{ datef }}製造</h4></th>
             </tr>
@@ -56,6 +51,7 @@
                     <th width="12%;">セット<br>チェック</th>
                     <th>便</th>
                     <th>区分</th>
+                    <th>ライン名</th>
                     <th>製品名</th>
                     <th>数量</th>
                     <th>〆切時間</th>
@@ -92,6 +88,7 @@
                     {% endif %}
                     </td>
                     <td>{% if koutei.kubun %}{{ koutei.kubun }}{% endif %}</td>
+                    <td>{{ koutei.line }}</td>
                     <td id="{{ koutei.id }}">{{ koutei.name }}</td>
                     <td class="text-right">{% if koutei.value %}{{ koutei.value }}{% endif %}</td>
                     <td class="text-right">{% close_time koutei.starty %}</td>
@@ -105,8 +102,6 @@
                 {% endfor %}
             </tbody>
         </table>
-        <i id="pageend" class="fas fa-chevron-circle-down fa-3x"></i>
-        <i id="pagetop" class="fas fa-chevron-circle-up fa-3x"></i>
     </div>
 </div>
 {% endblock content %}

@@ -27,20 +27,20 @@
     <br>
     <br>
     <table class="table-sm" style="width: 100%" align="center">
-        <form action="{% url 'kouteikanri:all' %}" method="post">
+        <form action="?" method="post">
             {% csrf_token %}
             <tr>
                 <td>　</td>
             </tr>
             <tr>
                 <td>
-                    <div class="input-group-lg mb-3">
+                    <div class="input-group-lg mb-3" id="date">
                         <div class="input-group-prepend">
                             <label class="input-group-text">製造日</label>
                             {{ form1.date }}
                         </div>
                     </div>
-                    <div class="input-group-lg mb-3">
+                    <div class="input-group-lg mb-3" id="period">
                         <div class="input-group-prepend">
                             <label class="input-group-text">時間帯</label>
                             {{ form1.period }}
@@ -51,21 +51,16 @@
             <tr>
                 <td>
                     <div align="left">
-                        <button type="submit" class="btn btn-primary btn-lg">
+                        <button type="submit" class="btn btn-primary btn-lg"
+                                formaction="{% url 'kouteikanri:all' %}">
                             <i class="fas fa-search" style="font-size:100%;"></i> 検索
                         </button>
                     </div>
-                </td>
-            </tr>
-        </form>
-        <form action="{% url 'kouteikanri:set_all' %}" method="post">
-            <tr>
-                <td>
-                    {% csrf_token %}
                     <div align="right">
-                        <input type="date" name="date2" id="date2" hidden>
-                        <input type="text" name="period2" id="period2" hidden>
-                        <button type="submit" class="btn btn-success">セットチェック</button>
+                        <button type="submit" class="btn btn-success"
+                                formaction="{% url 'kouteikanri:redirect_a' %}">
+                            セットチェック
+                        </button>
                     </div>
                 </td>
             </tr>

@@ -7,6 +7,7 @@ import datetime
 from django.db import connection
 import openpyxl
 from django.contrib import messages
+from django.core.paginator import Paginator
 
 
 # 検索
@@ -17,6 +18,14 @@ def top(request):
     d = datetime.datetime.today().strftime("%Y-%m-%d")
     f = MyModelForm(initial={'date': d, 'period': '昼勤'})
     return render(request, 'kouteikanri/top.html', {'form1': f})
+
+
+# リダイレクト用
+def redirect_a(request):
+    if request.method == 'POST':
+        date = request.POST['date']
+        period = request.POST['period']
+        return render(request, 'kouteikanri/redirect.html', {'date': date, 'period': period})
 
 
 # 全ライン一覧
@@ -53,8 +62,8 @@ def all_list(request):
 # セットチェック 全ライン一覧
 def set_all(request):
     if request.method == 'POST':
-        date = request.POST['date2']
-        period = request.POST['period2']
+        date = request.POST['date']
+        period = request.POST['period']
         sql_text = (
                 "SELECT line, period, "
                 "count(set) AS all_cnt, "
@@ -231,6 +240,48 @@ class SetList(ListView):
         return redirect('kouteikanri:set_list', line, date, period)
 
 
+# セット状況 (全ライン)
+class SetListAll(ListView):
+    model = Process
+    context_object_name = 'kouteis'
+    template_name = 'kouteikanri/set_list_all.html'
+    paginate_by = 100
+    d = datetime.datetime.today().strftime("%Y-%m-%d")
+    form = MyModelForm(initial={'date': d, 'period': '昼勤'})
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        dt = self.kwargs['date']
+        pr = self.kwargs['period']
+        # 製造日 ==========================================================================
+        tstr = self.kwargs['date']
+        tdata = datetime.datetime.strptime(tstr, '%Y-%m-%d')
+        tdate = str(tdata.year) + '年' + str(tdata.month) + '月' + str(tdata.day) + '日'
+        ctx['datef'] = tdate
+        # 時間帯 ==========================================================================
+        ctx['periodf'] = self.kwargs['period']
+        # セット総数 =======================================================================
+        ctx['setcnt'] = set_cnt('*', dt, pr)
+        # セット総数 =======================================================================
+        ctx['setend'] = set_end('*', dt, pr)
+        # 進捗 ============================================================================
+        ctx['progress'] = set_prog('*', dt, pr)
+        return ctx
+
+    def get_queryset(self, **kwargs):
+        return Process.objects.order_by('line', 'startj', 'starty').filter(
+            Q(date__exact=self.kwargs['date']) &
+            Q(period__exact=self.kwargs['period']) &
+            Q(hinban__gt=0))
+
+
+    @staticmethod
+    def post(request):
+        date = request.POST['date']
+        period = request.POST['period']
+        return render(request, 'kouteikanri:set_list_all', context={'date': date, 'period': period})
+
+
 # 「総数」を計算する関数
 def value_sum(line, date, period):
     koutei = Process.objects.filter(
@@ -347,12 +398,19 @@ def comp_time(line, date, period):
 
 # 「セット総数」を計算する関数
 def set_cnt(line, date, period):
-    koutei = Process.objects.filter(
-        Q(line__exact=line) &
-        Q(date__exact=date) &
-        Q(period__exact=period) &
-        Q(hinban__gt=0)
-    )
+    if line == '*':
+        koutei = Process.objects.filter(
+            Q(date__exact=date) &
+            Q(period__exact=period) &
+            Q(hinban__gt=0)
+        )
+    else:
+        koutei = Process.objects.filter(
+            Q(line__exact=line) &
+            Q(date__exact=date) &
+            Q(period__exact=period) &
+            Q(hinban__gt=0)
+        )
     if koutei.count() == 0:
         return 0
     else:
@@ -362,13 +420,21 @@ def set_cnt(line, date, period):
 
 # 「セット完了」を計算する関数
 def set_end(line, date, period):
-    koutei = Process.objects.filter(
-        Q(line__exact=line) &
-        Q(date__exact=date) &
-        Q(period__exact=period) &
-        Q(set__exact=1) &
-        Q(hinban__gt=0)
-    )
+    if line == '*':
+        koutei = Process.objects.filter(
+            Q(date__exact=date) &
+            Q(period__exact=period) &
+            Q(set__exact=1) &
+            Q(hinban__gt=0)
+        )
+    else:
+        koutei = Process.objects.filter(
+            Q(line__exact=line) &
+            Q(date__exact=date) &
+            Q(period__exact=period) &
+            Q(set__exact=1) &
+            Q(hinban__gt=0)
+        )
     if koutei.count() == 0:
         return 0
     else:
@@ -378,12 +444,19 @@ def set_end(line, date, period):
 
 # 「セット進捗率」
 def set_prog(line, date, period):
-    koutei = Process.objects.filter(
-        Q(line__exact=line) &
-        Q(date__exact=date) &
-        Q(period__exact=period) &
-        Q(hinban__gt=0)
-    )
+    if line == '*':
+        koutei = Process.objects.filter(
+            Q(date__exact=date) &
+            Q(period__exact=period) &
+            Q(hinban__gt=0)
+        )
+    else:
+        koutei = Process.objects.filter(
+            Q(line__exact=line) &
+            Q(date__exact=date) &
+            Q(period__exact=period) &
+            Q(hinban__gt=0)
+        )
     if koutei.count() == 0:
         return 0
     else:
@@ -405,9 +478,9 @@ def edit(request, id=None):
         koutei = get_object_or_404(Process, pk=id)
         form = KouteiEditForm(request.POST, instance=koutei)
         template = 'kouteikanri/edit.html'
-        #
-        if koutei.value is not None and koutei.value is not 0:
-            if koutei.slicev is not None and koutei.slicev is not 0:
+        # スライス枚数を変数に格納
+        if koutei.value is not None and koutei.value != 0:
+            if koutei.slicev is not None and koutei.slicev != 0:
                 mai = koutei.slicev / koutei.value
             else:
                 mai = 0
@@ -433,7 +506,7 @@ def edit(request, id=None):
                     koutei.seisand = koutei.value * koutei.price
                 if koutei.seisanh is not None and koutei.seisanh > 0:
                     koutei.processy = round(koutei.value / koutei.seisanh * 60)
-                if mai is not 0:
+                if mai != 0:
                     koutei.slicev = koutei.value * mai
             # 終了時間に応じて実際時間を計算しstatusを更新
             if koutei.endj is not None:

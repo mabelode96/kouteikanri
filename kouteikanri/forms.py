@@ -62,6 +62,7 @@ class KouteiEditForm(ModelForm):
     value = forms.IntegerField(label='数量', required=False)
     seisanh = forms.IntegerField(label='生産数/h', required=False)
     staff = forms.IntegerField(label='人員', required=False)
+    slicev = forms.IntegerField(label='スライス枚数', required=False, widget=forms.HiddenInput())
     startj = forms.DateTimeField(
         label='開始時間',
         required=False,
@@ -184,7 +185,7 @@ class KouteiCopyForm(ModelForm):
     conveyor = forms.FloatField(label='コンベア速度', required=False, widget=forms.HiddenInput())
     staff = forms.IntegerField(label='人員', required=False)
     panmm = forms.CharField(label='パンミリ数', required=False, max_length=50, widget=forms.HiddenInput())
-    slicev = forms.IntegerField(label='スライス枚数', required=False)
+    slicev = forms.IntegerField(label='スライス枚数', required=False, widget=forms.HiddenInput())
     slicep = forms.IntegerField(label='スライス能力', required=False, widget=forms.HiddenInput())
     changey = forms.IntegerField(label='切替予定', required=False)
     processy = forms.IntegerField(label='生産時間', required=True, widget=forms.HiddenInput())
