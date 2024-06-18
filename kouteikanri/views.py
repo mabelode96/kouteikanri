@@ -7,7 +7,6 @@ import datetime
 from django.db import connection
 import openpyxl
 from django.contrib import messages
-from django.core.paginator import Paginator
 
 
 # 検索
@@ -245,7 +244,7 @@ class SetListAll(ListView):
     model = Process
     context_object_name = 'kouteis'
     template_name = 'kouteikanri/set_list_all.html'
-    paginate_by = 100
+    paginate_by = 25
     d = datetime.datetime.today().strftime("%Y-%m-%d")
     form = MyModelForm(initial={'date': d, 'period': '昼勤'})
 
