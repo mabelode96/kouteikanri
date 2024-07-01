@@ -464,7 +464,7 @@ def set_prog(line, date, period):
         if sm['set__sum'] is None:
             return 0
         else:
-            if cn['set__count'] is None:
+            if cn['set__count'] is None or cn['set__count'] == 0:
                 return 0
             else:
                 return round(sm['set__sum'] / cn['set__count'] * 100, 1)
@@ -503,7 +503,7 @@ def edit(request, id=None):
             if koutei.value is not None:
                 if koutei.price is not None:
                     koutei.seisand = koutei.value * koutei.price
-                if koutei.seisanh is not None and koutei.seisanh > 0:
+                if koutei.seisanh is not None and koutei.seisanh != 0:
                     koutei.processy = round(koutei.value / koutei.seisanh * 60)
                 if mai != 0:
                     koutei.slicev = koutei.value * mai
@@ -594,10 +594,10 @@ def copy(request, id=None):
             koutei.date = request.POST['date']
             koutei.period = request.POST['period']
             # 数量に応じて生産高と生産数hを再計算
-            if koutei.value is not None:
+            if koutei.value is not None and koutei.value != 0:
                 if koutei.price is not None:
                     koutei.seisand = koutei.value * koutei.price
-                if koutei.seisanh is not None and koutei.seisanh > 0:
+                if koutei.seisanh is not None and koutei.seisanh != 0:
                     koutei.processy = round(koutei.value / koutei.seisanh * 60)
             # 開始状態にする
             koutei.startj = datetime.datetime.now().astimezone()
