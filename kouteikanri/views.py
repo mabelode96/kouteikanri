@@ -7,6 +7,11 @@ import datetime
 from django.db import connection
 import openpyxl
 from django.contrib import messages
+import plotly.express as px
+import pandas as pd
+from pathlib import Path
+from django.views.generic import TemplateView
+from django_pandas.io import read_frame
 
 
 # 検索
@@ -59,26 +64,26 @@ def all_list(request):
 
 
 # セットチェック 全ライン一覧
-def set_all(request):
-    if request.method == 'POST':
-        date = request.POST['date']
-        period = request.POST['period']
-        sql_text = (
-                "SELECT line, period, "
-                "count(set) AS all_cnt, "
-                "sum(set) AS end_cnt, "
-                "count(set) - sum(set) AS left_cnt, "
-                "sum(set) * 100 / count(set) AS progress "
-                "FROM kouteikanri_process "
-                "WHERE date='" + date +
-                "' AND period='" + period +
-                "' AND hinban IS NOT NULL "
-                "GROUP BY line, period "
-                "ORDER BY period DESC, line;"
-        )
-        emp_list = exec_query(sql_text)
-        return render(request, 'kouteikanri/set_all.html', {
-            'emp_list': emp_list, 'date': date, 'period': period})
+#def set_all(request):
+#    if request.method == 'POST':
+#        date = request.POST['date']
+#        period = request.POST['period']
+#        sql_text = (
+#                "SELECT line, period, "
+#                "count(set) AS all_cnt, "
+#                "sum(set) AS end_cnt, "
+#                "count(set) - sum(set) AS left_cnt, "
+#                "sum(set) * 100 / count(set) AS progress "
+#                "FROM kouteikanri_process "
+#                "WHERE date='" + date +
+#                "' AND period='" + period +
+#                "' AND hinban IS NOT NULL "
+#                "GROUP BY line, period "
+#                "ORDER BY period DESC, line;"
+#        )
+#        emp_list = exec_query(sql_text)
+#        return render(request, 'kouteikanri/set_all.html', {
+#            'emp_list': emp_list, 'date': date, 'period': period})
 
 
 # cursor.descriptionでフィールド名を配列にセットして、resultsにフィールド名を付加
@@ -953,3 +958,88 @@ def upload(request):
                     koutei.delete()
         messages.success(request, "ファイルのアップロードが終了しました")
     return render(request, 'kouteikanri/upload.html')
+
+
+def line_charts(date, period):
+    # CSV読み込み　※デバッグ時のみ使用
+    # p = Path("C:/Users/Administrator/Desktop")
+    # df = pd.read_csv(p.joinpath("file.csv"), header=0,
+    #                  index_col=0, engine="python", encoding="utf_8_sig")
+
+    koutei = Process.objects.order_by('line').filter(
+        Q(date__exact=date) &
+        Q(period__exact=period)
+    )
+    df = read_frame(koutei)
+
+    # datetune列の内容をDatetime型かつaware(UTC)で、"datetime_utc"列に入れる
+    df["start_utc"] = pd.to_datetime(df["starty"], utc=True)
+    df["end_utc"] = pd.to_datetime(df["endy"], utc=True)
+
+    # JSTに変換したデータを"datetime_jst"列に入れる
+    df["start_jst"] = df["start_utc"].dt.tz_convert('Asia/Tokyo')
+    df["end_jst"] = df["end_utc"].dt.tz_convert('Asia/Tokyo')
+
+    fig = px.timeline(
+        df, x_start="start_jst", x_end="end_jst", y="line", text="name",
+        color="status",
+        color_continuous_scale=["aliceblue", "palegreen"],
+        labels={'start_jst': '開始', 'end_jst': '終了', 'line': 'ライン', 'name': '製品名',
+                'status': '状態'},
+        # height=1440,
+    )
+    fig.update_traces(
+        width=0.95,
+        textposition='inside',
+        textfont=dict(color='black'),
+    )
+    fig.update_layout(
+        uniformtext_mode=False,
+        uniformtext_minsize=10,
+        plot_bgcolor='blanchedalmond',
+        clickmode='none',
+    )
+    fig.update_xaxes(
+        title=dict(text='', font=dict(color='grey')),
+        gridcolor='black', gridwidth=1,
+    )
+    fig.update_yaxes(
+        title=dict(text='', font=dict(color='grey')),
+        gridcolor='white', gridwidth=1,
+        categoryorder='array',
+        categoryarray=df['line'][::-1],
+    )
+
+    return fig.to_html(include_plotlyjs=False)
+
+
+class LineChartsView(TemplateView):
+    model = Process
+    context_object_name = 'kouteis'
+    template_name = 'kouteikanri/plot.html'
+    d = datetime.datetime.today().strftime("%Y-%m-%d")
+    form = MyModelForm(initial={'date': d, 'period': '昼勤'})
+
+    def get_context_data(self, **kwargs):
+        context = super(LineChartsView, self).get_context_data(**kwargs)
+        dt = self.kwargs['date']
+        pr = self.kwargs['period']
+        context["plot"] = line_charts(dt, pr)
+        # 製造日 ==========================================================================
+        tdata = datetime.datetime.strptime(dt, '%Y-%m-%d')
+        tdate = str(tdata.year) + '年' + str(tdata.month) + '月' + str(tdata.day) + '日'
+        context['datef'] = tdate
+        return context
+
+    def get_queryset(self, **kwargs):
+        return Process.objects.order_by('line', 'starty').filter(
+            Q(date__exact=self.kwargs['date']) &
+            Q(period__exact=self.kwargs['period']) &
+            Q(hinban__gt=0)
+        )
+
+    @staticmethod
+    def post(request):
+        date = request.POST['date']
+        period = request.POST['period']
+        return render(request, 'kouteikanri:plot', context={'date': date, 'period': period})

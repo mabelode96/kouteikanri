@@ -30,7 +30,8 @@ class MyModelForm(forms.ModelForm):
     )
     period = PeriodChoiceField(
         queryset=Process.objects.all().distinct('period').order_by('-period'),
-        label='時間帯', to_field_name='period', empty_label='選択してください')
+        label='時間帯', to_field_name='period', empty_label='選択してください'
+    )
 
     class Meta:
         model = Process

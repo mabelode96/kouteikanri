@@ -10,6 +10,7 @@ urlpatterns = [
     # path('set_all/', views.set_all, name='set_all'),
     path('redirect/', views.redirect_a, name='redirect_a'),
     path('set/<date>/<str:period>/', views.SetListAll.as_view(), name='set_list_all'),
+    path("plot/<date>/<str:period>/", views.LineChartsView.as_view(), name="plot"),
     path('set/<str:line>/<date>/<str:period>/', views.SetList.as_view(), name='set_list'),
     path('<str:line>/<date>/<str:period>/#<int:anchor>', views.KouteiList.as_view(), name='list'),
     path('<str:line>/<date>/<str:period>/', views.KouteiList.as_view(), name='list'),

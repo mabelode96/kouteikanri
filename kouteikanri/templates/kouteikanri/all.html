@@ -18,6 +18,10 @@
             <a href="{% url 'kouteikanri:top' %}"
                class="btn btn-info" id="btn_bak" role="button">製造日選択へ</a>
         </td>
+        <td>
+            <a href="{% url 'kouteikanri:plot' date period %}"
+               class="btn-sm btn-warning" id="btn_plot" role="button">単品別に切り替え</a>
+        </td>
         <td align="right">
             <h4>製造日: {{ date|date_to_str }}　【{{ period }}】</h4>
         </td>

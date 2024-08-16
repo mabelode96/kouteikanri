@@ -4,5 +4,8 @@ django-bootstrap-form==3.4
 django-bootstrap4==22.2
 django-mathfilters==1.0.0
 django-model-utils==2.6.1
+django_pandas~=0.6.7
 openpyxl==3.0.10
+pandas~=2.2.2
+plotly~=5.23.0
 psycopg2-binary==2.9.9

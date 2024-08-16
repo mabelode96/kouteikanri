@@ -1,0 +1,55 @@
+{% load static %}
+<script src="{% static 'js/plotly-latest.min.js' %}"></script>
+
+{% block content %}
+{% autoescape off %}
+{{ plot_html }}
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0 shrink-to-fit=no">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>{% block title %}盛付行程進捗管理{% endblock %}</title>
+  <!-- Bootstrap -->
+  <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'css/kouteikanri.css' %}" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link href="{% static 'css/fontawesome.css' %}" rel="stylesheet">
+  <link href="{% static 'css/font-awesome-animation.css' %}" rel="stylesheet" type="text/css" media="all" />
+  <!-- favicon -->
+  <link rel="icon" type="image/png" href="{% static 'icon/favicon.png' %}">
+</head>
+<body>
+  {% endautoescape %}
+  <div class="title" align="center"><h3>単品別工程一覧</h3></div>
+    <table class="all_table" style="width: 100%;">
+      <tr>
+        <td align="left">
+          &emsp;&emsp;
+          <a href="{% url 'kouteikanri:top' %}"
+             class="btn-sm btn-warning" id="btn_bak" role="button">戻る</a>
+        </td>
+        <td align="right">
+          <h4>{{ datef }}&emsp;{{ period }}&emsp;</h4>
+        </td>
+      </tr>
+    </table>
+  <div class="graph">{{plot|safe}}</div>
+  {% endblock content %}
+
+  {% block script %}
+  <script src="{% static 'js/plotly-latest.min.js' %}"></script>
+  <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+  <script src="{% static 'js/jquery-3.5.1.js' %}"></script>
+  <!-- Include all compiled plugins (below), or include individual files as needed -->
+  <script src="{% static 'js/bootstrap.min.js' %}"></script>
+  <!-- jsを書く場所 -->
+  <script>
+    // オートリロード
+    setTimeout(function () {
+      location.reload();
+    }, 60000);
+  </script>
+  {% endblock %}
+</body>
