@@ -997,7 +997,7 @@ def line_charts(date, period):
         uniformtext_mode=False,
         uniformtext_minsize=10,
         plot_bgcolor='blanchedalmond',
-        clickmode='none',
+        clickmode='event+select',
     )
     fig.update_xaxes(
         title=dict(text='', font=dict(color='grey')),
@@ -1029,6 +1029,7 @@ class LineChartsView(TemplateView):
         tdata = datetime.datetime.strptime(dt, '%Y-%m-%d')
         tdate = str(tdata.year) + '年' + str(tdata.month) + '月' + str(tdata.day) + '日'
         context['datef'] = tdate
+        context['periodf'] = pr
         return context
 
     def get_queryset(self, **kwargs):
