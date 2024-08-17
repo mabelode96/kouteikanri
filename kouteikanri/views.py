@@ -1000,8 +1000,8 @@ def line_charts(date, period):
         df, x_start="start_jst", x_end="end_jst", y="line", text="name_fix",
         color="status_fix",
         color_continuous_scale=["aliceblue", "palegreen"],
-        labels={'start_jst': '開始', 'end_jst': '終了', 'line': 'ライン', 'name_fix': '製品名',
-                'status': '状態'},
+        labels={'start_jst': '開始', 'end_jst': '終了', 'line': 'ライン',
+                'name_fix': '製品名', 'status_fix': '状態'},
         # height=1440,
     )
     fig.update_traces(
@@ -1026,7 +1026,7 @@ def line_charts(date, period):
         categoryarray=df['line'][::-1],
     )
 
-    return fig.to_html(include_plotlyjs=False)
+    return fig.to_html(full_html=False, include_plotlyjs=False)
 
 
 class LineChartsView(TemplateView):
