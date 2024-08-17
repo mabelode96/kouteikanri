@@ -972,19 +972,35 @@ def line_charts(date, period):
     )
     df = read_frame(koutei)
 
-    # datetune列の内容をDatetime型かつaware(UTC)で、"datetime_utc"列に入れる
+    # datetune列の内容をDatetime型かつaware(UTC)で、"*_utc"列に入れる
     df["start_utc"] = pd.to_datetime(df["starty"], utc=True)
     df["end_utc"] = pd.to_datetime(df["endy"], utc=True)
-
-    # JSTに変換したデータを"datetime_jst"列に入れる
+    # JSTに変換したデータを"*_jst"列に入れる
     df["start_jst"] = df["start_utc"].dt.tz_convert('Asia/Tokyo')
     df["end_jst"] = df["end_utc"].dt.tz_convert('Asia/Tokyo')
 
+    # 製品名を簡略化する
+    df["name_fix"] = df["name"].str.replace("（東北）", "")
+    df["name_fix"] = df["name_fix"].str.replace("ＬＷ", "")
+    df["name_fix"] = df["name_fix"].str.replace("■", "")
+    df["name_fix"] = df["name_fix"].str.replace("♪", "")
+    df["name_fix"] = df["name_fix"].str.replace("手巻おにぎり", "手巻　")
+    df["name_fix"] = df["name_fix"].str.replace("金しゃりおにぎり", "金しゃり　")
+    df["name_fix"] = df["name_fix"].str.replace("直巻おにぎり", "直巻　")
+
+    # 予備のstatusを1にする
+    def func(x):
+        if x["name"] == "予備":
+            return 1
+        else:
+            return x["status"]
+    df["status_fix"] = df.apply(func, axis=1)
+
     fig = px.timeline(
-        df, x_start="start_jst", x_end="end_jst", y="line", text="name",
-        color="status",
+        df, x_start="start_jst", x_end="end_jst", y="line", text="name_fix",
+        color="status_fix",
         color_continuous_scale=["aliceblue", "palegreen"],
-        labels={'start_jst': '開始', 'end_jst': '終了', 'line': 'ライン', 'name': '製品名',
+        labels={'start_jst': '開始', 'end_jst': '終了', 'line': 'ライン', 'name_fix': '製品名',
                 'status': '状態'},
         # height=1440,
     )
