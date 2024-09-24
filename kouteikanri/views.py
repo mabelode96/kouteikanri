@@ -9,7 +9,6 @@ import openpyxl
 from django.contrib import messages
 import plotly.express as px
 import pandas as pd
-from pathlib import Path
 from django.views.generic import TemplateView
 from django_pandas.io import read_frame
 
@@ -21,7 +20,7 @@ def top(request):
     # f = MyModelForm(initial={'date': d['date__max'], 'period': '昼勤'})
     d = datetime.datetime.today().strftime("%Y-%m-%d")
     f = MyModelForm(initial={'date': d, 'period': '昼勤'})
-    return render(request, 'kouteikanri/top.html', {'form1': f})
+    return render(request, 'top.html', {'form1': f})
 
 
 # リダイレクト用
@@ -29,7 +28,7 @@ def redirect_a(request):
     if request.method == 'POST':
         date = request.POST['date']
         period = request.POST['period']
-        return render(request, 'kouteikanri/redirect.html', {'date': date, 'period': period})
+        return render(request, 'redirect.html', {'date': date, 'period': period})
 
 
 # 全ライン一覧
@@ -57,7 +56,7 @@ def all_list(request):
                 "ORDER BY period DESC, line;"
         )
         emp_list = exec_query(sql_text)
-        return render(request, 'kouteikanri/all.html', {'emp_list': emp_list, 'date': date, 'period': period})
+        return render(request, 'all.html', {'emp_list': emp_list, 'date': date, 'period': period})
     else:
         # 通らないはず
         return redirect('kouteikanri:all', {'date': '2021-01-01', 'period': '昼勤'})
@@ -82,7 +81,7 @@ def all_list(request):
 #                "ORDER BY period DESC, line;"
 #        )
 #        emp_list = exec_query(sql_text)
-#        return render(request, 'kouteikanri/set_all.html', {
+#        return render(request, 'set_all.html', {
 #            'emp_list': emp_list, 'date': date, 'period': period})
 
 
@@ -107,7 +106,7 @@ def exec_query(sql_txt):
 class KouteiList(ListView):
     model = Process
     context_object_name = 'kouteis'
-    template_name = 'kouteikanri/list.html'
+    template_name = 'list.html'
     paginate_by = 50
 
     def get_context_data(self, **kwargs):
@@ -204,7 +203,7 @@ class KouteiList(ListView):
 class SetList(ListView):
     model = Process
     context_object_name = 'kouteis'
-    template_name = 'kouteikanri/set_list.html'
+    template_name = 'set_list.html'
     paginate_by = 50
 
     def get_context_data(self, **kwargs):
@@ -248,7 +247,7 @@ class SetList(ListView):
 class SetListAll(ListView):
     model = Process
     context_object_name = 'kouteis'
-    template_name = 'kouteikanri/set_list_all.html'
+    template_name = 'set_list_all.html'
     paginate_by = 25
     d = datetime.datetime.today().strftime("%Y-%m-%d")
     form = MyModelForm(initial={'date': d, 'period': '昼勤'})
@@ -481,7 +480,7 @@ def edit(request, id=None):
     if id:
         koutei = get_object_or_404(Process, pk=id)
         form = KouteiEditForm(request.POST, instance=koutei)
-        template = 'kouteikanri/edit.html'
+        template = 'edit.html'
         # スライス枚数を変数に格納
         if koutei.value is not None and koutei.value != 0:
             if koutei.slicev is not None and koutei.slicev != 0:
@@ -494,7 +493,7 @@ def edit(request, id=None):
     else:
         koutei = Process()
         form = KouteiAddForm(request.POST, instance=koutei)
-        template = 'kouteikanri/add.html'
+        template = 'add.html'
         mai = 0
     # POST
     if request.method == 'POST':
@@ -570,10 +569,10 @@ def edit(request, id=None):
     else:
         if id:
             form = KouteiEditForm(instance=koutei)
-            template = 'kouteikanri/edit.html'
+            template = 'edit.html'
         else:
             form = KouteiAddForm(instance=koutei)
-            template = 'kouteikanri/add.html'
+            template = 'add.html'
         if 'next' in request.GET:
             return redirect(request.GET['next'])
     return render(request, template, dict(form=form, id=id))
@@ -627,7 +626,7 @@ def copy(request, id=None):
         form = KouteiCopyForm(initial=initial_dict)
         if 'next' in request.GET:
             return redirect(request.GET['next'])
-    return render(request, 'kouteikanri/edit.html', dict(form=form))
+    return render(request, 'edit.html', dict(form=form))
 
 
 # 終了解除
@@ -779,7 +778,7 @@ def comment(request, id):
     if 'next' in request.GET:
         return redirect(request.GET['next'])
     else:
-        return render(request, 'kouteikanri/comment.html', {'form': form})
+        return render(request, 'comment.html', {'form': form})
 
 
 # アップロード
@@ -789,7 +788,7 @@ def upload(request):
         if not excel.name[-4:] == 'xlsx':
             print(excel.name[-4:])
             messages.error(request, "Excelファイル(*.xlsx)を選択してください")
-            return render(request, 'kouteikanri/upload.html')
+            return render(request, 'upload.html')
         # Excelの読み込み
         wb = openpyxl.load_workbook(excel)
         for ws in wb.worksheets:
@@ -957,7 +956,7 @@ def upload(request):
                     messages.error(request, "　削除：" + koutei.name)
                     koutei.delete()
         messages.success(request, "ファイルのアップロードが終了しました")
-    return render(request, 'kouteikanri/upload.html')
+    return render(request, 'upload.html')
 
 
 def line_charts(date, period):
@@ -1032,7 +1031,7 @@ def line_charts(date, period):
 class LineChartsView(TemplateView):
     model = Process
     context_object_name = 'kouteis'
-    template_name = 'kouteikanri/plot.html'
+    template_name = 'plot.html'
     d = datetime.datetime.today().strftime("%Y-%m-%d")
     form = MyModelForm(initial={'date': d, 'period': '昼勤'})
 
