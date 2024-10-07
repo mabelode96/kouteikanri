@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}
+調理工程進捗確認
+{% endblock title %}
+
+{% block content %}
+<br>
+<div class="col-sm-10 offset-sm-1">
+    <table class="table-sm" style="width: 100%" align="center">
+        <tr>
+            <td>
+                <button class="btn" onclick="window.location.reload();" id="btn_reload">
+                    <i class="fas fa-sync fa-2x" style="color: #007bff;"></i>
+                </button>
+            </td>
+            <td align="right">
+                何かの予定地
+                <!-- a href=""
+                   class="btn-sm btn-danger" id="btn_upload" role="button">管理メニュー</a -->
+            </td>
+        </tr>
+    </table>
+    <br>
+    <h1 align="center">調理工程進捗確認</h1>
+    <br>
+    <br>
+    <br>
+    <br>
+    <table class="table-sm" style="width: 100%" align="center">
+        <form action="?" method="post">
+            {% csrf_token %}
+            <tr>
+                <td>　</td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="input-group-lg mb-3" id="date">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text">製造日</label>
+                            {{ form1.date }}
+                        </div>
+                    </div>
+                    <div class="input-group-lg mb-3" id="period">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text">時間帯</label>
+                            {{ form1.period }}
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div align="left">
+                        <button type="submit" class="btn btn-primary btn-lg"
+                                formaction="{% url 'chourikoutei:list_all' %}">
+                            <i class="fas fa-search" style="font-size:100%;"></i> 検索
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        </form>
+    </table>
+</div>
+{% endblock content %}

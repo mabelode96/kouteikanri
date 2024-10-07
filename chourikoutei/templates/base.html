@@ -1,0 +1,90 @@
+{% load static %}
+
+<!DOCTYPE html>
+
+
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0 shrink-to-fit=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <title>{% block title %}調理行程進捗管理{% endblock %}</title>
+    <!-- Bootstrap -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/kouteikanri.css' %}" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="{% static 'css/fontawesome.css' %}" rel="stylesheet">
+    <link href="{% static 'css/font-awesome-animation.css' %}" rel="stylesheet" type="text/css" media="all" />
+    <!-- favicon -->
+    <link rel="icon" type="image/png" href="{% static 'icon/favicon.png' %}">
+  </head>
+  <body>
+    <div class="container-fluid">
+      {% block content %}
+      {{ content }}
+      {% endblock %}
+    </div>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="{% static 'js/jquery-3.5.1.js' %}"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <!-- jsを書く場所 -->
+    <script>
+      // リロードボタンがあるページのみオートリロード
+      if($('#btn_reload').length){
+        setTimeout(function () {
+          location.reload();
+        }, 60000);
+      }
+      else {
+      }
+      // 開始・終了ボタン
+      $('#btn_start').click(function() {
+        setTimeout(function(){
+          location.reload();
+        },100);
+      });
+      $('#btn_end').click(function() {
+        setTimeout(function(){
+          location.reload();
+        },100);
+      });
+      $('#btn_cancel').click(function() {
+        setTimeout(function(){
+          location.reload();
+        },100);
+      });
+      // セレクトボックスに連動させる
+      $(function(){
+        $('#date2').val($('#id_date').val());
+      });
+      $(function(){
+        $('#id_date').change(function(){
+          var text = $(this).val();
+          $('#date2').val(text);
+        });
+      });
+      $(function(){
+        $('#period2').val($('#id_period').val());
+      });
+      $(function(){
+        $('#id_period').change(function(){
+          var text = $(this).val();
+          $('#period2').val(text);
+        });
+      });
+      // ページのトップに移動
+      $("#pagetop").click(function () {
+        $('html, body').animate({ scrollTop: 0 }, 500);
+      });
+      // ページのボトムに移動
+      $("#pageend").click(function () {
+        $('html, body').animate({ scrollTop: 500 }, 500);
+      });
+    </script>
+    {% block script %}
+    {% endblock %}
+  </body>
+</html>
