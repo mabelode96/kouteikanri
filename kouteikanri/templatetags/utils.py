@@ -93,3 +93,17 @@ def close_time(start):
     else:
         ct = start.astimezone() - datetime.timedelta(minutes=5)
         return datetime.datetime.strftime(ct, '%H:%M')
+
+
+# 所要時間計算
+@register.simple_tag
+def seisan_time(start_time, end_time):
+    if start_time is None:
+        return 0
+    elif end_time is None:
+        return 0
+    elif end_time < start_time:
+        return 0
+    else:
+        td = end_time - start_time
+        return round((td.days * 1440) + (td.seconds / 60))

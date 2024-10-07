@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'bootstrapform',
     'mathfilters',
     'kouteikanri',
+    'chourikoutei',
 ]
 
 
