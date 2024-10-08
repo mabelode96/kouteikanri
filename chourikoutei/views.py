@@ -29,8 +29,9 @@ def list_all(request):
                 "count(hinban) - count(endj) AS left_cnt, "
                 "count(endj) * 100 / count(hinban) AS progress "
                 "FROM kouteikanri_chouriproc "
-                "WHERE date='" + date +
-                "' AND period='" + period +
+                "WHERE starty>='" + date +
+                " 0:00:00+09' AND starty<='" + date +
+                " 23:59:59+09' AND period='" + period +
                 "' AND hinban IS NOT NULL "
                 "GROUP BY line, period "
                 "ORDER BY period DESC, line;"
@@ -69,7 +70,8 @@ class List(ListView):
 
     def get_queryset(self, **kwargs):
         return Process.objects.order_by('startj', 'starty').filter(
-            Q(date__exact=self.kwargs['date']) &
+            Q(starty__gte=self.kwargs['date'] + ' 0:00:00+09') &
+            Q(starty__lte=self.kwargs['date'] + ' 23:59:59+09') &
             Q(period__exact=self.kwargs['period']) &
             Q(line__exact=self.kwargs['line']) &
             Q(hinban__gt=0))
@@ -85,16 +87,19 @@ class List(ListView):
 
 # 「生産総数」を計算する関数
 def all_cnt(line, date, period):
+    dstr = str(date.year) + '-' + str(date.month) + '-' + str(date.day)
     if line == '*':
         koutei = Process.objects.filter(
-            Q(date__exact=date) &
+            Q(starty__gte=dstr + ' 0:00:00+09') &
+            Q(starty__lte=dstr + ' 23:59:59+09') &
             Q(period__exact=period) &
             Q(hinban__gt=0)
         )
     else:
         koutei = Process.objects.filter(
             Q(line__exact=line) &
-            Q(date__exact=date) &
+            Q(starty__gte=dstr + ' 0:00:00+09') &
+            Q(starty__lte=dstr + ' 23:59:59+09') &
             Q(period__exact=period) &
             Q(hinban__gt=0)
         )
@@ -107,9 +112,11 @@ def all_cnt(line, date, period):
 
 # 「生産完了」を計算する関数
 def comp_cnt(line, date, period):
+    dstr = str(date.year) + '-' + str(date.month) + '-' + str(date.day)
     if line == '*':
         koutei = Process.objects.filter(
-            Q(date__exact=date) &
+            Q(starty__gte=dstr + ' 0:00:00+09') &
+            Q(starty__lte=dstr + ' 23:59:59+09') &
             Q(period__exact=period) &
             Q(endj__isnull=False) &
             Q(hinban__gt=0)
@@ -117,7 +124,8 @@ def comp_cnt(line, date, period):
     else:
         koutei = Process.objects.filter(
             Q(line__exact=line) &
-            Q(date__exact=date) &
+            Q(starty__gte=dstr + ' 0:00:00+09') &
+            Q(starty__lte=dstr + ' 23:59:59+09') &
             Q(period__exact=period) &
             Q(endj__isnull=False) &
             Q(hinban__gt=0)
@@ -131,16 +139,19 @@ def comp_cnt(line, date, period):
 
 # 「生産進捗率」
 def comp_prog(line, date, period):
+    dstr = str(date.year) + '-' + str(date.month) + '-' + str(date.day)
     if line == '*':
         koutei = Process.objects.filter(
-            Q(date__exact=date) &
+            Q(starty__gte=dstr + ' 0:00:00+09') &
+            Q(starty__lte=dstr + ' 23:59:59+09') &
             Q(period__exact=period) &
             Q(hinban__gt=0)
         )
     else:
         koutei = Process.objects.filter(
             Q(line__exact=line) &
-            Q(date__exact=date) &
+            Q(starty__gte=dstr + ' 0:00:00+09') &
+            Q(starty__lte=dstr + ' 23:59:59+09') &
             Q(period__exact=period) &
             Q(hinban__gt=0)
         )
@@ -149,7 +160,7 @@ def comp_prog(line, date, period):
     else:
         cm = koutei.aggregate(Count('endj'))
         cn = koutei.aggregate(Count('hinban'))
-        if cm['endj__count'] is None:
+        if cm['endj__count'] is None or cm['endj__count'] == 0:
             return 0
         else:
             if cn['hinban__count'] is None or cn['hinban__count'] == 0:
