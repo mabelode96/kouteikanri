@@ -20,6 +20,10 @@
                class="btn btn-info" id="btn_bak" role="button">製造日選択へ</a>
         </td>
         <td>
+            <a href="{% url 'chourikoutei:plot' date period %}"
+               class="btn-sm btn-warning" id="btn_plot" role="button">仕掛品別に切り替え</a>
+        </td>
+        <td>
             <h3 align="right">製造日: {{ date|date_to_str }}　【{{period}}】</h3>
         </td>
     </tr>

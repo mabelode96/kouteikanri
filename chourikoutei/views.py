@@ -1,12 +1,14 @@
 import datetime
-
 from django.db.models import Q, Count
 from django.shortcuts import render
 from django.views.generic import ListView
-
 from kouteikanri.views import exec_query
 from .forms import MyModelForm
 from .models import Process
+import plotly.express as px
+import pandas as pd
+from django.views.generic import TemplateView
+from django_pandas.io import read_frame
 
 
 # 検索
@@ -167,3 +169,97 @@ def comp_prog(line, date, period):
                 return 0
             else:
                 return round(cm['endj__count'] / cn['hinban__count'] * 100, 1)
+
+
+# plotly
+def line_charts(date, period):
+    koutei = Process.objects.order_by('line').filter(
+        Q(starty__gte=date + ' 0:00:00+09') &
+        Q(starty__lte=date + ' 23:59:59+09') &
+        Q(period__exact=period)
+    )
+    df = read_frame(koutei)
+
+    # datetune列の内容をDatetime型かつaware(UTC)で、"*_utc"列に入れる
+    df["start_utc"] = pd.to_datetime(df["starty"], utc=True)
+    df["end_utc"] = pd.to_datetime(df["endy"], utc=True)
+    # JSTに変換したデータを"*_jst"列に入れる
+    df["start_jst"] = df["start_utc"].dt.tz_convert('Asia/Tokyo')
+    df["end_jst"] = df["end_utc"].dt.tz_convert('Asia/Tokyo')
+
+    # 製品名を簡略化する
+    df["name_fix"] = df["name"].str.replace("ＬＷ", "")
+
+    # 予備のstatusを1にする
+    def func(x):
+        if x["hinban"] < 100:
+            return 1
+        else:
+            return x["status"]
+    df["status_fix"] = df.apply(func, axis=1)
+
+    fig = px.timeline(
+        df, x_start="start_jst", x_end="end_jst", y="line", text="name_fix",
+        color="status_fix",
+        color_continuous_scale=["aliceblue", "palegreen"],
+        labels={'start_jst': '開始', 'end_jst': '終了', 'line': '係',
+                'name_fix': '仕掛品名', 'status_fix': '状態'},
+        #height=800,
+    )
+    fig.update_traces(
+        width=0.95,
+        textposition='inside',
+        textfont=dict(color='black'),
+    )
+    fig.update_layout(
+        uniformtext_mode=False,
+        uniformtext_minsize=10,
+        plot_bgcolor='blanchedalmond',
+        clickmode='event+select',
+    )
+    fig.update_xaxes(
+        title=dict(text='', font=dict(color='grey')),
+        gridcolor='black', gridwidth=1,
+    )
+    fig.update_yaxes(
+        title=dict(text='', font=dict(color='grey')),
+        gridcolor='white', gridwidth=1,
+        categoryorder='array',
+        categoryarray=df['line'][::-1],
+    )
+
+    return fig.to_html(full_html=False, include_plotlyjs=False)
+
+
+class LineChartsView(TemplateView):
+    model = Process
+    context_object_name = 'kouteis'
+    template_name = 'plot2.html'
+    d = datetime.datetime.today().strftime("%Y-%m-%d")
+    form = MyModelForm(initial={'date': d, 'period': '昼勤'})
+
+    def get_context_data(self, **kwargs):
+        context = super(LineChartsView, self).get_context_data(**kwargs)
+        dt = self.kwargs['date']
+        pr = self.kwargs['period']
+        context["plot"] = line_charts(dt, pr)
+        # 製造日 ==========================================================================
+        tdata = datetime.datetime.strptime(dt, '%Y-%m-%d')
+        tdate = str(tdata.year) + '年' + str(tdata.month) + '月' + str(tdata.day) + '日'
+        context['datef'] = tdate
+        context['periodf'] = pr
+        return context
+
+    def get_queryset(self, **kwargs):
+        return Process.objects.order_by('line', 'starty').filter(
+            Q(staty__gte=self.kwargs['date'] + ' 0:00:00+09') &
+            Q(staty__lte=self.kwargs['date'] + ' 23:59:59+09') &
+            Q(period__exact=self.kwargs['period']) &
+            Q(hinban__gt=0)
+        )
+
+    @staticmethod
+    def post(request):
+        date = request.POST['date']
+        period = request.POST['period']
+        return render(request, 'chourikoutei:plot2', context={'date': date, 'period': period})
