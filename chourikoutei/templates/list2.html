@@ -11,14 +11,18 @@
     <header class="site-header" style="background:honeydew;">
         <table class="table-sm" style="width: 100%">
             <tr align="left">
-                <!--th align="center">
+                <th align="center">
                     <button class="btn" onclick="window.location.reload();" id="btn_reload">
                         <i class="fas fa-sync fa-2x" style="color: #007bff;"></i>
                     </button>
-                </th-->
+                </th>
                 <th align="left">
-                    <a href="{% url 'chourikoutei:top' %}"
-                        class="btn btn-info" id="btn_bak" role="button">製造日選択へ</a>
+                    <form action="{% url 'chourikoutei:list_all' %}" method="post">
+                        {% csrf_token %}
+                        <input type="text" name="date" value="{{ datef|str_to_date }}" hidden>
+                        <input type="text" name="period" value="{{ periodf }}" hidden>
+                        <input type="submit" value="全ライン一覧へ" class="btn btn-info">
+                    </form>
                 </th>
                 <th><h4>【{{ periodf }}】</h4></th>
                 <th align="right"><h4>{{ datef }}製造</h4></th>
@@ -146,7 +150,11 @@
                     <td class="text-right">{{ koutei.shimej|date:"G:i" }}</td>
                     <td class="text-right">{{ koutei.startj|date:"G:i" }}</td>
                     <td class="text-right">{{ koutei.endj|date:"G:i" }}</td>
-                    <td class="text-right">{% seisan_time koutei.startj koutei.endj %}</td>
+                    <td class="text-right">
+                        {% if koutei.endj %}
+                            {% seisan_time koutei.startj koutei.endj %}
+                        {% endif %}
+                    </td>
                     </tr>
                 {% endfor %}
             </tbody>

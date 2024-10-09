@@ -69,7 +69,7 @@ class List(ListView):
         return ctx
 
     def get_queryset(self, **kwargs):
-        return Process.objects.order_by('startj', 'starty').filter(
+        return Process.objects.order_by('endj', 'starty').filter(
             Q(starty__gte=self.kwargs['date'] + ' 0:00:00+09') &
             Q(starty__lte=self.kwargs['date'] + ' 23:59:59+09') &
             Q(period__exact=self.kwargs['period']) &
