@@ -29,7 +29,7 @@
                     </button>
                 </td>
                 <td>
-                    <form action="{% url 'kouteikanri:all' %}" method="post">
+                    <form action="{% url 'chourikoutei:list_all' %}" method="post">
                         {% csrf_token %}
                         <input type="text" name="date" value="{{ datef|str_to_date }}" hidden>
                         <input type="text" name="period" value="{{ periodf }}" hidden>
