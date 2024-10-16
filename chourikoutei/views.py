@@ -1,6 +1,7 @@
 import datetime
 from django.db.models import Q, Count
 from django.shortcuts import render
+from django.shortcuts import redirect
 from django.views.generic import ListView
 from kouteikanri.views import exec_query
 from .forms import MyModelForm
