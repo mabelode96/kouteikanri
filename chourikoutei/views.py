@@ -49,7 +49,7 @@ class List(ListView):
     model = Process
     context_object_name = 'kouteis'
     template_name = 'list2.html'
-    paginate_by = 20
+    paginate_by = 15
     d = datetime.datetime.today().strftime("%Y-%m-%d")
     form = MyModelForm(initial={'date': d, 'period': '昼勤'})
 
@@ -187,10 +187,11 @@ def line_charts(date, period):
     # JSTに変換したデータを"*_jst"列に入れる
     df["start_jst"] = df["start_utc"].dt.tz_convert('Asia/Tokyo')
     df["end_jst"] = df["end_utc"].dt.tz_convert('Asia/Tokyo')
-
     # 製品名を簡略化する
     df["name_fix"] = df["name"].str.replace("ＬＷ", "")
-
+    # ライン名をリンク化する
+    df["line_fix"] = "<a href='/chouri/" + df["line"] + "/" + date + \
+                     "/" + period + "/' target='_self'>" + df["line"] + "</a>"
     # 予備のstatusを1にする
     def func(x):
         if x["hinban"] < 100:
@@ -200,12 +201,12 @@ def line_charts(date, period):
     df["status_fix"] = df.apply(func, axis=1)
 
     fig = px.timeline(
-        df, x_start="start_jst", x_end="end_jst", y="line", text="name_fix",
+        df, x_start="start_jst", x_end="end_jst", y="line_fix", text="name_fix",
         color="status_fix",
         color_continuous_scale=["aliceblue", "palegreen"],
-        labels={'start_jst': '開始', 'end_jst': '終了', 'line': '係',
+        labels={'start_jst': '開始', 'end_jst': '終了', 'line_fix': '係',
                 'name_fix': '仕掛品名', 'status_fix': '状態'},
-        #height=800,
+        #height=900,
     )
     fig.update_traces(
         width=0.95,
@@ -226,7 +227,7 @@ def line_charts(date, period):
         title=dict(text='', font=dict(color='grey')),
         gridcolor='white', gridwidth=1,
         categoryorder='array',
-        categoryarray=df['line'][::-1],
+        categoryarray=df['line_fix'][::-1],
     )
 
     return fig.to_html(full_html=False, include_plotlyjs=False)

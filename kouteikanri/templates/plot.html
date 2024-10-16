@@ -19,11 +19,9 @@
         <link rel="icon" type="image/png" href="{% static 'icon/favicon.png' %}">
     </head>
     <body>
-        <div class="title" align="center"><h3>単品別工程一覧</h3></div>
-        <table class="all_table" style="width: 100%;">
+        <table class="all_table" style="width: 100%;" align="center">
             <tr>
                 <td>
-                    &emsp;&emsp;
                     <button class="btn" onclick="window.location.reload();" id="btn_reload">
                         <i class="fas fa-sync fa-2x" style="color: #007bff;"></i>
                     </button>
@@ -33,8 +31,11 @@
                         {% csrf_token %}
                         <input type="text" name="date" value="{{ datef|str_to_date }}" hidden>
                         <input type="text" name="period" value="{{ periodf }}" hidden>
-                        <input type="submit" value="全ライン一覧に切り替え" class="btn-sm btn-warning">
+                        <input type="submit" value="全ライン一覧に切替" class="btn-sm btn-warning">
                     </form>
+                </td>
+                <td>
+                    <div class="title" align="center"><h3>単品別工程一覧</h3></div>
                 </td>
                 <td align="right">
                     <h4>{{ datef }}&emsp;{{ period }}&emsp;</h4>

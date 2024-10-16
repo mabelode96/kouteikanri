@@ -986,7 +986,9 @@ def line_charts(date, period):
     df["name_fix"] = df["name_fix"].str.replace("手巻おにぎり", "手巻　")
     df["name_fix"] = df["name_fix"].str.replace("金しゃりおにぎり", "金しゃり　")
     df["name_fix"] = df["name_fix"].str.replace("直巻おにぎり", "直巻　")
-
+    # ライン名をリンク化する
+    df["line_fix"] = "<a href='/" + df["line"] + "/" + date + \
+                     "/" + period + "/' target='_self'>" + df["line"] + "</a>"
     # 予備のstatusを1にする
     def func(x):
         if x["name"] == "予備":
@@ -996,12 +998,12 @@ def line_charts(date, period):
     df["status_fix"] = df.apply(func, axis=1)
 
     fig = px.timeline(
-        df, x_start="start_jst", x_end="end_jst", y="line", text="name_fix",
+        df, x_start="start_jst", x_end="end_jst", y="line_fix", text="name_fix",
         color="status_fix",
         color_continuous_scale=["aliceblue", "palegreen"],
-        labels={'start_jst': '開始', 'end_jst': '終了', 'line': 'ライン',
+        labels={'start_jst': '開始', 'end_jst': '終了', 'line_fix': 'ライン',
                 'name_fix': '製品名', 'status_fix': '状態'},
-        # height=1440,
+        # height=900,
     )
     fig.update_traces(
         width=0.95,
@@ -1022,7 +1024,7 @@ def line_charts(date, period):
         title=dict(text='', font=dict(color='grey')),
         gridcolor='white', gridwidth=1,
         categoryorder='array',
-        categoryarray=df['line'][::-1],
+        categoryarray=df['line_fix'][::-1],
     )
 
     return fig.to_html(full_html=False, include_plotlyjs=False)

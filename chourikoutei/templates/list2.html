@@ -10,7 +10,7 @@
 <div class="row">
     <header class="site-header" style="background:honeydew;">
         <table class="table-sm" style="width: 100%">
-            <tr align="left">
+            <tr align="center">
                 <th align="center">
                     <button class="btn" onclick="window.location.reload();" id="btn_reload">
                         <i class="fas fa-sync fa-2x" style="color: #007bff;"></i>
@@ -24,7 +24,7 @@
                         <input type="submit" value="全ライン一覧へ" class="btn btn-info">
                     </form>
                 </th>
-                <th><h4>【{{ periodf }}】</h4></th>
+                <th align="center"><h3>{{ linef }}【{{ periodf }}】</h3></th>
                 <th align="right"><h4>{{ datef }}製造</h4></th>
             </tr>
         </table>
@@ -94,7 +94,7 @@
                 <tr class="text-center">
                     <th>便</th>
                     <th>区分</th>
-                    <th width="10%">係名</th>
+                    <!-- th width="10%">係名</th -->
                     <th width="25%">仕掛品名</th>
                     <th>指示数</th>
                     <th>単位</th>
@@ -129,7 +129,7 @@
                     {% endif %}
                     </td>
                     <td>{% if koutei.kubun %}{{ koutei.kubun }}{% endif %}</td>
-                    <td>{{ koutei.line }}</td>
+                    <!-- td>{{ koutei.line }}</td -->
                     <td id="{{ koutei.id }}">{{ koutei.name }}</td>
                     <td class="text-right">{% if koutei.value %}{{ koutei.value }}{% endif %}</td>
                     <td class="text-right">{% if koutei.unit %}{{ koutei.unit }}{% endif %}</td>
