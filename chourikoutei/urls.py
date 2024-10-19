@@ -6,7 +6,8 @@ app_name = 'chourikoutei'
 
 urlpatterns = [
     path('', views.top, name='top'),
-    path('list_all/', views.list_all, name='list_all'),
-    path("plot/<date>/<str:period>/", views.LineChartsView.as_view(), name="plot"),
+    path('redirect/', views.redirect_b, name='redirect_b'),
+    path('list_all/<str:date>/<str:period>/', views.ListAll.as_view(), name='list_all'),
+    path('plot/<str:date>/<str:period>/', views.LineChartsView.as_view(), name='plot'),
     path('<str:line>/<date>/<str:period>/', views.List.as_view(), name='list'),
 ]

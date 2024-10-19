@@ -17,12 +17,8 @@
                     </button>
                 </th>
                 <th align="left">
-                    <form action="{% url 'chourikoutei:list_all' %}" method="post">
-                        {% csrf_token %}
-                        <input type="text" name="date" value="{{ datef|str_to_date }}" hidden>
-                        <input type="text" name="period" value="{{ periodf }}" hidden>
-                        <input type="submit" value="全ライン一覧へ" class="btn btn-info">
-                    </form>
+                    <a href="{% url 'chourikoutei:list_all' datef|str_to_date periodf %}"
+                       class="btn btn-info" id="btn_plot" role="button">全ライン一覧へ</a>
                 </th>
                 <th align="center"><h3>{{ linef }}【{{ periodf }}】</h3></th>
                 <th align="right"><h4>{{ datef }}製造</h4></th>

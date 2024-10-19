@@ -1,9 +1,7 @@
 import datetime
 from django.db.models import Q, Count
 from django.shortcuts import render
-from django.shortcuts import redirect
 from django.views.generic import ListView
-from kouteikanri.views import exec_query
 from .forms import MyModelForm
 from .models import Process
 import plotly.express as px
@@ -20,28 +18,46 @@ def top(request):
     return render(request, 'top2.html', {'form1': f})
 
 
-# 調理工程 全ライン一覧
-def list_all(request):
+# リダイレクト用
+def redirect_b(request):
     if request.method == 'POST':
         date = request.POST['date']
         period = request.POST['period']
-        sql_text = (
-                "SELECT line, period, "
-                "count(hinban) AS all_cnt, "
-                "count(endj) AS end_cnt, "
-                "count(hinban) - count(endj) AS left_cnt, "
-                "count(endj) * 100 / count(hinban) AS progress "
-                "FROM kouteikanri_chouriproc "
-                "WHERE starty>='" + date +
-                " 0:00:00+09' AND starty<='" + date +
-                " 23:59:59+09' AND period='" + period +
-                "' AND hinban IS NOT NULL "
-                "GROUP BY line, period "
-                "ORDER BY period DESC, line;"
-        )
-        emp_list = exec_query(sql_text)
-        return render(request, 'list_all.html', {
-            'emp_list': emp_list, 'date': date, 'period': period})
+        return render(request, 'redirect2.html', {'date': date, 'period': period})
+
+
+# 調理工程 全ライン一覧
+class ListAll(ListView):
+    model = Process
+    context_object_name = 'data'
+    template_name = 'list_all.html'
+    d = datetime.datetime.today().strftime("%Y-%m-%d")
+    form = MyModelForm(initial={'date': d, 'period': '昼勤'})
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['date'] = self.kwargs['date']
+        ctx['period'] = self.kwargs['period']
+        return ctx
+
+    def get_queryset(self, **kwargs):
+        p = self.kwargs['period']
+        s = self.kwargs['date'] + " 0:00:00+09"
+        e = self.kwargs['date'] + " 23:59:59+09"
+        return Process.objects.filter(starty__gte=s, starty__lte=e, period__exact=p) \
+            .values("line", "period") \
+            .annotate(all_cnt=Count("hinban"),
+                      end_cnt=Count("endj"),
+                      left_cnt=Count("hinban") - Count("endj"),
+                      progress=Count("endj") * 100 / Count("hinban")
+                      )
+
+    @staticmethod
+    def post(request):
+        date = request.POST['date']
+        period = request.POST['period']
+        return render(request, 'chourikoutei:list_all',
+                      context={'date': date, 'period': period})
 
 
 # 調理工程
@@ -248,6 +264,7 @@ class LineChartsView(TemplateView):
         # 製造日 ==========================================================================
         tdata = datetime.datetime.strptime(dt, '%Y-%m-%d')
         tdate = str(tdata.year) + '年' + str(tdata.month) + '月' + str(tdata.day) + '日'
+        context['date'] = str(dt)
         context['datef'] = tdate
         context['periodf'] = pr
         return context

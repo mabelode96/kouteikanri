@@ -19,22 +19,23 @@ class PeriodChoiceField(ModelChoiceField):
 
 
 class MyModelForm(forms.ModelForm):
-    line = LineChoiceField(
-        queryset=Process.objects.all().distinct('line'),
-        label='ライン名', to_field_name='line', empty_label='選択してください'
-    )
+    #line = LineChoiceField(
+    #    queryset=Process.objects.all().distinct('line'),
+    #    label='ライン名', to_field_name='line', empty_label='選択してください',
+    #)
     date = DateChoiceField(
         queryset=Process.objects.all().distinct('date').order_by('-date'),
-        label='製造日', to_field_name='date', empty_label='選択してください'
+        label='製造日', to_field_name='date', empty_label='選択してください',
     )
     period = PeriodChoiceField(
         queryset=Process.objects.all().distinct('period').order_by('-period'),
-        label='時間帯', to_field_name='period', empty_label='選択してください'
+        label='時間帯', to_field_name='period', empty_label='選択してください',
     )
 
     class Meta:
         model = Process
-        fields = ('line', 'date', 'period',)
+        #fields = ('line', 'date', 'period',)
+        fields = ('date', 'period')
 
 
 class KouteiEditForm(ModelForm):
