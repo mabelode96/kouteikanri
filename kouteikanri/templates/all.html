@@ -25,19 +25,6 @@
         <td align="right">
             <h4>製造日: {{ date|date_to_str }}　【{{ period }}】</h4>
         </td>
-        <td align="right">
-            <form action="{% url 'kouteikanri:all' %}" method="post">
-                {% csrf_token %}
-                <input type="date" name="date" id="date" value="{{ date }}" hidden>
-                {% if period == '夜勤' %}
-                <input type="text" name="period" id="period" value="昼勤" hidden>
-                <button type="submit" class="btn btn-outline-danger">昼勤へ</button>
-                {% else %}
-                <input type="text" name="period" id="period" value="夜勤" hidden>
-                <button type="submit" class="btn btn-outline-primary">夜勤へ</button>
-                {% endif %}
-            </form>
-        </td>
     </tr>
 </table>
 <form action="" method="post">
@@ -45,7 +32,7 @@
     <table class="table table-striped table-bordered" style="width: 100%;">
         <thead class="table-sm" align="center">
         <tr>
-            <th><label for="period">時間帯</label></th>
+            <th><label for="periodf">時間帯</label></th>
             <th><label for="line">ライン名</label></th>
             <th><label for="val_sum">数量</label></th>
             <th><label for="left_val">残り(品)</label></th>
@@ -57,7 +44,7 @@
         </tr>
         </thead>
         <tbody>
-        {% for data in emp_list %}
+        {% for data in object_list %}
         <tr>
             {% if data.period == '夜勤' %}
             <td bgcolor="azure">

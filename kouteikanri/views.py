@@ -16,8 +16,6 @@ from django_pandas.io import read_frame
 # 検索
 def top(request):
     # 初期値を設定
-    # d = Process.objects.all().aggregate(Max('date'))
-    # f = MyModelForm(initial={'date': d['date__max'], 'period': '昼勤'})
     d = datetime.datetime.today().strftime("%Y-%m-%d")
     f = MyModelForm(initial={'date': d, 'period': '昼勤'})
     return render(request, 'top.html', {'form1': f})
@@ -31,12 +29,31 @@ def redirect_a(request):
         return render(request, 'redirect.html', {'date': date, 'period': period})
 
 
-# 全ライン一覧
-# 参考url: https://qiita.com/t-iguchi/items/827865481e82bb32ad04
-def all_list(request):
+def redirect_c(request):
     if request.method == 'POST':
         date = request.POST['date']
         period = request.POST['period']
+        return render(request, 'redirect1.html', {'date': date, 'period': period})
+
+
+# 盛付工程 全ライン一覧
+# 参考url: https://qiita.com/t-iguchi/items/827865481e82bb32ad04
+class All(ListView):
+    model = Process
+    context_object_name = 'data'
+    template_name = 'all.html'
+    d = datetime.datetime.today().strftime("%Y-%m-%d")
+    form = MyModelForm(initial={'date': d, 'period': '昼勤'})
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['date'] = self.kwargs['date']
+        ctx['period'] = self.kwargs['period']
+        return ctx
+
+    def get_queryset(self, **kwargs):
+        period = self.kwargs['period']
+        date = self.kwargs['date']
         sql_text = (
                 "SELECT line, period, "
                 "sum(value) AS val_sum, "
@@ -55,11 +72,13 @@ def all_list(request):
                 "' GROUP BY line, period "
                 "ORDER BY period DESC, line;"
         )
-        emp_list = exec_query(sql_text)
-        return render(request, 'all.html', {'emp_list': emp_list, 'date': date, 'period': period})
-    else:
-        # 通らないはず
-        return redirect('kouteikanri:all', {'date': '2021-01-01', 'period': '昼勤'})
+        return exec_query(sql_text)
+
+    @staticmethod
+    def post(request):
+        date = request.POST['date']
+        period = request.POST['period']
+        return render(request, 'kouteikanri:all', context={'date': date, 'period': period})
 
 
 # セットチェック 全ライン一覧

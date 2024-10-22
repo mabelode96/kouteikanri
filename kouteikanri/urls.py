@@ -6,9 +6,10 @@ app_name = 'kouteikanri'
 
 urlpatterns = [
     path('', views.top, name='top'),
-    path('all/', views.all_list, name='all'),
+    path('all/<str:date>/<str:period>/', views.All.as_view(), name='all'),
     # path('set_all/', views.set_all, name='set_all'),
     path('redirect/', views.redirect_a, name='redirect_a'),
+    path('redirect1/', views.redirect_c, name='redirect_c'),
     path('set/<date>/<str:period>/', views.SetListAll.as_view(), name='set_list_all'),
     path("plot/<date>/<str:period>/", views.LineChartsView.as_view(), name="plot"),
     path('set/<str:line>/<date>/<str:period>/', views.SetList.as_view(), name='set_list'),

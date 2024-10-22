@@ -56,8 +56,7 @@ class ListAll(ListView):
     def post(request):
         date = request.POST['date']
         period = request.POST['period']
-        return render(request, 'chourikoutei:list_all',
-                      context={'date': date, 'period': period})
+        return render(request, 'chourikoutei:list_all', context={'date': date, 'period': period})
 
 
 # 調理工程

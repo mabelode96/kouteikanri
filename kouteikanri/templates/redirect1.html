@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}
+リダイレクト
+{% endblock title %}
+
+{% block content %}
+
+    {{date}}{{period}}の工程にリダイレクトしています...
+
+    <script>
+        window.location.href = "{% url 'kouteikanri:all' date period %}";
+    </script>
+
+{% endblock content %}

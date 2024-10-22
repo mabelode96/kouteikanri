@@ -27,12 +27,8 @@
                     </button>
                 </td>
                 <td>
-                    <form action="{% url 'kouteikanri:all' %}" method="post">
-                        {% csrf_token %}
-                        <input type="text" name="date" value="{{ datef|str_to_date }}" hidden>
-                        <input type="text" name="period" value="{{ periodf }}" hidden>
-                        <input type="submit" value="全ライン一覧に切替" class="btn-sm btn-warning">
-                    </form>
+                    <a href="{% url 'kouteikanri:all' date period %}"
+                       class="btn-sm btn-warning" id="btn_plot" role="button">全ライン一覧に切替</a>
                 </td>
                 <td>
                     <div class="title" align="center"><h3>単品別工程一覧</h3></div>
