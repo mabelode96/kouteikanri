@@ -207,6 +207,7 @@ def line_charts(date, period):
     # ライン名をリンク化する
     df["line_fix"] = "<a href='/chouri/" + df["line"] + "/" + date + \
                      "/" + period + "/' target='_self'>" + df["line"] + "</a>"
+
     # 予備のstatusを1にする
     def func(x):
         if x["hinban"] < 100:

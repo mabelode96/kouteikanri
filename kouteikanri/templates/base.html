@@ -56,25 +56,6 @@
           location.reload();
         },100);
       });
-      // セレクトボックスに連動させる
-      $(function(){
-        $('#date2').val($('#id_date').val());
-      });
-      $(function(){
-        $('#id_date').change(function(){
-          var text = $(this).val();
-          $('#date2').val(text);
-        });
-      });
-      $(function(){
-        $('#period2').val($('#id_period').val());
-      });
-      $(function(){
-        $('#id_period').change(function(){
-          var text = $(this).val();
-          $('#period2').val(text);
-        });
-      });
       // ページのトップに移動
       $("#pagetop").click(function () {
         $('html, body').animate({ scrollTop: 0 }, 500);

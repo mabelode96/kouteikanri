@@ -165,24 +165,24 @@ class KouteiList(ListView):
             jin = 0
         else:
             jin = stfavg['staff__avg']
-        sdEnd = Process.objects.all().filter(ql & qd & qp & qs).aggregate(Sum('seisand'))
-        if sdEnd['seisand__sum'] is None:
-            sdE = 0
+        sdend = Process.objects.all().filter(ql & qd & qp & qs).aggregate(Sum('seisand'))
+        if sdend['seisand__sum'] is None:
+            sde = 0
         else:
-            sdE = sdEnd['seisand__sum']
-        minSt = Process.objects.all().filter(ql & qd & qp).aggregate(Min('startj'))
-        maxEn = Process.objects.all().filter(ql & qd & qp).aggregate(Max('endj'))
-        if minSt['startj__min'] is None:
+            sde = sdend['seisand__sum']
+        minst = Process.objects.all().filter(ql & qd & qp).aggregate(Min('startj'))
+        maxen = Process.objects.all().filter(ql & qd & qp).aggregate(Max('endj'))
+        if minst['startj__min'] is None:
             tm = 0
         else:
-            Smin = minSt['startj__min']
-            if maxEn['endj__max'] is not None:
-                Emax = maxEn['endj__max']
-                tm = get_stime(Smin, Emax) / 60
+            smin = minst['startj__min']
+            if maxen['endj__max'] is not None:
+                emax = maxen['endj__max']
+                tm = get_stime(smin, emax) / 60
             else:
                 tm = 0
         try:
-            ctx['nouritsu'] = '{:,}'.format(round(sdE / tm / jin)) + ' 円'
+            ctx['nouritsu'] = '{:,}'.format(round(sde / tm / jin)) + ' 円'
         except ZeroDivisionError:
             ctx['nouritsu'] = '0 円'
         # 生産中の調査 ===================================================================
