@@ -6,8 +6,6 @@
 
 {% block content %}
 
-    {{date}}{{period}}の工程にリダイレクトしています...
-
     <script>
         window.location.href = "{% url 'kouteikanri:all' date period %}";
     </script>
