@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block title %}
+404エラー
+{% endblock title %}
+
+{% block content %}
+
+<h2>このページは利用できません</h2>
+<p>アクセスできないURLか、ページが削除されています。</p>
+<p><a href="{% url 'kouteikanri:top' %}">トップページに戻る</a></p>
+
+{% endblock content %}
