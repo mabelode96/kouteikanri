@@ -1,7 +1,8 @@
 from django.db import models
 from model_utils import FieldTracker
+from config.local import *
 
-# ライン名, 時間帯,製造日, 便,
+# 事業所, ライン名, 時間帯,製造日, 便,
 # 品番, 単価, 区分, 製品名,
 # 生産数h, 数量, 生産高, コンベア,
 # 人員, パンミリ数, スライス枚数, スライス能力,
@@ -11,6 +12,7 @@ from model_utils import FieldTracker
 
 
 class Process(models.Model):
+    jigyousyo = models.CharField('事業所', blank=True, max_length=50, default=jigyousyo)
     line = models.CharField('ライン名', blank=True, max_length=50)
     period = models.CharField('時間帯', blank=True, max_length=50)
     date = models.DateField('製造日', blank=True)

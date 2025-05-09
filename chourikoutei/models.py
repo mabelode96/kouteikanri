@@ -1,11 +1,13 @@
 from django.db import models
+from config.local import *
 
 
-# 順番, 品目コード, 品目名称, 予測生産, 処理区分名称, 指示量, 単位,
+# 事業所, 順番, 品目コード, 品目名称, 予測生産, 処理区分名称, 指示量, 単位,
 # 調理種別, バッチ当り出来高, バッチ当り調理時間, 1時間当り出来高, 切替時間, 回数,
 # 作業時間, 開始時間, 終了時間, 開始時刻, 締切予定, 終了時刻, status
 
 class Process(models.Model):
+    jigyousyo = models.CharField('事業所', blank=True, max_length=50, default=jigyousyo)
     line = models.CharField('ライン名', blank=True, max_length=50)
     period = models.CharField('時間帯', blank=True, max_length=50)
     date = models.DateField('製造日', blank=True)

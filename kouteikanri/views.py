@@ -11,7 +11,7 @@ import plotly.express as px
 import pandas as pd
 from django.views.generic import TemplateView
 from django_pandas.io import read_frame
-
+from config.local import *
 
 # 検索
 def top(request):
@@ -697,6 +697,8 @@ def start_or_end(request, id=id):
                 koutei.processj = get_stime(koutei.startj, koutei.endj)
         koutei.status = 1
         koutei.save()
+        if tsuuchi == True:
+            print(koutei.line + 'の' + koutei.name + 'が終了しました')
     # return redirect('kouteikanri:list', koutei.line, koutei.date, koutei.period)
     return redirect(request.META.get('HTTP_REFERER', '/', ))
 
