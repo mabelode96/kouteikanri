@@ -1,6 +1,12 @@
 from pathlib import Path
 import os
 
+
+# Global variable
+jigyousyo = '盛岡'
+tsuchi = True
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 

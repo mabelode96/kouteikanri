@@ -12,6 +12,8 @@ import pandas as pd
 from django.views.generic import TemplateView
 from django_pandas.io import read_frame
 from config.local import *
+from django.contrib import messages
+
 
 # 検索
 def top(request):
@@ -65,7 +67,7 @@ class All(ListView):
                 "max(endj) AS endj_max, "
                 "(sum(processy) + sum(changey)) - sum(processy * status) - sum(changey * status) AS left_time, "
                 "(sum(processj * status) + sum(changej * status)) - (sum(processy * status) + sum(changey * status)) AS real_time, "
-                "sum(value * status) * 100 / sum(value) AS progress "
+                "sum(value * status) * 100 / (sum(value) + 1) AS progress "
                 "FROM kouteikanri_process "
                 "WHERE date='" + date +
                 "' AND period='" + period +
@@ -697,8 +699,11 @@ def start_or_end(request, id=id):
                 koutei.processj = get_stime(koutei.startj, koutei.endj)
         koutei.status = 1
         koutei.save()
-        if tsuuchi == True:
-            print(koutei.line + 'の' + koutei.name + 'が終了しました')
+        if tsuchi == True:
+            #print(koutei.line + 'の' + koutei.name + 'が終了しました')
+            messages.add_message(request, messages.INFO, koutei.line + 'の' + koutei.name + 'が終了しました')
+            for message in messages:
+                print(message)
     # return redirect('kouteikanri:list', koutei.line, koutei.date, koutei.period)
     return redirect(request.META.get('HTTP_REFERER', '/', ))
 
