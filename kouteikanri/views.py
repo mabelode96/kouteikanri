@@ -66,7 +66,7 @@ class All(ListView):
                 "max(endj) AS endj_max, "
                 "(sum(processy) + sum(changey)) - sum(processy * status) - sum(changey * status) AS left_time, "
                 "(sum(processj * status) + sum(changej * status)) - (sum(processy * status) + sum(changey * status)) AS real_time, "
-                "sum(value * status) * 100 / (sum(value) + 1) AS progress "
+                "sum(processy * status) * 100 / sum(processy) AS progress "
                 "FROM kouteikanri_process "
                 "WHERE date='" + date +
                 "' AND period='" + period +
