@@ -63,7 +63,7 @@ class KouteiEditForm(ModelForm):
     value = forms.IntegerField(label='数量', required=False)
     seisanh = forms.IntegerField(label='生産数/h', required=False)
     staff = forms.IntegerField(label='人員', required=False)
-    slicev = forms.IntegerField(label='スライス枚数', required=False, widget=forms.HiddenInput())
+    slicev = forms.IntegerField(label='スライス枚数', required=False)
     startj = forms.DateTimeField(
         label='開始時間',
         required=False,
