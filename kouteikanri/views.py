@@ -501,20 +501,20 @@ def edit(request, id=None):
         koutei = get_object_or_404(Process, pk=id)
         form = KouteiEditForm(request.POST, instance=koutei)
         template = 'edit.html'
-        # スライス枚数を変数に格納
-        if koutei.value is not None and koutei.value != 0:
-            if koutei.slicev is not None and koutei.slicev != 0:
-                mai = koutei.slicev / koutei.value
-            else:
-                mai = 0
-        else:
-            mai = 0
+        ## スライス枚数を変数に格納
+        #if koutei.value is not None and koutei.value != 0:
+        #    if koutei.slicev is not None and koutei.slicev != 0:
+        #        mai = koutei.slicev / koutei.value
+        #    else:
+        #        mai = 0
+        #else:
+        #    mai = 0
     # 新規
     else:
         koutei = Process()
         form = KouteiAddForm(request.POST, instance=koutei)
         template = 'add.html'
-        mai = 0
+        #mai = 0
     # POST
     if request.method == 'POST':
         # バリデーションチェック
@@ -529,8 +529,8 @@ def edit(request, id=None):
                     koutei.seisand = koutei.value * koutei.price
                 if koutei.seisanh is not None and koutei.seisanh != 0:
                     koutei.processy = round(koutei.value / koutei.seisanh * 60)
-                if mai != 0:
-                    koutei.slicev = koutei.value * mai
+                #if mai != 0:
+                #    koutei.slicev = koutei.value * mai
             # 終了時間に応じて実際時間を計算しstatusを更新
             if koutei.endj is not None:
                 if koutei.startj is not None:
