@@ -954,12 +954,12 @@ def upload(request):
                                 koutei.seisanh = ws.cell(row=j, column=7).value
                                 koutei.value = ws.cell(row=j, column=8).value
                                 koutei.seisand = ws.cell(row=j, column=9).value
+                                koutei.slicev = ws.cell(row=j, column=13).value
                             # 常に更新する
                             koutei.price = ws.cell(row=j, column=4).value
                             koutei.conveyor = ws.cell(row=j, column=10).value
                             koutei.staff = ws.cell(row=j, column=11).value
                             koutei.panmm = ws.cell(row=j, column=12).value
-                            koutei.slicev = ws.cell(row=j, column=13).value
                             koutei.slicep = ws.cell(row=j, column=14).value
                             koutei.changey = chy
                             koutei.processy = ws.cell(row=j, column=16).value
