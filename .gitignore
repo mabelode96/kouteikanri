@@ -1,3 +1,4 @@
 config/local.py
 venv/
 db.sqlite3
+kouteikanri_nginx.conf
