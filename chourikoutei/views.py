@@ -359,7 +359,7 @@ def download(request, **kwargs ):
     Jisseki.objects.all().delete()
 
     try:
-        with open("data/dekidaka.csv") as f:
+        with open("data/dekidaka.csv", encoding="shift-jis") as f:
             reader = csv.reader(f)
             header = next(reader)
             for line in reader:
@@ -389,7 +389,7 @@ def download(request, **kwargs ):
     Tounyu.objects.all().delete()
 
     try:
-        with open("data/tounyu.csv") as F:
+        with open("data/tounyu.csv", encoding="shift-jis") as F:
             reader = csv.reader(F)
             header = next(reader)
             for line in reader:

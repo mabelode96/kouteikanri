@@ -20,4 +20,9 @@ class Migration(migrations.Migration):
             name='fkey',
             field=models.IntegerField(blank=True, verbose_name='fkey'),
         ),
+        migrations.AddField(
+            model_name='process',
+            name='jigyousyo',
+            field=models.CharField(blank=True, default='盛岡', max_length=50, verbose_name='事業所'),
+        ),
     ]

@@ -62,7 +62,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterField(
             model_name='process',
-            name='order',
+            name='number',
             field=models.IntegerField(blank=True, null=True, verbose_name='順番'),
         ),
         migrations.AlterField(
@@ -87,6 +87,11 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterField(
             model_name='process',
+            name='endj',
+            field=models.DateTimeField(null=True, verbose_name='終了時刻'),
+        ),
+        migrations.AlterField(
+            model_name='process',
             name='starty',
             field=models.DateTimeField(blank=True, null=True, verbose_name='開始予定'),
         ),
@@ -104,5 +109,15 @@ class Migration(migrations.Migration):
             model_name='process',
             name='yosoku',
             field=models.IntegerField(blank=True, null=True, verbose_name='予測生産'),
+        ),
+        migrations.AlterField(
+            model_name='process',
+            name='batcount',
+            field=models.IntegerField(default=1, verbose_name='回数'),
+        ),
+        migrations.AlterField(
+            model_name='process',
+            name='jigyousyo',
+            field=models.CharField(blank=True, default='盛岡', max_length=50, verbose_name='事業所'),
         ),
     ]

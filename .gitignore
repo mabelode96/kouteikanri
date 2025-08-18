@@ -1,4 +1,7 @@
+chourikoutei/migrations/
 config/local.py
+data/
 db.sqlite3
 kouteikanri_nginx.conf
+kouteikanri/migrations/
 venv/
