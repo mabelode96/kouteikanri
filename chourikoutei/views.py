@@ -1,13 +1,14 @@
 import datetime
 from django.db.models import Q, Count
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView
 from .forms import MyModelForm
-from .models import Process
+from .models import Process, Jisseki, Tounyu
 import plotly.express as px
 import pandas as pd
 from django.views.generic import TemplateView
 from django_pandas.io import read_frame
+import csv
 
 
 # 検索
@@ -24,6 +25,67 @@ def redirect_b(request):
         date = request.POST['date']
         period = request.POST['period']
         return render(request, 'redirect2.html', {'date': date, 'period': period})
+
+
+# 各種実績
+class JissekiView(ListView):
+    model = Jisseki
+    context_object_name = 'jisseki'
+    template_name = 'results.html'
+    paginate_by = 20
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['select'] = self.kwargs['select']
+        ctx['datef'] =self.kwargs['date']
+        ctx['periodf'] = self.kwargs['period']
+        return ctx
+
+    def get_queryset(self, **kwargs):
+        if self.kwargs['period'] == '夜勤':
+            d = self.kwargs['date']
+            b = 3
+        else:
+            d = self.kwargs['date']
+            b = 2
+        select = self.kwargs['select']
+        if select == '1':
+            return Tounyu.objects.filter(
+                Q(jisseki__isnull=True) &
+                Q(date__exact=d) &
+                Q(bin__exact=b) &
+                ~Q(line__exact='炊飯') &
+                ~Q(tantou__exact='指示完了') &
+                ~Q(kanryouflg__exact=1)
+            ).all()
+        elif select == '2':
+            return Jisseki.objects.filter(
+                Q(jisseki__isnull=True) &
+                Q(date__exact=d) &
+                Q(bin__exact=b) &
+                ~Q(tantou__exact='指示完了') &
+                ~Q(kanryouflg__exact=1)
+            ).all()
+        elif select == '3':
+            return Jisseki.objects.filter(
+                Q(kanetsu__exact='') &
+                (Q(hinonflg__exact=1) | Q(hinonflg__exact=3)) &
+                Q(date__exact=d) &
+                Q(bin__exact=b) &
+                ~Q(tantou__exact='指示完了') &
+                ~Q(kanryouflg__exact=1)
+            ).all()
+        elif select == '4':
+            return Jisseki.objects.filter(
+                Q(reikyaku__exact='') &
+                (Q(hinonflg__exact=2) | Q(hinonflg__exact=3)) &
+                Q(date__exact=d) &
+                Q(bin__exact=b) &
+                ~Q(tantou__exact='指示完了') &
+                ~Q(kanryouflg__exact=1)
+            ).all()
+        else:
+            return Jisseki.objects.all()
 
 
 # 調理工程 全ライン一覧
@@ -56,8 +118,9 @@ class ListAll(ListView):
     def post(request):
         date = request.POST['date']
         period = request.POST['period']
-        return render(request, 'chourikoutei:list_all', context={'date': date, 'period': period})
-
+        return render(request, 'chourikoutei:list_all',
+                      {'date': date, 'period': period}
+                      )
 
 # 調理工程
 class List(ListView):
@@ -282,3 +345,74 @@ class LineChartsView(TemplateView):
         date = request.POST['date']
         period = request.POST['period']
         return render(request, 'chourikoutei:plot2', context={'date': date, 'period': period})
+
+
+def download(request, **kwargs ):
+
+    if request.method == 'POST':
+        date = request.POST['date']
+        period = request.POST['period']
+    else:
+        date = kwargs['date']
+        period = kwargs['period']
+
+    Jisseki.objects.all().delete()
+
+    try:
+        with open("data/dekidaka.csv") as f:
+            reader = csv.reader(f)
+            header = next(reader)
+            for line in reader:
+                jisseki = Jisseki()
+                d = datetime.datetime.strptime(line[0], '%Y/%m/%d')
+                jisseki.date = d
+                jisseki.chain = line[1]
+                jisseki.bin = line[2]
+                jisseki.line = line[3]
+                jisseki.hinban = line[4]
+                jisseki.name = line[5]
+                jisseki.kubun = line[6]
+                if line[12] != '':
+                    jisseki.shiji = line[12]
+                if line[13] != '':
+                    jisseki.jisseki = line[13]
+                jisseki.tantou = line[16]
+                jisseki.hinonflg = line[21]
+                jisseki.kanetsu = line[24]
+                jisseki.reikyaku = line[31]
+                jisseki.kanryouflg = line[34]
+                jisseki.save()
+
+    except FileNotFoundError:
+        print("失敗")
+
+    Tounyu.objects.all().delete()
+
+    try:
+        with open("data/tounyu.csv") as F:
+            reader = csv.reader(F)
+            header = next(reader)
+            for line in reader:
+                tounyu = Tounyu()
+                d = datetime.datetime.strptime(line[0], '%Y/%m/%d')
+                tounyu.date = d
+                tounyu.chain = line[1]
+                tounyu.bin = line[2]
+                tounyu.line = line[3]
+                tounyu.hinban = line[4]
+                tounyu.name = line[5]
+                tounyu.kubun = line[6]
+                tounyu.t_hinban = line[7]
+                tounyu.t_name = line[8]
+                if line[9] != '':
+                    tounyu.shiji = line[9]
+                if line[11] != '':
+                    tounyu.jisseki = line[11]
+                tounyu.tantou = line[14]
+                tounyu.kanryouflg = line[17]
+                tounyu.save()
+
+    except FileNotFoundError:
+        print("失敗")
+
+    return redirect('chourikoutei:list_all',date, period)

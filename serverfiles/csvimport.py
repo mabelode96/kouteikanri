@@ -3,7 +3,7 @@ from datetime import datetime
 from datetime import timedelta
 import psycopg2
 
-csv_file = 'dekidaka.csv'
+csv_file = 'kouteikanri/data/dekidaka.csv'
 df = pd.read_csv(csv_file, encoding='shift_jis')
 
 # データベースに接続

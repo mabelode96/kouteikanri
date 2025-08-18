@@ -40,3 +40,36 @@ class Process(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Jisseki(models.Model):
+    date = models.DateField('製造日', blank=True, null=True)
+    chain = models.CharField('チェーン名', blank=True, null=True, max_length=50)
+    bin = models.IntegerField('便', blank=True, null=True)
+    line = models.CharField('係', blank=True, null=True, max_length=50)
+    hinban = models.IntegerField('品目コード', blank=True, null=True)
+    name = models.CharField('品目名称', blank=True, null=True, max_length=50)
+    kubun = models.CharField('処理区分名称', blank=True, null=True, max_length=50)
+    shiji = models.FloatField('指示量', blank=True, null=True)
+    jisseki = models.FloatField('実績量', blank=True, null=True)
+    tantou = models.CharField('担当者名', blank=True, null=True, max_length=50)
+    hinonflg = models.IntegerField('品温測定フラグ', blank=True, null=True)
+    kanetsu = models.CharField('加熱温度', blank=True, null=True, max_length=50)
+    reikyaku = models.CharField('冷却温度', blank=True, null=True, max_length=50)
+    kanryouflg = models.IntegerField('追加指示完了フラグ', blank=True, null=True)
+
+
+class Tounyu(models.Model):
+    date = models.DateField('製造日', blank=True, null=True)
+    chain = models.CharField('チェーン名', blank=True, null=True, max_length=50)
+    bin = models.IntegerField('便', blank=True, null=True)
+    line = models.CharField('係', blank=True, null=True, max_length=50)
+    hinban = models.IntegerField('品目コード', blank=True, null=True)
+    name = models.CharField('品目名称', blank=True, null=True, max_length=50)
+    kubun = models.CharField('処理区分名称', blank=True, null=True, max_length=50)
+    t_hinban = models.IntegerField('投入品目コード', blank=True, null=True)
+    t_name = models.CharField('投入品目名称', blank=True, null=True, max_length=50)
+    shiji = models.FloatField('投入指示量', blank=True, null=True)
+    jisseki = models.FloatField('投入実績量', blank=True, null=True)
+    tantou = models.CharField('担当者名', blank=True, null=True, max_length=50)
+    kanryouflg = models.IntegerField('追加指示完了フラグ', blank=True, null=True)
