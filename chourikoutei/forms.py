@@ -38,6 +38,13 @@ class MyModelForm(forms.ModelForm):
         fields = ('date', 'period')
 
 
+class PeriodsChoiceForm(forms.Form):
+    period = forms.fields.ChoiceField(
+        choices = (('昼勤', '昼勤'), ('夜勤', '夜勤')),
+        required=True, widget=forms.widgets.Select
+    )
+
+
 class KouteiEditForm(ModelForm):
     name = forms.CharField(
         label='製品名', required=False, max_length=50,

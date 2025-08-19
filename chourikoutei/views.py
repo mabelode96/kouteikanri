@@ -1,10 +1,9 @@
 import datetime
 import os
-
 from django.db.models import Q, Count
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView
-from .forms import MyModelForm
+from .forms import MyModelForm, PeriodsChoiceForm
 from .models import Process, Jisseki, Tounyu
 import plotly.express as px
 import pandas as pd
@@ -17,8 +16,9 @@ import csv
 def top(request):
     # 初期値を設定
     d = datetime.datetime.today().strftime("%Y-%m-%d")
-    f = MyModelForm(initial={'date': d, 'period': '昼勤'})
-    return render(request, 'top2.html', {'form1': f})
+    f1 = MyModelForm(initial={'date': d, 'period': '昼勤'})
+    f2 = PeriodsChoiceForm(initial={'period': '昼勤'})
+    return render(request, 'top2.html', {'form1': f1, 'form2': f2})
 
 
 # リダイレクト用
