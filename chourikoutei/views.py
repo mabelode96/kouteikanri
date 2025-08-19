@@ -371,8 +371,8 @@ def get_dekidaka():
     #tn = datetime.datetime.now().timestamp()
     tf = os.path.getmtime("data/dekidaka.csv")
     #if tn - tf > 300:
-    if sf - tf > 120 or tf -sf > 120:
-        shutil.copy(smbpath + '出来高実績一覧表.csv', 'data/tounyu.csv')
+    if sf - tf > 120 or tf - sf > 120:
+        shutil.copy(smbpath + '出来高実績一覧表.csv', 'data/dekidaka.csv')
         Jisseki.objects.all().delete()
         try:
             with open("data/dekidaka.csv", encoding="cp932") as f:
@@ -409,7 +409,7 @@ def get_tounyu():
     #tn = datetime.datetime.now().timestamp()
     tf = os.path.getmtime("data/tounyu.csv")
     #if tn - tf > 300:
-    if sf - tf > 120 or tf -sf > 120:
+    if sf - tf > 120 or tf - sf > 120:
         shutil.copy(smbpath + '投入実績一覧表.csv', 'data/tounyu.csv')
         Tounyu.objects.all().delete()
         try:
