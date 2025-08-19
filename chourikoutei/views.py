@@ -61,7 +61,6 @@ class JissekiView(ListView):
                 ~Q(kanryouflg__exact=1)
             ).all()
         elif select == '2':
-            printtest()
             return Jisseki.objects.filter(
                 Q(jisseki__isnull=True) &
                 Q(date__exact=d) &
@@ -372,8 +371,6 @@ def get_dekidaka():
     if tn - tf > 300:
         Jisseki.objects.all().delete()
         try:
-            print(datetime.datetime.now().timestamp() - os.path.getmtime("data/dekidaka.csv"))
-
             with open("data/dekidaka.csv", encoding="cp932") as f:
                 reader = csv.reader(f)
                 header = next(reader)
