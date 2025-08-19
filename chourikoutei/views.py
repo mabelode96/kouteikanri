@@ -1,4 +1,6 @@
 import datetime
+import os
+
 from django.db.models import Q, Count
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView
@@ -59,6 +61,7 @@ class JissekiView(ListView):
                 ~Q(kanryouflg__exact=1)
             ).all()
         elif select == '2':
+            printtest()
             return Jisseki.objects.filter(
                 Q(jisseki__isnull=True) &
                 Q(date__exact=d) &
@@ -356,63 +359,78 @@ def download(request, **kwargs ):
         date = kwargs['date']
         period = kwargs['period']
 
-    Jisseki.objects.all().delete()
-
-    try:
-        with open("data/dekidaka.csv", encoding="cp932") as f:
-            reader = csv.reader(f)
-            header = next(reader)
-            for line in reader:
-                jisseki = Jisseki()
-                d = datetime.datetime.strptime(line[0], '%Y/%m/%d')
-                jisseki.date = d
-                jisseki.chain = line[1]
-                jisseki.bin = line[2]
-                jisseki.line = line[3]
-                jisseki.hinban = line[4]
-                jisseki.name = line[5]
-                jisseki.kubun = line[6]
-                if line[12] != '':
-                    jisseki.shiji = line[12]
-                if line[13] != '':
-                    jisseki.jisseki = line[13]
-                jisseki.tantou = line[16]
-                jisseki.hinonflg = line[21]
-                jisseki.kanetsu = line[24]
-                jisseki.reikyaku = line[31]
-                jisseki.kanryouflg = line[34]
-                jisseki.save()
-
-    except FileNotFoundError:
-        print("失敗")
-
-    Tounyu.objects.all().delete()
-
-    try:
-        with open("data/tounyu.csv", encoding="cp932") as F:
-            reader = csv.reader(F)
-            header = next(reader)
-            for line in reader:
-                tounyu = Tounyu()
-                d = datetime.datetime.strptime(line[0], '%Y/%m/%d')
-                tounyu.date = d
-                tounyu.chain = line[1]
-                tounyu.bin = line[2]
-                tounyu.line = line[3]
-                tounyu.hinban = line[4]
-                tounyu.name = line[5]
-                tounyu.kubun = line[6]
-                tounyu.t_hinban = line[7]
-                tounyu.t_name = line[8]
-                if line[9] != '':
-                    tounyu.shiji = line[9]
-                if line[11] != '':
-                    tounyu.jisseki = line[11]
-                tounyu.tantou = line[14]
-                tounyu.kanryouflg = line[17]
-                tounyu.save()
-
-    except FileNotFoundError:
-        print("失敗")
+    get_dekidaka()
+    get_tounyu()
 
     return redirect('chourikoutei:list_all',date, period)
+
+
+def get_dekidaka():
+
+    tn = datetime.datetime.now().timestamp()
+    tf = os.path.getmtime("data/dekidaka.csv")
+    if tn - tf > 300:
+        Jisseki.objects.all().delete()
+        try:
+            print(datetime.datetime.now().timestamp() - os.path.getmtime("data/dekidaka.csv"))
+
+            with open("data/dekidaka.csv", encoding="cp932") as f:
+                reader = csv.reader(f)
+                header = next(reader)
+                for line in reader:
+                    jisseki = Jisseki()
+                    d = datetime.datetime.strptime(line[0], '%Y/%m/%d')
+                    jisseki.date = d
+                    jisseki.chain = line[1]
+                    jisseki.bin = line[2]
+                    jisseki.line = line[3]
+                    jisseki.hinban = line[4]
+                    jisseki.name = line[5]
+                    jisseki.kubun = line[6]
+                    if line[12] != '':
+                        jisseki.shiji = line[12]
+                    if line[13] != '':
+                        jisseki.jisseki = line[13]
+                    jisseki.tantou = line[16]
+                    jisseki.hinonflg = line[21]
+                    jisseki.kanetsu = line[24]
+                    jisseki.reikyaku = line[31]
+                    jisseki.kanryouflg = line[34]
+                    jisseki.save()
+
+        except FileNotFoundError:
+            print("失敗")
+
+
+def get_tounyu():
+
+    tn = datetime.datetime.now().timestamp()
+    tf = os.path.getmtime("data/tounyu.csv")
+    if tn - tf > 300:
+        Tounyu.objects.all().delete()
+        try:
+            with open("data/tounyu.csv", encoding="cp932") as F:
+                reader = csv.reader(F)
+                header = next(reader)
+                for line in reader:
+                    tounyu = Tounyu()
+                    d = datetime.datetime.strptime(line[0], '%Y/%m/%d')
+                    tounyu.date = d
+                    tounyu.chain = line[1]
+                    tounyu.bin = line[2]
+                    tounyu.line = line[3]
+                    tounyu.hinban = line[4]
+                    tounyu.name = line[5]
+                    tounyu.kubun = line[6]
+                    tounyu.t_hinban = line[7]
+                    tounyu.t_name = line[8]
+                    if line[9] != '':
+                        tounyu.shiji = line[9]
+                    if line[11] != '':
+                        tounyu.jisseki = line[11]
+                    tounyu.tantou = line[14]
+                    tounyu.kanryouflg = line[17]
+                    tounyu.save()
+
+        except FileNotFoundError:
+            print("失敗")
