@@ -1,5 +1,5 @@
 import datetime
-import os
+from config.local import *
 from django.db.models import Q, Count
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView
@@ -366,9 +366,11 @@ def download(request, **kwargs ):
 
 def get_dekidaka():
 
-    tn = datetime.datetime.now().timestamp()
+    sf = os.path.getmtime(smbpath + '出来高実績一覧表.csv')
+    #tn = datetime.datetime.now().timestamp()
     tf = os.path.getmtime("data/dekidaka.csv")
-    if tn - tf > 300:
+    #if tn - tf > 300:
+    if sf != tf:
         Jisseki.objects.all().delete()
         try:
             with open("data/dekidaka.csv", encoding="cp932") as f:
@@ -401,9 +403,11 @@ def get_dekidaka():
 
 def get_tounyu():
 
-    tn = datetime.datetime.now().timestamp()
+    sf = os.path.getmtime(smbpath + '投入実績一覧表.csv')
+    #tn = datetime.datetime.now().timestamp()
     tf = os.path.getmtime("data/tounyu.csv")
-    if tn - tf > 300:
+    #if tn - tf > 300:
+    if sf != tf:
         Tounyu.objects.all().delete()
         try:
             with open("data/tounyu.csv", encoding="cp932") as F:
