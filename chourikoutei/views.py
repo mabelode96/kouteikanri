@@ -35,7 +35,7 @@ class JissekiView(ListView):
     model = Jisseki
     context_object_name = 'jisseki'
     template_name = 'results.html'
-    paginate_by = 20
+    paginate_by = 15
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
