@@ -1,4 +1,5 @@
 import datetime
+import shutil
 from config.local import *
 from django.db.models import Q, Count
 from django.shortcuts import render, get_object_or_404, redirect
@@ -371,6 +372,7 @@ def get_dekidaka():
     tf = os.path.getmtime("data/dekidaka.csv")
     #if tn - tf > 300:
     if sf - tf > 120 or tf -sf > 120:
+        shutil.copy(smbpath + '出来高実績一覧表.csv', 'data/tounyu.csv')
         Jisseki.objects.all().delete()
         try:
             with open("data/dekidaka.csv", encoding="cp932") as f:
@@ -408,6 +410,7 @@ def get_tounyu():
     tf = os.path.getmtime("data/tounyu.csv")
     #if tn - tf > 300:
     if sf - tf > 120 or tf -sf > 120:
+        shutil.copy(smbpath + '投入実績一覧表.csv', 'data/tounyu.csv')
         Tounyu.objects.all().delete()
         try:
             with open("data/tounyu.csv", encoding="cp932") as F:
