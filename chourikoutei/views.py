@@ -1,7 +1,7 @@
 import datetime
-import shutil
+import psycopg2
 from config.local import *
-from django.db.models import Q, Count
+from django.db.models import Q, Count, Max
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView
 from .forms import MyModelForm, PeriodsChoiceForm
@@ -359,20 +359,23 @@ def download(request, **kwargs ):
         date = kwargs['date']
         period = kwargs['period']
 
-    get_dekidaka()
     get_tounyu()
+    get_dekidaka()
 
     return redirect('chourikoutei:list_all',date, period)
 
 
 def get_dekidaka():
 
-    sf = os.path.getmtime(smbpath + '出来高実績一覧表.csv')
-    #tn = datetime.datetime.now().timestamp()
     tf = os.path.getmtime("data/dekidaka.csv")
-    #if tn - tf > 300:
-    if sf - tf > 120 or tf - sf > 120:
-        shutil.copy(smbpath + '出来高実績一覧表.csv', 'data/dekidaka.csv')
+    if Jisseki.objects.all().count() > 0:
+        mx = Jisseki.objects.all().aggregate(Max('updated_at'))
+        ts = mx['updated_at__max'].timestamp()
+        print(tf - ts)
+    else:
+        ts = 0
+
+    if tf > ts:
         Jisseki.objects.all().delete()
         try:
             with open("data/dekidaka.csv", encoding="cp932") as f:
@@ -405,12 +408,15 @@ def get_dekidaka():
 
 def get_tounyu():
 
-    sf = os.path.getmtime(smbpath + '投入実績一覧表.csv')
-    #tn = datetime.datetime.now().timestamp()
     tf = os.path.getmtime("data/tounyu.csv")
-    #if tn - tf > 300:
-    if sf - tf > 120 or tf - sf > 120:
-        shutil.copy(smbpath + '投入実績一覧表.csv', 'data/tounyu.csv')
+    if Tounyu.objects.all().count() > 0:
+        mx = Tounyu.objects.all().aggregate(Max('updated_at'))
+        ts = mx['updated_at__max'].timestamp()
+        print(tf - ts)
+    else:
+        ts = 0
+
+    if tf > ts:
         Tounyu.objects.all().delete()
         try:
             with open("data/tounyu.csv", encoding="cp932") as F:

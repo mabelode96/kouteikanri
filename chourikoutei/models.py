@@ -1,3 +1,5 @@
+from email.policy import default
+
 from django.db import models
 from config.local import *
 
@@ -57,6 +59,7 @@ class Jisseki(models.Model):
     kanetsu = models.CharField('加熱温度', blank=True, null=True, max_length=50)
     reikyaku = models.CharField('冷却温度', blank=True, null=True, max_length=50)
     kanryouflg = models.IntegerField('追加指示完了フラグ', blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
 
 class Tounyu(models.Model):
@@ -73,3 +76,4 @@ class Tounyu(models.Model):
     jisseki = models.FloatField('投入実績量', blank=True, null=True)
     tantou = models.CharField('担当者名', blank=True, null=True, max_length=50)
     kanryouflg = models.IntegerField('追加指示完了フラグ', blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True)
