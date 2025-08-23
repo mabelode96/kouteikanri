@@ -78,6 +78,10 @@
             <td>品目名称</td>
             {% if select == '1' %}
             <td>投入品目名称</td>
+            {% elif select == '3' %}
+            <td>加熱</td>
+            {% elif select == '4' %}
+            <td>冷却</td>
             {% endif %}
             <td>処理区分</td>
             <td>担当者名</td>
@@ -91,6 +95,18 @@
             <td>{{ data.name }}</td>
             {% if select == '1' %}
             <td>{{ data.t_name }}</td>
+            {% elif select == '3' %}
+            <td>
+                {% if data.kanetsu %}
+                {{ data.kanetsu }}
+                {% endif %}
+            </td>
+            {% elif select == '4' %}
+            <td>
+                {% if data.reikyaku %}
+                {{ data.reikyaku }}
+                {% endif %}
+            </td>
             {% endif %}
             <td>{{ data.kubun }}</td>
             <td>

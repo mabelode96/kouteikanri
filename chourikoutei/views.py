@@ -55,7 +55,6 @@ class JissekiView(ListView):
         else:
             dt = datetime.datetime.strptime(self.kwargs['date'], '%Y-%m-%d')
             d = dt.strftime('%Y/%m/%d')
-            print(d, d ,d)
             b0 = 1
             b1 = 2
         select = self.kwargs['select']
@@ -90,7 +89,7 @@ class JissekiView(ListView):
             ).all()
         elif select == '4':
             return Jisseki.objects.filter(
-                (Q(kanetsu__isnull=True) | Q(reikyaku__exact='')) &
+                Q(reikyaku__isnull=True) &
                 (Q(hinonflg__exact=2) | Q(hinonflg__exact=3)) &
                 Q(date__exact=d) &
                 Q(bin__gte=b0) &
