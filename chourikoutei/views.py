@@ -1,5 +1,7 @@
 import datetime
 import psycopg2
+from numpy.distutils.conv_template import header
+from io import StringIO
 from config.local import *
 from django.db.models import Q, Count, Max
 from django.shortcuts import render, get_object_or_404, redirect
@@ -46,17 +48,23 @@ class JissekiView(ListView):
 
     def get_queryset(self, **kwargs):
         if self.kwargs['period'] == '夜勤':
-            d = self.kwargs['date']
-            b = 3
+            dt = datetime.datetime.strptime(self.kwargs['date'], '%Y-%m-%d')
+            d = dt.strftime('%Y/%m/%d')
+            b0 = 3
+            b1 = 3
         else:
-            d = self.kwargs['date']
-            b = 2
+            dt = datetime.datetime.strptime(self.kwargs['date'], '%Y-%m-%d')
+            d = dt.strftime('%Y/%m/%d')
+            print(d, d ,d)
+            b0 = 1
+            b1 = 2
         select = self.kwargs['select']
         if select == '1':
             return Tounyu.objects.filter(
                 Q(jisseki__isnull=True) &
                 Q(date__exact=d) &
-                Q(bin__exact=b) &
+                Q(bin__gte=b0) &
+                Q(bin__lte=b1) &
                 ~Q(line__exact='炊飯') &
                 ~Q(tantou__exact='指示完了') &
                 ~Q(kanryouflg__exact=1)
@@ -65,25 +73,28 @@ class JissekiView(ListView):
             return Jisseki.objects.filter(
                 Q(jisseki__isnull=True) &
                 Q(date__exact=d) &
-                Q(bin__exact=b) &
+                Q(bin__gte=b0) &
+                Q(bin__lte=b1) &
                 ~Q(tantou__exact='指示完了') &
                 ~Q(kanryouflg__exact=1)
             ).all()
         elif select == '3':
             return Jisseki.objects.filter(
-                Q(kanetsu__exact='') &
+                (Q(kanetsu__isnull=True) | Q(kanetsu__exact='')) &
                 (Q(hinonflg__exact=1) | Q(hinonflg__exact=3)) &
                 Q(date__exact=d) &
-                Q(bin__exact=b) &
+                Q(bin__gte=b0) &
+                Q(bin__lte=b1) &
                 ~Q(tantou__exact='指示完了') &
                 ~Q(kanryouflg__exact=1)
             ).all()
         elif select == '4':
             return Jisseki.objects.filter(
-                Q(reikyaku__exact='') &
+                (Q(kanetsu__isnull=True) | Q(reikyaku__exact='')) &
                 (Q(hinonflg__exact=2) | Q(hinonflg__exact=3)) &
                 Q(date__exact=d) &
-                Q(bin__exact=b) &
+                Q(bin__gte=b0) &
+                Q(bin__lte=b1) &
                 ~Q(tantou__exact='指示完了') &
                 ~Q(kanryouflg__exact=1)
             ).all()
@@ -359,8 +370,8 @@ def download(request, **kwargs ):
         date = kwargs['date']
         period = kwargs['period']
 
-    get_tounyu()
     get_dekidaka()
+    get_tounyu()
 
     return redirect('chourikoutei:list_all',date, period)
 
@@ -370,40 +381,51 @@ def get_dekidaka():
     tf = os.path.getmtime("data/dekidaka.csv")
     if Jisseki.objects.all().count() > 0:
         mx = Jisseki.objects.all().aggregate(Max('updated_at'))
-        ts = mx['updated_at__max'].timestamp()
-        print(tf - ts)
+        ts = mx['updated_at__max']
+        if ts is None or ts == '':
+            ts = 0
     else:
         ts = 0
+    print(tf - ts)
 
     if tf > ts:
         Jisseki.objects.all().delete()
+        df = pd.read_csv(
+            'data/dekidaka.csv', skiprows=1, encoding='CP932',
+            usecols=[0, 1, 2, 3, 4, 5, 6, 12, 13, 16, 21, 24, 31, 34],
+            names=["date", "chain", "bin", "line", "hinban",
+                   "name", "kubun", "shiji", "jisseki", "tantou",
+                   "hinonflg", "kanetsu", "reikyaku", "kanryouflg"
+                   ],
+            dtype = {"date": object, "chain": str, "bin": int, "line": str, "hinban": int,
+                     "name": str, "kubun": str, "shiji": float, "jisseki": float, "tantou": str,
+                     "hinonflg": int, "kanetsu": str, "reikyaku": str,"kanryouflg": int
+                     }
+        )
+
+        conn = psycopg2.connect(**connection_config)
+        cur = conn.cursor()
+        conn.set_isolation_level(0)
+        tbl = 'chourikoutei_jisseki'
+        col = ["date", "chain", "bin", "line", "hinban",
+               "name", "kubun", "shiji", "jisseki", "tantou",
+               "hinonflg", "kanetsu", "reikyaku", "kanryouflg"
+               ]
         try:
-            with open("data/dekidaka.csv", encoding="cp932") as f:
-                reader = csv.reader(f)
-                header = next(reader)
-                for line in reader:
-                    jisseki = Jisseki()
-                    d = datetime.datetime.strptime(line[0], '%Y/%m/%d')
-                    jisseki.date = d
-                    jisseki.chain = line[1]
-                    jisseki.bin = line[2]
-                    jisseki.line = line[3]
-                    jisseki.hinban = line[4]
-                    jisseki.name = line[5]
-                    jisseki.kubun = line[6]
-                    if line[12] != '':
-                        jisseki.shiji = line[12]
-                    if line[13] != '':
-                        jisseki.jisseki = line[13]
-                    jisseki.tantou = line[16]
-                    jisseki.hinonflg = line[21]
-                    jisseki.kanetsu = line[24]
-                    jisseki.reikyaku = line[31]
-                    jisseki.kanryouflg = line[34]
-                    jisseki.save()
+            buf = StringIO()
+            df.to_csv(buf, sep=',', na_rep='', index=False, header=False)
+            buf.seek(0)
+            cur.copy_from(buf, tbl, sep=',', null='', columns=col)
+            conn.commit()
+            cur.execute("UPDATE " + tbl + " SET updated_at = " + str(tf) + ";")
+            print("OK")
 
         except FileNotFoundError:
             print("失敗")
+
+        finally:
+            cur.close()
+            conn.close()
 
 
 def get_tounyu():
@@ -411,36 +433,47 @@ def get_tounyu():
     tf = os.path.getmtime("data/tounyu.csv")
     if Tounyu.objects.all().count() > 0:
         mx = Tounyu.objects.all().aggregate(Max('updated_at'))
-        ts = mx['updated_at__max'].timestamp()
-        print(tf - ts)
+        ts = mx['updated_at__max']
+        if ts is None or ts == '':
+            ts = 0
     else:
         ts = 0
 
     if tf > ts:
         Tounyu.objects.all().delete()
+        df = pd.read_csv(
+            'data/tounyu.csv', skiprows=1, encoding='CP932',
+            usecols=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 14, 17],
+            names=["date", "chain", "bin", "line", "hinban", "name",
+                   "kubun", "t_hinban", "t_name", "shiji", "jisseki",
+                   "tantou", "kanryouflg"
+                   ],
+            dtype = {"date": object, "chain": str, "bin": int, "line": str, "hinban": int,
+                     "name": str, "kubun": str, "t_hinban": int, "t_name": str,
+                     "shiji": float, "jisseki": float, "tantou": str,"kanryouflg": int
+                     }
+        )
+
+        conn = psycopg2.connect(**connection_config)
+        cur = conn.cursor()
+        conn.set_isolation_level(0)
+        tbl = 'chourikoutei_tounyu'
+        col = ["date", "chain", "bin", "line", "hinban", "name",
+               "kubun", "t_hinban", "t_name", "shiji", "jisseki",
+               "tantou", "kanryouflg"
+               ]
         try:
-            with open("data/tounyu.csv", encoding="cp932") as F:
-                reader = csv.reader(F)
-                header = next(reader)
-                for line in reader:
-                    tounyu = Tounyu()
-                    d = datetime.datetime.strptime(line[0], '%Y/%m/%d')
-                    tounyu.date = d
-                    tounyu.chain = line[1]
-                    tounyu.bin = line[2]
-                    tounyu.line = line[3]
-                    tounyu.hinban = line[4]
-                    tounyu.name = line[5]
-                    tounyu.kubun = line[6]
-                    tounyu.t_hinban = line[7]
-                    tounyu.t_name = line[8]
-                    if line[9] != '':
-                        tounyu.shiji = line[9]
-                    if line[11] != '':
-                        tounyu.jisseki = line[11]
-                    tounyu.tantou = line[14]
-                    tounyu.kanryouflg = line[17]
-                    tounyu.save()
+            buf = StringIO()
+            df.to_csv(buf, sep=',', na_rep='', index=False, header=False)
+            buf.seek(0)
+            cur.copy_from(buf, tbl, sep=',', null='', columns=col)
+            conn.commit()
+            cur.execute("UPDATE " + tbl + " SET updated_at = " + str(tf) + ";")
+            print("OK")
 
         except FileNotFoundError:
             print("失敗")
+
+        finally:
+            cur.close()
+            conn.close()

@@ -93,7 +93,11 @@
             <td>{{ data.t_name }}</td>
             {% endif %}
             <td>{{ data.kubun }}</td>
-            <td>{{ data.tantou }}</td>
+            <td>
+                {% if data.tantou %}
+                {{ data.tantou }}
+                {% endif %}
+            </td>
         </tr>
         {% endfor %}
     </table>

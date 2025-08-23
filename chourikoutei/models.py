@@ -45,7 +45,7 @@ class Process(models.Model):
 
 
 class Jisseki(models.Model):
-    date = models.DateField('製造日', blank=True, null=True)
+    date = models.CharField('製造日', blank=True, null=True, max_length=10)
     chain = models.CharField('チェーン名', blank=True, null=True, max_length=50)
     bin = models.IntegerField('便', blank=True, null=True)
     line = models.CharField('係', blank=True, null=True, max_length=50)
@@ -59,11 +59,11 @@ class Jisseki(models.Model):
     kanetsu = models.CharField('加熱温度', blank=True, null=True, max_length=50)
     reikyaku = models.CharField('冷却温度', blank=True, null=True, max_length=50)
     kanryouflg = models.IntegerField('追加指示完了フラグ', blank=True, null=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    updated_at = models.FloatField(blank=True, null=True)
 
 
 class Tounyu(models.Model):
-    date = models.DateField('製造日', blank=True, null=True)
+    date = models.CharField('製造日', blank=True, null=True, max_length=10)
     chain = models.CharField('チェーン名', blank=True, null=True, max_length=50)
     bin = models.IntegerField('便', blank=True, null=True)
     line = models.CharField('係', blank=True, null=True, max_length=50)
@@ -76,4 +76,4 @@ class Tounyu(models.Model):
     jisseki = models.FloatField('投入実績量', blank=True, null=True)
     tantou = models.CharField('担当者名', blank=True, null=True, max_length=50)
     kanryouflg = models.IntegerField('追加指示完了フラグ', blank=True, null=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    updated_at = models.FloatField(blank=True, null=True)
