@@ -67,7 +67,7 @@ class JissekiView(ListView):
                 ~Q(line__exact='炊飯') &
                 ~Q(tantou__exact='指示完了') &
                 ~Q(kanryouflg__exact=1)
-            ).all()
+            ).all().order_by('line', 'hinban')
         elif select == '2':
             return Jisseki.objects.filter(
                 Q(jisseki__isnull=True) &
@@ -76,7 +76,7 @@ class JissekiView(ListView):
                 Q(bin__lte=b1) &
                 ~Q(tantou__exact='指示完了') &
                 ~Q(kanryouflg__exact=1)
-            ).all()
+            ).all().order_by('line', 'hinban')
         elif select == '3':
             return Jisseki.objects.filter(
                 (Q(kanetsu__isnull=True) | Q(kanetsu__exact='')) &
@@ -86,7 +86,7 @@ class JissekiView(ListView):
                 Q(bin__lte=b1) &
                 ~Q(tantou__exact='指示完了') &
                 ~Q(kanryouflg__exact=1)
-            ).all()
+            ).all().order_by('line', 'hinban')
         elif select == '4':
             return Jisseki.objects.filter(
                 Q(reikyaku__isnull=True) &
@@ -96,9 +96,9 @@ class JissekiView(ListView):
                 Q(bin__lte=b1) &
                 ~Q(tantou__exact='指示完了') &
                 ~Q(kanryouflg__exact=1)
-            ).all()
+            ).all().order_by('line', 'hinban')
         else:
-            return Jisseki.objects.all()
+            return Jisseki.objects.all().order_by('line', 'hinban')
 
 
 # 調理工程 全ライン一覧
