@@ -65,7 +65,7 @@
                     <td><h5>{{ nouritsu }}</h5></td>
                     <td><h5>
                         {% if valend.value__sum %}
-                            <span style="color:#4169E1;"> {{ valend.value__sum }} </span>
+                        <span style="color:#4169E1;"> {{ valend.value__sum }} </span>
                         {% else %}0{% endif %} /
                         {% if valsum.value__sum %}{{ valsum.value__sum }}
                         {% else %}0{% endif %}
@@ -73,19 +73,19 @@
                     <td><h5>{{ maxendy|date:"G:i" }}</h5></td>
                     <td><h5>
                         {% if chavg.changej__avg %}
-                            {{ chavg.changej__avg|floatformat:1 }}
+                        {{ chavg.changej__avg|floatformat:1 }}
                         {% else %}0{% endif %}
                     </h5></td>
                     <td><h5>{{ comptime|date:"G:i" }}</h5></td>
                     <td><h5>
                         {% if progress == 0 %}
-                            <span style="color:#4169E1;">遅れなし</span>
+                        <span style="color:#4169E1;">遅れなし</span>
                         {% else %}
-                            {% if progress > 0 %}
-                                <span style="color:#4169E1;">{{ progress }}分進み</span>
-                            {% else %}
-                                <div class="text-danger" align="center">{{ progress|mul:-1 }}分遅れ</div>
-                            {% endif %}
+                        {% if progress > 0 %}
+                        <span style="color:#4169E1;">{{ progress }}分進み</span>
+                        {% else %}
+                        <div class="text-danger" align="center">{{ progress|mul:-1 }}分遅れ</div>
+                        {% endif %}
                         {% endif %}
                     </h5></td>
                     <td>
@@ -95,9 +95,9 @@
                             <input type="text" name="date" value="{{ datef }}" hidden>
                             <input type="text" name="period" value="{{ periodf }}" hidden>
                             {% if cntst == 0 %}
-                                <input type="submit" value="キャンセル" class="btn-sm btn-secondary" disabled>
+                            <input type="submit" value="キャンセル" class="btn-sm btn-secondary" disabled>
                             {% else %}
-                                <input type="submit" value="キャンセル" class="btn-sm btn-warning" id="btn_cancel">
+                            <input type="submit" value="キャンセル" class="btn-sm btn-warning" id="btn_cancel">
                             {% endif %}
                         </form>
                     </td>
@@ -138,138 +138,137 @@
             <tbody>
                 {% for koutei in kouteis %}
                 {% if koutei.status == 0 %}
-                    {% if koutei.startj %}
-                        <tr class="table-danger">
-                    {% else %}
-                        <tr>
-                    {% endif %}
+                {% if koutei.startj %}
+                <tr class="table-danger">
                 {% else %}
-                    <tr>
+                <tr>{% endif %}
+                {% else %}
+                <tr>
                 {% endif %}
-                        <td class="text-center">
-                            <!-- 開始・終了ボタン -->
-                            <form action="{% url 'kouteikanri:start_or_end' id=koutei.id %}" method="get" class="form_start">
-                                {% if koutei.status == 1 %}
-                                    <!-- 終了済 -->
-                                    <input type="submit" class="btn btn-sm btn-secondary" value="終了" disabled>
-                                {% elif koutei.status == 0 %}
-                                    {% if koutei.endj %}
-                                        <!-- 通常は通らない　-->
-                                        <input type="submit" class="btn btn-sm btn-danger" value="終了">
-                                    {% else %}
-                                        {% if koutei.startj %}
-                                            <!-- 通常の終了のパターン（生産中） -->
-                                            <input type="submit" class="btn btn-sm btn-danger" id="btn_end" value="終了">
-                                        {% else %}
-                                            <!-- 通常の開始のパターン -->
-                                            {% if cntst == 0 %}
-                                                <input type="submit" class="btn btn-sm btn-success" id="btn_start" value="開始">
-                                            {% else %}
-                                                <input type="button" class="btn btn-sm btn-success active" value="開始" data-toggle="modal" data-target="#testModal">
-                                            {% endif %}
-                                        {% endif %}
-                                    {% endif %}
-                                {% endif %}
-                            </form>
-                        </td>
-                        {% if koutei.bin %}
-                            {% if koutei.bin == 1 %}
-                                <td class="text-right" bgcolor="khaki">
-                            {% elif koutei.bin == 2 %}
-                                <td class="text-right" bgcolor="hotpink">
-                            {% elif koutei.bin == 3 %}
-                                <td class="text-right" bgcolor="deepskyblue">
+                    <td class="text-center">
+                        <!-- 開始・終了ボタン -->
+                        <form action="{% url 'kouteikanri:start_or_end' id=koutei.id %}" method="get" class="form_start">
+                            {% if koutei.status == 1 %}
+                            <!-- 終了済 -->
+                            <input type="submit" class="btn btn-sm btn-secondary" value="終了" disabled>
+                            {% elif koutei.status == 0 %}
+                            {% if koutei.endj %}
+                            <!-- 通常は通らない　-->
+                            <input type="submit" class="btn btn-sm btn-danger" value="終了">
                             {% else %}
-                                <td>
+                            {% if koutei.startj %}
+                            <!-- 通常の終了のパターン（生産中） -->
+                            <input type="submit" class="btn btn-sm btn-danger" id="btn_end" value="終了">
+                            {% else %}
+                            <!-- 通常の開始のパターン -->
+                            {% if cntst == 0 %}
+                            <input type="submit" class="btn btn-sm btn-success" id="btn_start" value="開始">
+                            {% else %}
+                            <input type="button" class="btn btn-sm btn-success active" value="開始" data-toggle="modal" data-target="#testModal">
                             {% endif %}
-                            {{ koutei.bin }}
+                            {% endif %}
+                            {% endif %}
+                            {% endif %}
+                        </form>
+                    </td>
+                    {% if koutei.bin %}
+                    {% if koutei.bin == 1 %}
+                    <td class="text-right" bgcolor="khaki">
+                    {% elif koutei.bin == 2 %}
+                    <td class="text-right" bgcolor="hotpink">
+                    {% elif koutei.bin == 3 %}
+                    <td class="text-right" bgcolor="deepskyblue">
+                    {% else %}
+                    <td>
+                    {% endif %}
+                    {{ koutei.bin }}
+                    {% else %}
+                    <td>
+                    {% endif %}
+                    </td>
+                    <td>{% if koutei.kubun %}{{ koutei.kubun }}{% endif %}</td>
+                    <td align="center" style="font-size:20px;">
+                        {% if koutei.set %}
+                        <i class="fas fa-check" style="color:#4169E1;"></i>
+                        {% endif %}
+                    </td>
+                    <td id="{{ koutei.id }}">
+                        {% if koutei.comment %}
+                        <a href="{% url 'kouteikanri:comment' koutei.id %}">{{ koutei.name }}</a>
                         {% else %}
-                            <td>
+                        {{ koutei.name }}
                         {% endif %}
-                        </td>
-                        <td>{% if koutei.kubun %}{{ koutei.kubun }}{% endif %}</td>
-                        <td align="center" style="font-size:20px;">
-                            {% if koutei.set %}
-                            <i class="fas fa-check" style="color:#4169E1;"></i>
-                            {% endif %}
-                        </td>
-                        <td id="{{ koutei.id }}">
-                            {% if koutei.comment %}
-                            <a href="{% url 'kouteikanri:comment' koutei.id %}">{{ koutei.name }}</a>
-                            {% else %}
-                                {{ koutei.name }}
-                            {% endif %}
-                        </td>
-                        <td class="text-right">{% if koutei.value %}{{ koutei.value }}{% endif %}</td>
-                        {% if 'パン' in linef %}
-                            {% if koutei.slicev %}
-                                <td class="text-right">
-                                    <span style="color:navy;">{{ koutei.slicev }}</span>
-                                </td>
-                            {% else %}
-                                <td></td>
-                            {% endif %}
-                            {% if koutei.slicep %}
-                                <td class="text-right">
-                                    <span style="color:navy;">{{ koutei.slicep }}</span>
-                                </td>
-                            {% else %}
-                                <td></td>
-                            {% endif %}
-                        {% endif %}
-                        <td class="text-right">{% if koutei.seisanh %}{{ koutei.seisanh }}{% endif %}</td>
+                    </td>
+                    <td class="text-right">{% if koutei.value %}{{ koutei.value }}{% endif %}</td>
+                    {% if 'パン' in linef %}
+                    {% if koutei.slicev %}
+                    <td class="text-right">
+                        <span style="color:navy;">{{ koutei.slicev }}</span>
+                    </td>
+                    {% else %}
+                    <td></td>
+                    {% endif %}
+                    {% if koutei.slicep %}
+                    <td class="text-right">
+                        <span style="color:navy;">{{ koutei.slicep }}</span>
+                    </td>
+                    {% else %}
+                    <td></td>
+                    {% endif %}
+                    {% endif %}
+                    <td class="text-right">{% if koutei.seisanh %}{{ koutei.seisanh }}{% endif %}</td>
                     <td class="text-right">{% if koutei.conveyor %}{{ koutei.conveyor }}{% endif %}</td>
-                        <!--<td class="text-right">{{ koutei.starty|date:"G:i" }}</td>-->
-                        <td class="text-right">{{ koutei.endy|date:"G:i" }}</td>
-                        <td class="text-right">{{ koutei.processy }}</td>
-                        <td class="text-right">{{ koutei.startj|date:"G:i" }}</td>
-                        <td class="text-right">{{ koutei.endj|date:"G:i" }}</td>
-                        <td class="text-right">
-                            {% if koutei.processj %}
-                                {{ koutei.processj }}
+                    <!--<td class="text-right">{{ koutei.starty|date:"G:i" }}</td>-->
+                    <td class="text-right">{{ koutei.endy|date:"G:i" }}</td>
+                    <td class="text-right">{{ koutei.processy }}</td>
+                    <td class="text-right">{{ koutei.startj|date:"G:i" }}</td>
+                    <td class="text-right">{{ koutei.endj|date:"G:i" }}</td>
+                    <td class="text-right">
+                        {% if koutei.processj %}
+                        {{ koutei.processj }}
+                        {% endif %}
+                    </td>
+                    <td class="text-right">
+                        {% if koutei.processj %}
+                        {% if koutei.processj|sub:koutei.processy < 0 %}
+                        <div class="text-primary" align="right">
+                            +{{ koutei.processj|sub:koutei.processy|mul:-1 }}
+                        </div>
+                        {% elif koutei.processj|sub:koutei.processy == 0 %}
+                        <div class="text-primary" align="right">
+                            {{ koutei.processj|sub:koutei.processy|mul:-1 }}
+                        </div>
+                        {% else %}
+                        <div class="text-danger" align="right">
+                            {{ koutei.processj|sub:koutei.processy|mul:-1 }}
+                        </div>
+                        {% endif %}
+                        {% endif%}
+                    </td>
+                    <td align="right">
+                        {% if koutei.value|get_nouryoku:koutei.processj %}
+                        {{ koutei.value|get_nouryoku:koutei.processj }}
+                        {% endif %}
+                    </td>
+                    <td class="text-right">
+                        {% if koutei.hinban %}
+                        {% if koutei.processj %}
+                        {{ koutei.staff|mul:koutei.processj|mul:60|intdiv:koutei.value }}
+                        {% endif %}
+                        {% endif %}
+                    </td>
+                    <td class="text-right">{% if koutei.changej %}{{ koutei.changej }}{% endif %}</td>
+                    <td class="text-center">
+                        <!-- 編集ボタン -->
+                        <form action="{% url 'kouteikanri:edit' id=koutei.id %}">
+                            {% if cntst == 0 %}
+                            <input type="submit" class="btn btn-sm btn-primary" value="編集">
+                            {% else %}
+                            <input type="button" class="btn btn-sm btn-primary active" value="編集" data-toggle="modal" data-target="#testModal">
                             {% endif %}
-                        </td>
-                        <td class="text-right">
-                            {% if koutei.processj %}
-                                {% if koutei.processj|sub:koutei.processy < 0 %}
-                                    <div class="text-primary" align="right">
-                                        +{{ koutei.processj|sub:koutei.processy|mul:-1 }}
-                                    </div>
-                                {% elif koutei.processj|sub:koutei.processy == 0 %}
-                                    <div class="text-primary" align="right">
-                                        {{ koutei.processj|sub:koutei.processy|mul:-1 }}
-                                    </div>
-                                {% else %}
-                                    <div class="text-danger" align="right">
-                                        {{ koutei.processj|sub:koutei.processy|mul:-1 }}
-                                    </div>
-                                {% endif %}
-                            {% endif%}
-                        </td>
-                        <td align="right">
-                            {% if koutei.value|get_nouryoku:koutei.processj %}
-                                {{ koutei.value|get_nouryoku:koutei.processj }}
-                            {% endif %}
-                        </td>
-                        <td class="text-right">
-                            {% if koutei.hinban %}
-                                {% if koutei.processj %}
-                                    {{ koutei.staff|mul:koutei.processj|mul:60|intdiv:koutei.value }}
-                                {% endif %}
-                            {% endif %}
-                        </td>
-                        <td class="text-right">{% if koutei.changej %}{{ koutei.changej }}{% endif %}</td>
-                        <td class="text-center">
-                            <!-- 編集ボタン -->
-                            <form action="{% url 'kouteikanri:edit' id=koutei.id %}">
-                                {% if cntst == 0 %}
-                                    <input type="submit" class="btn btn-sm btn-primary" value="編集">
-                                {% else %}
-                                    <input type="button" class="btn btn-sm btn-primary active" value="編集" data-toggle="modal" data-target="#testModal">
-                                {% endif %}
-                            </form>
-                        </td>
-                    </tr>
+                        </form>
+                    </td>
+                </tr>
                 {% endfor %}
             </tbody>
         </table>

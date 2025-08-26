@@ -12,4 +12,7 @@ urlpatterns = [
     path('results/<str:date>/<str:period>/<select>/', views.JissekiView.as_view(), name='results'),
     path('download/<str:date>/<str:period>/', views.download, name='download'),
     path('<str:line>/<date>/<str:period>/', views.List.as_view(), name='list'),
+    url(r'^edit/(?P<id>\d+)/$', views.edit, name='edit'),
+    url(r'^start_or_end/(?P<id>\d+)/$', views.start_or_end, name='start_or_end'),
+    url(r'^end_none/(?P<id>\d+)/$', views.end_none, name='end_none'),
 ]

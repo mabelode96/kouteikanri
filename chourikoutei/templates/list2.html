@@ -47,39 +47,39 @@
         <ul class="pagination">
             <!-- 前へ の部分 -->
             {% if page_obj.has_previous %}
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
-                        <span aria-hidden="true">&laquo;</span>
-                    </a>
-                </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
             {% else %}
-                <li class="page-item disabled">
-                    <a class="page-link">
-                        <span aria-hidden="true">&laquo;</span>
-                    </a>
-                </li>
+            <li class="page-item disabled">
+                <a class="page-link">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
             {% endif %}
             <!-- 数字の部分 -->
             {% for num in page_obj.paginator.page_range %}
-                {% if page_obj.number == num %}
-                    <li class="page-item active"><a class="page-link" href="#!">{{ num }}</a></li>
-                {% else %}
-                    <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
-                {% endif %}
+            {% if page_obj.number == num %}
+            <li class="page-item active"><a class="page-link" href="#!">{{ num }}</a></li>
+            {% else %}
+            <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+            {% endif %}
             {% endfor %}
             <!-- 次へ の部分 -->
             {% if page_obj.has_next %}
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">
-                        <span aria-hidden="true">&raquo;</span>
-                    </a>
-                </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
             {% else %}
-                <li class="page-item disabled">
-                    <a class="page-link">
-                        <span aria-hidden="true">&raquo;</span>
-                    </a>
-                </li>
+            <li class="page-item disabled">
+                <a class="page-link">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
             {% endif %}
         </ul>
     </header>
@@ -88,6 +88,9 @@
         <table class="table-sm table-striped table-bordered" align="left" style="width: 100%;">
             <thead class="table">
                 <tr class="text-center">
+                    {% if jissekiauto == False %}
+                    <th width="6%;"></th>
+                    {% endif %}
                     <th>便</th>
                     <th>区分</th>
                     <!-- th width="10%">係名</th -->
@@ -104,24 +107,64 @@
                     <th>開始<br>時間</th>
                     <th>終了<br>時間</th>
                     <th>作業<br>時間</th>
+                    {% if jissekiauto == False %}
+                    <th></th>
+                    {% endif %}
                 </tr>
             </thead>
             <tbody>
                 {% for koutei in object_list %}
+                {% if koutei.status == 0 %}
+                {% if koutei.startj %}
+                <tr class="table-danger">
+                {% else %}
                 <tr>
+                {% endif %}
+                {% else %}
+                <tr>
+                {% endif %}
+                    {% if jissekiauto == False %}
+                    <td class="text-center">
+                        <!-- 開始・終了ボタン -->
+                        <form action="{% url 'chourikoutei:start_or_end' id=koutei.id %}" method="get" class="form_start">
+                            {% if koutei.status == 1 %}
+                            <!-- 終了済 -->
+                            <input type="submit" class="btn btn-sm btn-secondary" value="終了" disabled>
+                            {% elif koutei.status == 0 %}
+                            {% if koutei.endj %}
+                            <!-- 通常は通らない　-->
+                            <input type="submit" class="btn btn-sm btn-danger" value="終了">
+                            {% else %}
+                            {% if koutei.startj %}
+                            <!-- 通常の終了のパターン（生産中） -->
+                            <input type="submit" class="btn btn-sm btn-danger" id="btn_end" value="終了">
+                            {% else %}
+                            <!-- 通常の開始のパターン -->
+                            {% if cntst == 0 %}
+                            <input type="submit" class="btn btn-sm btn-success" id="btn_start" value="開始">
+                            {% else %}
+                            <!--input type="button" class="btn btn-sm btn-success active" value="開始" data-toggle="modal" data-target="#testModal"-->
+                            <input type="submit" class="btn btn-sm btn-success" id="btn_start" value="開始">
+                            {% endif %}
+                            {% endif %}
+                            {% endif %}
+                            {% endif %}
+                        </form>
+                    </td>
+                    {% endif %}
                     {% if koutei.bin %}
-                        {% if koutei.bin == 1 %}
-                            <td class="text-right" bgcolor="khaki">
-                        {% elif koutei.bin == 2 %}
-                            <td class="text-right" bgcolor="hotpink">
-                        {% elif koutei.bin == 3 %}
-                            <td class="text-right" bgcolor="deepskyblue">
-                        {% else %}
-                            <td>
-                        {% endif %}
-                        {{ koutei.bin }}
+                    {% if koutei.bin == 1 %}
+                    <td class="text-right" bgcolor="khaki">
+                    {% elif koutei.bin == 2 %}
+                    <td class="text-right" bgcolor="hotpink">
+                    {% elif koutei.bin == 3 %}
+                    <td class="text-right" bgcolor="deepskyblue">
                     {% else %}
-                        <td>
+                    <td>
+                    {% endif %}
+                    {{ koutei.bin }}
+                    {% else %}
+                    <td>
                     {% endif %}
                     </td>
                     <td>{% if koutei.kubun %}{{ koutei.kubun }}{% endif %}</td>
@@ -131,11 +174,11 @@
                     <td class="text-right">{% if koutei.unit %}{{ koutei.unit }}{% endif %}</td>
                     <td class="text-right">
                         {% if koutei.hdeki %}
-                            {{ koutei.hdeki }}
+                        {{ koutei.hdeki }}
                         {% else %}
-                            {% if koutei.batdeki %}
-                                {{ koutei.batdeki }} ({{ koutei.battime }})
-                            {% endif %}
+                        {% if koutei.batdeki %}
+                        {{ koutei.batdeki }} ({{ koutei.battime }})
+                        {% endif %}
                         {% endif %}
                     </td>
                     <td class="text-right">{% if koutei.changey %}{{ koutei.changey }}{% endif %}</td>
@@ -148,10 +191,23 @@
                     <td class="text-right">{{ koutei.endj|date:"G:i" }}</td>
                     <td class="text-right">
                         {% if koutei.endj %}
-                            {% seisan_time koutei.startj koutei.endj %}
+                        {% seisan_time koutei.startj koutei.endj %}
                         {% endif %}
                     </td>
-                    </tr>
+                    {% if jissekiauto == False %}
+                    <td class="text-center">
+                        <!-- 編集ボタン -->
+                        <form action="{% url 'chourikoutei:edit' id=koutei.id %}">
+                            {% if cntst == 0 %}
+                            <input type="submit" class="btn btn-sm btn-primary" value="編集">
+                            {% else %}
+                            <!--input type="button" class="btn btn-sm btn-primary active" value="編集" data-toggle="modal" data-target="#testModal"-->
+                            <input type="submit" class="btn btn-sm btn-primary" value="編集">
+                            {% endif %}
+                        </form>
+                    </td>
+                    {% endif %}
+                </tr>
                 {% endfor %}
             </tbody>
         </table>

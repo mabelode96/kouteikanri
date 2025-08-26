@@ -1,18 +1,16 @@
 import datetime
 import psycopg2
-from numpy.distutils.conv_template import header
 from io import StringIO
 from config.local import *
 from django.db.models import Q, Count, Max
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView
-from .forms import MyModelForm, PeriodsChoiceForm
+from .forms import MyModelForm, KouteiEditForm, PeriodsChoiceForm
 from .models import Process, Jisseki, Tounyu
 import plotly.express as px
 import pandas as pd
 from django.views.generic import TemplateView
 from django_pandas.io import read_frame
-import csv
 
 
 # 検索
@@ -146,6 +144,13 @@ class List(ListView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
+        ln = self.kwargs['line']
+        dt = self.kwargs['date']
+        pr = self.kwargs['period']
+        ql = Q(line__exact=ln)
+        qd = Q(date__exact=dt)
+        qp = Q(period__exact=pr)
+        qs = Q(status__exact=1)
         # 製造日 ==========================================================================
         tstr = self.kwargs['date']
         tdata = datetime.datetime.strptime(tstr, '%Y-%m-%d')
@@ -158,8 +163,14 @@ class List(ListView):
         ctx['all_cnt'] = all_cnt(ctx['linef'], tdata, ctx['periodf'])
         # セット総数 =======================================================================
         ctx['comp_cnt'] = comp_cnt(ctx['linef'], tdata, ctx['periodf'])
+        # 生産中の調査 ===================================================================
+        cntst = Process.objects.all().filter(
+            ql & qd & qp & Q(status__exact=0) & Q(startj__isnull=False)
+        ).count()
+        ctx['cntst'] = cntst
         # 進捗 ============================================================================
         ctx['progress'] = comp_prog(ctx['linef'], tdata, ctx['periodf'])
+        ctx['jissekiauto'] = jissekiauto
         return ctx
 
     def get_queryset(self, **kwargs):
@@ -261,6 +272,106 @@ def comp_prog(line, date, period):
                 return 0
             else:
                 return round(cm['endj__count'] / cn['hinban__count'] * 100, 1)
+
+
+# 開始 or 終了
+def start_or_end(request, id=id):
+    koutei = get_object_or_404(Process, pk=id)
+    # 開始の処理
+    ql = Q(line__exact=koutei.line)
+    qd = Q(date__exact=koutei.date)
+    qp = Q(period__exact=koutei.period)
+    if koutei.startj is None:
+        nw = datetime.datetime.now().astimezone()
+        # 切替時間を更新
+        if koutei.value is not None:
+            maxendj = Process.objects.all().filter(ql & qd & qp).aggregate(Max('endj'))
+            if maxendj['endj__max'] is None:
+                koutei.changej = 0
+            else:
+                dt = maxendj['endj__max'].astimezone()
+                koutei.changej = get_stime(dt, nw)
+        # 開始時間を更新
+        koutei.startj = nw
+        koutei.save()
+    else:
+        if koutei.endj is None:
+            koutei.endj = datetime.datetime.now().astimezone()
+            if koutei.name == '予備':
+                koutei.processj = koutei.processy
+            else:
+                koutei.processj = get_stime(koutei.startj, koutei.endj)
+        koutei.status = 1
+        koutei.save()
+    return redirect(request.META.get('HTTP_REFERER', '/', ))
+
+
+# 所要時間計算
+def get_stime(start_time, end_time):
+    if start_time is None:
+        return 0
+    elif end_time is None:
+        return 0
+    else:
+        td = end_time - start_time
+        return round((td.days * 1440) + (td.seconds / 60))
+
+
+# 編集
+def edit(request, id=id):
+    koutei = get_object_or_404(Process, pk=id)
+    form = KouteiEditForm(request.POST, instance=koutei)
+    template = 'edit2.html'
+    # POST
+    if request.method == 'POST':
+        # バリデーションチェック
+        if form.is_valid():
+            koutei = form.save(commit=False)
+            koutei.line = request.POST['line']
+            koutei.date = request.POST['date']
+            koutei.period = request.POST['period']
+            if koutei.yosoku == '':
+                koutei.yosoku = None
+            # 数量に応じて生産数hを再計算
+            if koutei.value is not None:
+                if koutei.hdeki is not None and koutei.hdeki != 0:
+                    koutei.processy = round(koutei.value / koutei.hdeki * 60)
+            # 終了時間に応じて実際時間を計算しstatusを更新
+            if koutei.endj is not None:
+                if koutei.startj is not None:
+                    if koutei.name == '予備':
+                        koutei.processj = koutei.processy
+                    else:
+                        koutei.processj = get_stime(koutei.startj, koutei.endj)
+                koutei.status = 1
+            else:
+                koutei.processj = None
+                koutei.status = 0
+            # 保存
+            koutei.save()
+            if 'next' in request.GET:
+                return redirect(request.GET['next'])
+        else:
+            print("validation error: id=" + str(id))
+    # GET
+    else:
+        form = KouteiEditForm(instance=koutei)
+        template = 'edit2.html'
+        if 'next' in request.GET:
+            return redirect(request.GET['next'])
+    return render(request, template, dict(form=form, id=id))
+
+
+# 終了解除
+def end_none(request, id=id):
+    koutei = get_object_or_404(Process, pk=id)
+    if request.method == 'POST':
+        koutei.endj = None
+        # 終了を解除、開始はそのまま
+        koutei.processj = None
+        koutei.status = 0
+        koutei.save()
+    return redirect('chourikoutei:list', koutei.line, koutei.date, koutei.period)
 
 
 # plotly

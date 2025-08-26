@@ -70,25 +70,24 @@
                         <!-- 完了ボタン -->
                         <form action="{% url 'kouteikanri:set_comp' id=koutei.id %}" method="get" class="form_start">
                             {% if koutei.set == 0 %}
-                                <input type="submit" class="btn btn-success" id="btn_end" value="完了">
+                            <input type="submit" class="btn btn-success" id="btn_end" value="完了">
                             {% else %}
-                                <input type="submit" class="btn btn-secondary" id="btn_start" value="解除">
+                            <input type="submit" class="btn btn-secondary" id="btn_start" value="解除">
                             {% endif %}
                         </form>
                     </td>
                     {% if koutei.bin %}
-                        {% if koutei.bin == 1 %}
-                            <td class="text-right" bgcolor="khaki">
-                        {% elif koutei.bin == 2 %}
-                            <td class="text-right" bgcolor="hotpink">
-                        {% elif koutei.bin == 3 %}
-                            <td class="text-right" bgcolor="deepskyblue">
-                        {% else %}
-                            <td>
-                        {% endif %}
-                        {{ koutei.bin }}
+                    {% if koutei.bin == 1 %}
+                    <td class="text-right" bgcolor="khaki">{% elif koutei.bin == 2 %}
+                    <td class="text-right" bgcolor="hotpink">
+                    {% elif koutei.bin == 3 %}
+                    <td class="text-right" bgcolor="deepskyblue">
                     {% else %}
-                        <td>
+                    <td>
+                    {% endif %}
+                    {{ koutei.bin }}
+                    {% else %}
+                    <td>
                     {% endif %}
                     </td>
                     <td>{% if koutei.kubun %}{{ koutei.kubun }}{% endif %}</td>
@@ -101,7 +100,7 @@
                         <i class="fas fa-check" style="color:red;"></i>
                         {% endif %}
                     </td>
-                    </tr>
+                </tr>
                 {% endfor %}
             </tbody>
         </table>

@@ -29,9 +29,9 @@
         <p>{{ value }}</p>
         {% endif %}
         {% for message in messages %}
-            <div {% if message.tags %}class="{{ message.tags }}"{% endif %}>
-                {{ message }}
-            </div>
+        <div {% if message.tags %}class="{{ message.tags }}"{% endif %}>
+            {{ message }}
+        </div>
         {% endfor %}
         <br>
         <div align="right">

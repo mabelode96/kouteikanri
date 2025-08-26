@@ -501,20 +501,11 @@ def edit(request, id=None):
         koutei = get_object_or_404(Process, pk=id)
         form = KouteiEditForm(request.POST, instance=koutei)
         template = 'edit.html'
-        ## スライス枚数を変数に格納
-        #if koutei.value is not None and koutei.value != 0:
-        #    if koutei.slicev is not None and koutei.slicev != 0:
-        #        mai = koutei.slicev / koutei.value
-        #    else:
-        #        mai = 0
-        #else:
-        #    mai = 0
     # 新規
     else:
         koutei = Process()
         form = KouteiAddForm(request.POST, instance=koutei)
         template = 'add.html'
-        #mai = 0
     # POST
     if request.method == 'POST':
         # バリデーションチェック
@@ -558,12 +549,12 @@ def edit(request, id=None):
                 )
                 nm = koutei_f.count() + 1
                 koutei.fkey = nm
-            # 保存
-            koutei.save()
             # =============================================================================
             # 例えば fkey の末尾 1 の工程のラインを変更したとき末尾 2 以降の工程があった場合には
             # 付番しなおす必要がある
             # =============================================================================
+            # 保存
+            koutei.save()
             update_list = []
             i = 1
             koutei_old = Process.objects.filter(
@@ -665,7 +656,6 @@ def end_none(request, id=id):
 def delete(request, id):
     koutei = get_object_or_404(Process, pk=id)
     koutei.delete()
-    # return redirect('kouteikanri:list', koutei.line, koutei.date, koutei.period)
     return redirect(request.META.get('HTTP_REFERER', '/', ))
 
 
@@ -698,12 +688,6 @@ def start_or_end(request, id=id):
                 koutei.processj = get_stime(koutei.startj, koutei.endj)
         koutei.status = 1
         koutei.save()
-        #if tsuchi == True:
-        #    #print(koutei.line + 'の' + koutei.name + 'が終了しました')
-        #    #messages.add_message(request, messages.INFO, koutei.line + 'の' + koutei.name + 'が終了しました')
-        #    for message in messages:
-        #        print(message)
-    # return redirect('kouteikanri:list', koutei.line, koutei.date, koutei.period)
     return redirect(request.META.get('HTTP_REFERER', '/', ))
 
 
@@ -736,7 +720,6 @@ def start_cancel(request, **kwargs):
             # 生産中のデータを一括更新
             Process.objects.bulk_update(
                 update_list, fields=["changej", "startj", "status"])
-        # return redirect('kouteikanri:list', line, d, period)
         return redirect(request.META.get('HTTP_REFERER', '/', ))
 
 
@@ -753,7 +736,6 @@ def set_comp(request, id=id):
         koutei.set = 0
         koutei.setj = None
     koutei.save()
-    # return redirect('kouteikanri:set_list', koutei.line, koutei.date, koutei.period)
     return redirect(request.META.get('HTTP_REFERER', '/', ))
 
 
@@ -781,7 +763,6 @@ def reset_all(request, **kwargs):
             # 工程のデータを一括更新
             Process.objects.bulk_update(
                 update_list, fields=["startj", "endj", "changej", "processj", "status"])
-        # return redirect('kouteikanri:list', line, date, period)
         return redirect(request.META.get('HTTP_REFERER', '/', ))
 
 

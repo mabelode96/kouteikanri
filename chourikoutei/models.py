@@ -1,5 +1,3 @@
-from email.policy import default
-
 from django.db import models
 from config.local import *
 
@@ -10,7 +8,7 @@ from config.local import *
 
 class Process(models.Model):
     jigyousyo = models.CharField('事業所', blank=True, max_length=50, default=jigyousyo)
-    line = models.CharField('ライン名', blank=True, max_length=50)
+    line = models.CharField('係', blank=True, max_length=50)
     period = models.CharField('時間帯', blank=True, max_length=50)
     date = models.DateField('製造日', blank=True)
     bin = models.IntegerField('便', blank=True)

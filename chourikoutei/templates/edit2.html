@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load bootstrap %}
+
+{% block title %}工程の編集{% endblock title %}
+
+{% block content %}
+<!-- bootstrap_datepicker_plus -->
+<script src="/static/js/jquery-3.6.0.min.js"></script>
+<script src="/static/js/bootstrap.min.js"></script>
+<link href="/static/bootstrap_datepicker_plus/css/bootstrap-datetimepicker.css" type="text/css" media="all" rel="stylesheet">
+<link href="/static/bootstrap_datepicker_plus/css/datepicker-widget.css" type="text/css" media="all" rel="stylesheet">
+<script src="/static/bootstrap_datepicker_plus/js/moment-with-locales.min.js"></script>
+<script src="/static/bootstrap_datepicker_plus/js/bootstrap-datetimepicker.min.js"></script>
+<script src="/static/bootstrap_datepicker_plus/js/datepicker-widget.js"></script>
+<script src="/static/bootstrap_datepicker_plus/popper.min.js"></script>
+
+<div class="container">
+    <table class="table-sm">
+        <tr>
+            <th></th>
+            <th></th>
+            <th></th>
+        </tr>
+        <tr>
+            <td>
+                <a href="{% url 'chourikoutei:list' form.initial.line form.initial.date form.initial.period %}" class="btn btn-primary" role="button">戻る</a>
+            </td>
+            <td>
+                {% if form.endj.value %}
+                <form action="{% url 'chourikoutei:end_none' form.initial.id %}" method="post">
+                    {% csrf_token %}
+                    <input type="submit" value="終了を解除" class="btn btn-danger">
+                </form>
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+    <hr>
+    <form action="./?next={% url 'chourikoutei:list' form.initial.line form.initial.date form.initial.period %}"
+          method="post" class="form-horizontal" role="form">
+        {% csrf_token %}
+        {{ form|bootstrap_horizontal }}
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <button type="submit" class="btn btn-primary">更新</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+{% endblock content %}

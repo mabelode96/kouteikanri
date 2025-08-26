@@ -11,21 +11,15 @@ ALLOWED_HOSTS = ['*']
 
 # Global variable
 jigyousyo = '盛岡'
-tsuchi = True
-smbpath = '/mnt/nas0/生産実行システム/backup/'
+# 生産サーバーのQCS計量実績を自動で取得するかどうかを選択する
+# Trueに設定するならserverfilesのcsvimport.pyとyobi.shをcronで実行する必要がある
+# Falseに設定するなら逆に上記は無効にすること
+jissekiauto = False
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SQL server settings
-
-#DATABASES = {
-#    'default': {
-#        'ENGINE': 'django.db.backends.sqlite3',
-#        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#    }
-#}
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -35,6 +29,14 @@ DATABASES = {
         'HOST': '12.23.1.198',
         'PORT': '5432',
     }
+}
+
+connection_config = {
+    'user': 'postgres',
+    'password ': 'postgres',
+    'host ': '12.23.1.198',
+    'port ': '5432',
+    'dbname ': 'postgres'
 }
 
 # Static files (CSS, JavaScript, Images)
