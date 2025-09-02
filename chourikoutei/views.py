@@ -57,6 +57,7 @@ class JissekiView(ListView):
             b1 = 2
         select = self.kwargs['select']
         if select == '1':
+            get_tounyu()
             return Tounyu.objects.filter(
                 Q(jisseki__isnull=True) &
                 Q(date__exact=d) &
@@ -67,6 +68,7 @@ class JissekiView(ListView):
                 ~Q(kanryouflg__exact=1)
             ).all().order_by('line', 'hinban')
         elif select == '2':
+            get_dekidaka()
             return Jisseki.objects.filter(
                 Q(jisseki__isnull=True) &
                 Q(date__exact=d) &
@@ -76,6 +78,7 @@ class JissekiView(ListView):
                 ~Q(kanryouflg__exact=1)
             ).all().order_by('line', 'hinban')
         elif select == '3':
+            get_dekidaka()
             return Jisseki.objects.filter(
                 (Q(kanetsu__isnull=True) | Q(kanetsu__exact='')) &
                 (Q(hinonflg__exact=1) | Q(hinonflg__exact=3)) &
@@ -86,6 +89,7 @@ class JissekiView(ListView):
                 ~Q(kanryouflg__exact=1)
             ).all().order_by('line', 'hinban')
         elif select == '4':
+            get_dekidaka()
             return Jisseki.objects.filter(
                 Q(reikyaku__isnull=True) &
                 (Q(hinonflg__exact=2) | Q(hinonflg__exact=3)) &
