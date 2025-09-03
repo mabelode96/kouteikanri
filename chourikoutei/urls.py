@@ -15,4 +15,6 @@ urlpatterns = [
     url(r'^edit/(?P<id>\d+)/$', views.edit, name='edit'),
     url(r'^start_or_end/(?P<id>\d+)/$', views.start_or_end, name='start_or_end'),
     url(r'^end_none/(?P<id>\d+)/$', views.end_none, name='end_none'),
+    url(r'^start_cancel/(?P<id>\d+)/$', views.start_cancel, name='start_cancel'),
+    #path('start_cancel/<id>/', views.start_cancel, name='start_cancel'),
 ]

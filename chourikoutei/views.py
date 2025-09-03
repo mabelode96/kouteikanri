@@ -168,22 +168,23 @@ class List(ListView):
         # セット総数 =======================================================================
         ctx['comp_cnt'] = comp_cnt(ctx['linef'], tdata, ctx['periodf'])
         # 生産中の調査 ===================================================================
-        cntst = Process.objects.all().filter(
-            ql & qd & qp & Q(status__exact=0) & Q(startj__isnull=False)
-        ).count()
-        ctx['cntst'] = cntst
+        #cntst = Process.objects.all().filter(
+        #    ql & qd & qp & Q(status__exact=0) & Q(startj__isnull=False)
+        #).count()
         # 進捗 ============================================================================
         ctx['progress'] = comp_prog(ctx['linef'], tdata, ctx['periodf'])
         ctx['jissekiauto'] = jissekiauto
         return ctx
 
     def get_queryset(self, **kwargs):
-        return Process.objects.order_by('endj', 'starty').filter(
+        return (Process.objects.all().order_by('endj', 'startj', 'starty')
+        .filter(
             Q(starty__gte=self.kwargs['date'] + ' 0:00:00+09') &
             Q(starty__lte=self.kwargs['date'] + ' 23:59:59+09') &
             Q(period__exact=self.kwargs['period']) &
             Q(line__exact=self.kwargs['line']) &
             Q(hinban__gt=0))
+        )
 
     @staticmethod
     def post(request):
@@ -319,6 +320,16 @@ def get_stime(start_time, end_time):
     else:
         td = end_time - start_time
         return round((td.days * 1440) + (td.seconds / 60))
+
+
+# 生産中をキャンセル
+def start_cancel(request, id=id):
+    koutei = get_object_or_404(Process, pk=id)
+    koutei.startj = None
+    koutei.changej = None
+    koutei.status = 0
+    koutei.save()
+    return redirect(request.META.get('HTTP_REFERER', '/', ))
 
 
 # 編集

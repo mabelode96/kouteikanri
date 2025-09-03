@@ -43,40 +43,37 @@ class PeriodsChoiceForm(forms.Form):
 
 class KouteiEditForm(ModelForm):
     name = forms.CharField(
-        label='品目名称', required=False, max_length=50,
-        widget=forms.TextInput(attrs={'readonly': True})
+        label='品目名称', required=False, max_length=50, widget=forms.TextInput(attrs={'readonly': True})
     )
     date = forms.DateField(label='製造日', required=False, widget=forms.HiddenInput())
     bin = forms.IntegerField(
-        label='便', required=False, widget=forms.TextInput(attrs={'readonly': True})
+        label='便', required=False, widget=forms.NumberInput(attrs={'readonly': True})
     )
-    hinban = forms.IntegerField(
-        label='品目コード', required=False, widget=forms.HiddenInput()
-    )
+    hinban = forms.IntegerField(label='品目コード', required=False, widget=forms.HiddenInput())
     yosoku = forms.CharField(
-        label='予測生産', required=False, max_length=10,
-        widget=forms.TextInput(attrs={'readonly': True})
+        label='予測生産', required=False, max_length=10, widget=forms.TextInput(attrs={'readonly': True})
     )
-    line = forms.CharField(
-        label='係', required=False, max_length=50,
-        widget=forms.TextInput(attrs={'readonly': True})
-    )
-    period = forms.CharField(
-        label='時間帯', required=False, max_length=50,
-        widget=forms.TextInput(attrs={'readonly': True})
-    )
-    value = forms.FloatField(label='指示量', required=False)
-    unit = forms.IntegerField(label='単位', required=False)
-    ctype = forms.IntegerField(label='調理種別', required=False)
+    line = forms.CharField(label='係', required=False, max_length=50, widget=forms.HiddenInput())
+    period = forms.CharField(label='時間帯', required=False, max_length=50, widget=forms.HiddenInput())
+    value = forms.FloatField(label='指示量', required=False, widget=forms.HiddenInput())
+    unit = forms.IntegerField(label='単位', required=False, widget=forms.HiddenInput())
+    ctype = forms.IntegerField(label='調理種別', required=False, widget=forms.HiddenInput())
     batdeki = forms.FloatField(label='バッチ当り出来高', required=False, widget=forms.HiddenInput())
-    battime = forms.IntegerField(label='バッチ当り調理時間', required=False, disabled=False)
+    battime = forms.IntegerField(label='バッチ当り調理時間', required=False, widget=forms.HiddenInput())
     hdeki = forms.FloatField(label='1時間当り出来高', required=False, widget=forms.HiddenInput())
-    changey = forms.IntegerField(label='切替予定', required=False, widget=forms.NumberInput())
+    changey = forms.IntegerField(
+        label='切替予定', required=False, widget=forms.NumberInput(attrs={'readonly': True})
+    )
     processy = forms.IntegerField(label='作業予定', required=False, widget=forms.HiddenInput())
-    starty = forms.DateTimeField(label='開始予定', required=False, disabled=False)
-    endy = forms.DateTimeField(label='終了予定', required=False, disabled=False)
-    shimej = forms.DateTimeField(label='締切時間', required=False)
-
+    starty = forms.DateTimeField(
+        label='開始予定', required=False, widget=forms.TextInput(attrs={'readonly': True})
+    )
+    endy = forms.DateTimeField(
+        label='終了予定', required=False, widget=forms.TextInput(attrs={'readonly': True})
+    )
+    shimej = forms.DateTimeField(
+        label='締切時間', required=False, widget=forms.TextInput(attrs={'readonly': True})
+    )
     changej = forms.IntegerField(label='切替時間', required=False, widget=forms.NumberInput())
     startj = forms.DateTimeField(
         label='開始時間',
