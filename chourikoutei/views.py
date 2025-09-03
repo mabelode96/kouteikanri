@@ -35,7 +35,7 @@ class JissekiView(ListView):
     model = Jisseki
     context_object_name = 'jisseki'
     template_name = 'results.html'
-    paginate_by = 15
+    paginate_by = 20
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
@@ -142,7 +142,7 @@ class List(ListView):
     model = Process
     context_object_name = 'kouteis'
     template_name = 'list2.html'
-    paginate_by = 15
+    paginate_by = 10
     d = datetime.datetime.today().strftime("%Y-%m-%d")
     form = MyModelForm(initial={'date': d, 'period': '昼勤'})
 
