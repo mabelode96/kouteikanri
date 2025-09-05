@@ -17,7 +17,7 @@ conn = psycopg2.connect(
 
 for index, row in df.iterrows():
   # 自動更新から除外する係
-  if row['係'] != 'オートフライヤー' and  row['係'] != 'ジェットオーブンは除外しないよ！':
+  if row['係'] != 'オートフライヤー' and  row['係'] != 'ジェットオーブンは除外しない':
     if row['チェーン名'] == 'ＬＷ惣菜':
       dt = datetime.strftime(datetime.today() + timedelta(days=1), "%Y/%m/%d")
       bn = 3
