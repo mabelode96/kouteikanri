@@ -20,10 +20,10 @@
     <!-- favicon -->
     <link rel="icon" type="image/png" href="{% static 'icon/favicon.png' %}">
     <!-- PWA -->
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="{% static 'manifest.json' %}">
     <script>
       if ('serviceWorker' in navigator) {
-  	    navigator.serviceWorker.register('serviceWorker.js')
+  	    navigator.serviceWorker.register({% static 'serviceWorker.js' %})
         .then(
         function (registration) {
             if (typeof registration.update == 'function') {
