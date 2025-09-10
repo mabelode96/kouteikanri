@@ -23,7 +23,7 @@
     <link rel="manifest" href="{% static 'manifest.json' %}">
     <script>
       if ('serviceWorker' in navigator) {
-  	    navigator.serviceWorker.register({% static 'serviceWorker.js' %})
+  	    navigator.serviceWorker.register("{% static 'serviceWorker.js' %}")
         .then(
         function (registration) {
             if (typeof registration.update == 'function') {
