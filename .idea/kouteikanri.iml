@@ -9,6 +9,8 @@
       <excludeFolder url="file://$MODULE_DIR$/chourikoutei/migrations" />
       <excludeFolder url="file://$MODULE_DIR$/kouteikanri/.idea" />
       <excludeFolder url="file://$MODULE_DIR$/kouteikanri/migrations" />
+      <excludePattern pattern="manifest.json" />
+      <excludePattern pattern="serviceWorker.js" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.10 (kouteikanri)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
