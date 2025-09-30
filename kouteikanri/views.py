@@ -61,6 +61,7 @@ class All(ListView):
                 "sum(value * status) AS val_end_sum, "
                 "sum(value) - sum(value * status) AS left_val, "
                 "count(status) - sum(status) AS left_cnt, "
+                "count(startj) - sum(status) AS current_status, "
                 "min(starty) AS starty_min, "
                 "max(endy) AS endy_max, "
                 "max(endj) AS endj_max, "
