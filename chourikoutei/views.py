@@ -191,7 +191,7 @@ class List(ListView):
         ctx['progress'] = progress
         ctx["new_date"] = datetime.datetime.now()
         # 進捗率 ==========================================================================
-        ctx['progress'] = comp_prog(ctx['linef'], tdata, ctx['periodf'])
+        ctx['progress_p'] = comp_prog(ctx['linef'], tdata, ctx['periodf'])
         ctx['jissekiauto'] = jissekiauto
         return ctx
 
