@@ -90,11 +90,6 @@
             </td>
             <td>
                 <div id="comp_time" align="right">
-                    {% if data.endj_max %}
-                    {{ data.endj_max|comp_time:data.left_time|date:"G:i" }}
-                    {% else %}
-                    {{ data.starty_min|comp_time:data.left_time|date:"G:i" }}
-                    {% endif %}
                 </div>
             </td>
             <td>
