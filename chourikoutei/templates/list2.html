@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load mathfilters %}
+{% load static %}
 {% load utils %}
 
 {% block title %}
@@ -8,7 +9,7 @@
 
 {% block content %}
 <div class="row">
-    <header class="site-header" style="background:honeydew;">
+    <header class="site-header000" style="background:honeydew;">
         <table class="table-sm" style="width: 100%">
             <tr align="center">
                 <th align="center">
@@ -27,10 +28,13 @@
         <table class="table-sm table-bordered table-secondary" style="width: 100%" align="center">
             <thead>
                 <tr class="text-center" style="font-size:16px;">
-                    <th width="25%">総数</th>
-                    <th width="25%"><span style="color:#4169E1;">完了</span></th>
-                    <th width="25%">残り</th>
-                    <th width="25%">進捗</th>
+                    <th width="14%">総数</th>
+                    <th width="14%"><span style="color:#4169E1;">完了</span></th>
+                    <th width="14%">残り</th>
+                    <th width="14%">残り時間</th>
+                    <th width="15%">終了予定</th>
+                    <th width="15%">実際終了</th>
+                    <th width="14%">進捗</th>
                 </tr>
             </thead>
             <tbody>
@@ -38,7 +42,19 @@
                     <td>{{ all_cnt }} 品</td>
                     <td><span style="color:#4169E1;">{{ comp_cnt }}</span> 品</td>
                     <td>{{ all_cnt|sub:comp_cnt }} 品</td>
-                    <td>{{ progress }} %</td>
+                    <td>{{ left_time }} 分</td>
+                    <td>{{ maxendy|date:"G:i" }}</td>
+                    <td>{{ comptime|date:"G:i" }}</td>
+                    <td>{% if progress == 0 %}
+                        <span style="color:#4169E1;">遅れなし</span>
+                        {% else %}
+                        {% if progress > 0 %}
+                        <span style="color:#4169E1;">{{ progress }}分進み</span>
+                        {% else %}
+                        <div class="text-danger" align="center">{{ progress|mul:-1 }}分遅れ</div>
+                        {% endif %}
+                        {% endif %}
+                    </td>
                 </tr>
             </tbody>
         </table>
@@ -220,4 +236,6 @@
         </table>
     </div>
 </div>
+
 {% endblock content %}
+
