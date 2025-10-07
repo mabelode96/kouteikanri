@@ -2,7 +2,8 @@ import datetime
 import psycopg2
 from io import StringIO
 from config.local import *
-from django.db.models import Q, Count, Max
+from django.db.models import Q, Count, Max, Sum, Case, When, F
+from django.db.models.functions import Abs
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView
 from .forms import MyModelForm, KouteiEditForm, PeriodsChoiceForm
@@ -121,12 +122,17 @@ class ListAll(ListView):
         p = self.kwargs['period']
         s = self.kwargs['date'] + " 0:00:00+09"
         e = self.kwargs['date'] + " 23:59:59+09"
+
+        tstr = self.kwargs['date']
+        tdata = datetime.datetime.strptime(tstr, '%Y-%m-%d')
+
         return Process.objects.filter(starty__gte=s, starty__lte=e, period__exact=p) \
             .values("line", "period") \
             .annotate(all_cnt=Count("hinban"),
                       end_cnt=Count("endj"),
                       left_cnt=Count("hinban") - Count("endj"),
-                      progress=Count("endj") * 100 / Count("hinban")
+                      progress=Count("endj") * 100 / Count("hinban"),
+                      real_time=Sum(Abs(F("status") * F("processy")))
                       )
 
     @staticmethod
