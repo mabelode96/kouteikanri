@@ -38,7 +38,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr style="background-color: #FFFFFF; font-size:20px;" align="center">
+                <tr style="background-color: #FFFFFF; font-size:18px;" align="center">
                     <td>{{ all_cnt }} 品</td>
                     <td><span style="color:#4169E1;">{{ comp_cnt }}</span> 品</td>
                     <td>{{ all_cnt|sub:comp_cnt }} 品</td>
@@ -58,7 +58,7 @@
                 </tr>
             </tbody>
         </table>
-        <br>
+        <div style="font-size:10px;">　</div>
         <!-- ページネーション用のUI -->
         <ul class="pagination">
             <!-- 前へ の部分 -->
@@ -235,7 +235,14 @@
             </tbody>
         </table>
     </div>
+    <div class="site-plotly">
+        <div style="height=10%">
+            <script src="{% static 'js/plotly-latest.min.js' %}"></script>
+            {% autoescape off %}
+            <div class="graph">{{plot|safe}}</div>
+            {% endautoescape %}
+        </div>
+    </div>
 </div>
 
 {% endblock content %}
-

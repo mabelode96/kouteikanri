@@ -152,7 +152,7 @@ class List(ListView):
     model = Process
     context_object_name = 'kouteis'
     template_name = 'list2.html'
-    paginate_by = 10
+    paginate_by = 8
     d = datetime.datetime.today().strftime("%Y-%m-%d")
     form = MyModelForm(initial={'date': d, 'period': '昼勤'})
 
@@ -193,6 +193,8 @@ class List(ListView):
         # 進捗率 ==========================================================================
         ctx['progress_p'] = comp_prog(ctx['linef'], tdata, ctx['periodf'])
         ctx['jissekiauto'] = jissekiauto
+        # plotly
+        ctx["plot"] = line_charts(dt, pr, ln)
         return ctx
 
     def get_queryset(self, **kwargs):
@@ -505,12 +507,22 @@ def end_none(request, id=id):
 
 
 # plotly
-def line_charts(date, period):
-    koutei = Process.objects.order_by('line').filter(
-        Q(starty__gte=date + ' 0:00:00+09') &
-        Q(starty__lte=date + ' 23:59:59+09') &
-        Q(period__exact=period)
-    )
+def line_charts(date, period, line):
+    if line is None:
+        koutei = Process.objects.order_by('line').filter(
+            Q(starty__gte=date + ' 0:00:00+09') &
+            Q(starty__lte=date + ' 23:59:59+09') &
+            Q(period__exact=period)
+        )
+        h = 800
+    else:
+        koutei = Process.objects.filter(
+            Q(starty__gte=date + ' 0:00:00+09') &
+            Q(starty__lte=date + ' 23:59:59+09') &
+            Q(period__exact=period),
+            Q(line__exact=line)
+        )
+        h = 240
     df = read_frame(koutei)
 
     # datetune列の内容をDatetime型かつaware(UTC)で、"*_utc"列に入れる
@@ -538,8 +550,8 @@ def line_charts(date, period):
         color="status_fix",
         color_continuous_scale=["aliceblue", "palegreen"],
         labels={'start_jst': '開始', 'end_jst': '終了', 'line_fix': '係',
-                'name_fix': '仕掛品名', 'status_fix': '状態'},
-        #height=900,
+                'name_fix': '仕掛品名', 'status_fix': '完了'},
+        height=h,
     )
     fig.update_traces(
         width=0.95,
@@ -577,7 +589,7 @@ class LineChartsView(TemplateView):
         context = super(LineChartsView, self).get_context_data(**kwargs)
         dt = self.kwargs['date']
         pr = self.kwargs['period']
-        context["plot"] = line_charts(dt, pr)
+        context["plot"] = line_charts(dt, pr, None)
         # 製造日 ==========================================================================
         tdata = datetime.datetime.strptime(dt, '%Y-%m-%d')
         tdate = str(tdata.year) + '年' + str(tdata.month) + '月' + str(tdata.day) + '日'
@@ -626,7 +638,6 @@ def get_dekidaka():
             ts = 0
     else:
         ts = 0
-    print(tf - ts)
 
     if tf > ts:
         Jisseki.objects.all().delete()
@@ -658,7 +669,6 @@ def get_dekidaka():
             cur.copy_from(buf, tbl, sep=',', null='', columns=col)
             conn.commit()
             cur.execute("UPDATE " + tbl + " SET updated_at = " + str(tf) + ";")
-            print("OK")
 
         except FileNotFoundError:
             print("失敗")
@@ -709,7 +719,6 @@ def get_tounyu():
             cur.copy_from(buf, tbl, sep=',', null='', columns=col)
             conn.commit()
             cur.execute("UPDATE " + tbl + " SET updated_at = " + str(tf) + ";")
-            print("OK")
 
         except FileNotFoundError:
             print("失敗")

@@ -31,6 +31,13 @@ width: 100%;
 padding-top: 140px;
 }
 
+.site-plotly{
+position: absolute;
+z-index: 5;
+width: 100%;
+padding-top: 680px;
+}
+
 #id_line, #id_date, #id_period{
 width: 80%;
 font-size: 20px;
