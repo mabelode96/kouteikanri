@@ -532,7 +532,10 @@ def line_charts(date, period, line):
     df["start_jst"] = df["start_utc"].dt.tz_convert('Asia/Tokyo')
     df["end_jst"] = df["end_utc"].dt.tz_convert('Asia/Tokyo')
     # 製品名を簡略化する
-    df["name_fix"] = df["name"].str.replace("ＬＷ", "")
+    s = df["name"].str.replace("ＬＷ　", "")
+    s = s.str.replace("ＬＷ", "")
+    s = s.str.replace("（", "<br>（")
+    df["name_fix"] = s
     # ライン名をリンク化する
     df["line_fix"] = "<a href='/chouri/" + df["line"] + "/" + date + \
                      "/" + period + "/' target='_self'>" + df["line"] + "</a>"
