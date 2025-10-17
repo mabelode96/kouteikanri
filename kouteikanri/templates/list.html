@@ -253,7 +253,9 @@
                     <td class="text-right">
                         {% if koutei.hinban %}
                         {% if koutei.processj %}
+                        {% if koutei.value != 0 %}
                         {{ koutei.staff|mul:koutei.processj|mul:60|intdiv:koutei.value }}
+                        {% endif %}
                         {% endif %}
                         {% endif %}
                     </td>
