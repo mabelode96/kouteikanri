@@ -152,7 +152,7 @@ class List(ListView):
     model = Process
     context_object_name = 'kouteis'
     template_name = 'list2.html'
-    paginate_by = 8
+    paginate_by = 9
     d = datetime.datetime.today().strftime("%Y-%m-%d")
     form = MyModelForm(initial={'date': d, 'period': '昼勤'})
 

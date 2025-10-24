@@ -110,10 +110,10 @@
                     <th>便</th>
                     <th>区分</th>
                     <!-- th width="10%">係名</th -->
-                    <th width="25%">仕掛品名</th>
+                    <th width="30%">仕掛品名</th>
                     <th>指示数</th>
-                    <th>単位</th>
-                    <th>1h能力/<br>出来高(分)</th>
+                    <th>単<br>位</th>
+                    <th>1h能力</th>
                     <th>切替</th>
                     <th>回数</th>
                     <th>作業<br>予定</th>
@@ -185,7 +185,7 @@
                     </td>
                     <td>{% if koutei.kubun %}{{ koutei.kubun }}{% endif %}</td>
                     <!-- td>{{ koutei.line }}</td -->
-                    <td id="{{ koutei.id }}">{{ koutei.name }}</td>
+                    <td id="koutei_name">{{ koutei.name }}</td>
                     <td class="text-right">{% if koutei.value %}{{ koutei.value }}{% endif %}</td>
                     <td class="text-right">{% if koutei.unit %}{{ koutei.unit }}{% endif %}</td>
                     <td class="text-right">
