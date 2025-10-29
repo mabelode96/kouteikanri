@@ -93,6 +93,8 @@
                     {% if data.endj_max %}
                     {% if data.left_time %}
                     {{ data.endj_max|comp_time:data.left_time|date:"G:i" }}
+                    {% else %}
+                    {{ data.endj_max|comp_time:0|date:"G:i" }}
                     {% endif %}
                     {% endif %}
                 </div>
