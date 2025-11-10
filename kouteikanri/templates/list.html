@@ -126,8 +126,8 @@
                     <th style="font-size:80%;">1m個数</th>
                     {% endif %}
                     <!--<th>開始予定</th>-->
-                    <th>能力1h</th>
                     <th style="font-size:80%;">コンベア</th>
+                    <th>能力1h</th>
                     <th>終了予定</th>
                     <th>生産予定</th>
                     <th>開始時間</th>
@@ -244,8 +244,8 @@
                     <td></td>
                     {% endif %}
                     {% endif %}
-                    <td class="text-right">{% if koutei.seisanh %}{{ koutei.seisanh }}{% endif %}</td>
                     <td class="text-right">{% if koutei.conveyor %}{{ koutei.conveyor }}{% endif %}</td>
+                    <td class="text-right">{% if koutei.seisanh %}{{ koutei.seisanh }}{% endif %}</td>
                     <!--<td class="text-right">{{ koutei.starty|date:"G:i" }}</td>-->
                     <td class="text-right">{{ koutei.endy|date:"G:i" }}</td>
                     <td class="text-right">{{ koutei.processy }}</td>
