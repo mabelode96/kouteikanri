@@ -238,7 +238,7 @@
                     {% else %}
                     {% if koutei.conveyor %}
                     <td class="text-right">
-                        {{ koutei.seisanh | div:koutei.conveyor | div:60 | floatformat:2 }}
+                        {{ koutei.seisanh | div:koutei.conveyor | div:60 | floatformat:1 }}
                     </td>
                     {% else %}
                     <td></td>
