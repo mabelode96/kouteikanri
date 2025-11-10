@@ -119,6 +119,11 @@
                     {% if 'パン' in linef %}
                     <th style="font-size:80%;"><span style="color:navy;">ｽﾗｲｽ<br>枚数</span></th>
                     <th style="font-size:80%;"><span style="color:navy;">ｽﾗｲｽ<br>能力</span></th>
+                    {% elif 'サンドイッチ' in linef %}
+                    <th style="font-size:80%;"><span style="color:navy;">ｽﾗｲｽ<br>枚数</span></th>
+                    <th style="font-size:80%;"><span style="color:navy;">ｽﾗｲｽ<br>能力</span></th>
+                    {% else %}
+                    <th style="font-size:80%;"><span style="color:navy;">1m個数</span></th>
                     {% endif %}
                     <!--<th>開始予定</th>-->
                     <th>能力1h</th>
@@ -211,6 +216,29 @@
                     {% if koutei.slicep %}
                     <td class="text-right">
                         <span style="color:navy;">{{ koutei.slicep }}</span>
+                    </td>
+                    {% else %}
+                    <td></td>
+                    {% endif %}
+                    {% elif 'サンドイッチ' in linef %}
+                    {% if koutei.slicev %}
+                    <td class="text-right">
+                        <span style="color:navy;">{{ koutei.slicev }}</span>
+                    </td>
+                    {% else %}
+                    <td></td>
+                    {% endif %}
+                    {% if koutei.slicep %}
+                    <td class="text-right">
+                        <span style="color:navy;">{{ koutei.slicep }}</span>
+                    </td>
+                    {% else %}
+                    <td></td>
+                    {% endif %}
+                    {% else %}
+                    {% if koutei.conveyor %}
+                    <td class="text-right">
+                        {{ koutei.seisanh | div:koutei.conveyor | div:60 | floatformat:2 }}
                     </td>
                     {% else %}
                     <td></td>
