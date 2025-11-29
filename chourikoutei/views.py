@@ -128,10 +128,10 @@ class ListAll(ListView):
 
         return Process.objects.filter(starty__gte=s, starty__lte=e, period__exact=p) \
             .values("line", "period") \
-            .annotate(all_cnt=Count("hinban"),
+            .annotate(all_cnt=Count("name"),
                       end_cnt=Count("endj"),
-                      left_cnt=Count("hinban") - Count("endj"),
-                      progress=Count("endj") * 100 / Count("hinban"),
+                      left_cnt=Count("name") - Count("endj"),
+                      progress=Count("endj") * 100 / Count("name"),
                       left_time=Sum("changey") - Sum(Abs(F("status") * F("changey"))) +
                                 Sum("processy") - Sum(Abs(F("status") * F("processy"))),
                       endy_max=Max("endy"),
@@ -203,8 +203,8 @@ class List(ListView):
             Q(starty__gte=self.kwargs['date'] + ' 0:00:00+09') &
             Q(starty__lte=self.kwargs['date'] + ' 23:59:59+09') &
             Q(period__exact=self.kwargs['period']) &
-            Q(line__exact=self.kwargs['line']) &
-            Q(hinban__gt=0))
+            Q(line__exact=self.kwargs['line'])
+            )
         )
 
     @staticmethod
@@ -319,22 +319,20 @@ def all_cnt(line, date, period):
         koutei = Process.objects.filter(
             Q(starty__gte=dstr + ' 0:00:00+09') &
             Q(starty__lte=dstr + ' 23:59:59+09') &
-            Q(period__exact=period) &
-            Q(hinban__gt=0)
+            Q(period__exact=period)
         )
     else:
         koutei = Process.objects.filter(
             Q(line__exact=line) &
             Q(starty__gte=dstr + ' 0:00:00+09') &
             Q(starty__lte=dstr + ' 23:59:59+09') &
-            Q(period__exact=period) &
-            Q(hinban__gt=0)
+            Q(period__exact=period)
         )
     if koutei.count() == 0:
         return 0
     else:
-        cn = koutei.aggregate(Count('hinban'))
-        return cn['hinban__count']
+        cn = koutei.aggregate(Count('name'))
+        return cn['name__count']
 
 
 # 「生産完了」を計算する関数
@@ -345,8 +343,7 @@ def comp_cnt(line, date, period):
             Q(starty__gte=dstr + ' 0:00:00+09') &
             Q(starty__lte=dstr + ' 23:59:59+09') &
             Q(period__exact=period) &
-            Q(endj__isnull=False) &
-            Q(hinban__gt=0)
+            Q(endj__isnull=False)
         )
     else:
         koutei = Process.objects.filter(
@@ -354,8 +351,7 @@ def comp_cnt(line, date, period):
             Q(starty__gte=dstr + ' 0:00:00+09') &
             Q(starty__lte=dstr + ' 23:59:59+09') &
             Q(period__exact=period) &
-            Q(endj__isnull=False) &
-            Q(hinban__gt=0)
+            Q(endj__isnull=False)
         )
     if koutei.count() == 0:
         return 0
@@ -371,29 +367,27 @@ def comp_prog(line, date, period):
         koutei = Process.objects.filter(
             Q(starty__gte=dstr + ' 0:00:00+09') &
             Q(starty__lte=dstr + ' 23:59:59+09') &
-            Q(period__exact=period) &
-            Q(hinban__gt=0)
+            Q(period__exact=period)
         )
     else:
         koutei = Process.objects.filter(
             Q(line__exact=line) &
             Q(starty__gte=dstr + ' 0:00:00+09') &
             Q(starty__lte=dstr + ' 23:59:59+09') &
-            Q(period__exact=period) &
-            Q(hinban__gt=0)
+            Q(period__exact=period)
         )
     if koutei.count() == 0:
         return 0
     else:
         cm = koutei.aggregate(Count('endj'))
-        cn = koutei.aggregate(Count('hinban'))
+        cn = koutei.aggregate(Count('name'))
         if cm['endj__count'] is None or cm['endj__count'] == 0:
             return 0
         else:
-            if cn['hinban__count'] is None or cn['hinban__count'] == 0:
+            if cn['name__count'] is None or cn['name__count'] == 0:
                 return 0
             else:
-                return round(cm['endj__count'] / cn['hinban__count'] * 100, 1)
+                return round(cm['endj__count'] / cn['name__count'] * 100, 1)
 
 
 # 開始 or 終了
@@ -542,7 +536,9 @@ def line_charts(date, period, line):
 
     # 予備のstatusを1にする
     def func(x):
-        if x["hinban"] < 100:
+        if x["value"] == 0:
+            return 1
+        elif x["value"] is None:
             return 1
         else:
             return x["status"]
@@ -605,8 +601,7 @@ class LineChartsView(TemplateView):
         return Process.objects.order_by('line', 'starty').filter(
             Q(staty__gte=self.kwargs['date'] + ' 0:00:00+09') &
             Q(staty__lte=self.kwargs['date'] + ' 23:59:59+09') &
-            Q(period__exact=self.kwargs['period']) &
-            Q(hinban__gt=0)
+            Q(period__exact=self.kwargs['period'])
         )
 
     @staticmethod
