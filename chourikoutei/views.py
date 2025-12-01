@@ -123,9 +123,6 @@ class ListAll(ListView):
         s = self.kwargs['date'] + " 0:00:00+09"
         e = self.kwargs['date'] + " 23:59:59+09"
 
-        tstr = self.kwargs['date']
-        tdata = datetime.datetime.strptime(tstr, '%Y-%m-%d')
-
         return Process.objects.filter(starty__gte=s, starty__lte=e, period__exact=p) \
             .values("line", "period") \
             .annotate(all_cnt=Count("name"),
@@ -138,7 +135,7 @@ class ListAll(ListView):
                       endy_max=Max("endy"),
                       endj_max=Max("endj"),
                       comp_time=Max("endy")
-                      )
+                      ).order_by("line")
 
     @staticmethod
     def post(request):
@@ -175,12 +172,12 @@ class List(ListView):
         ctx['datef'] = tdate
         # 時間帯 ==========================================================================
         ctx['periodf'] = self.kwargs['period']
-        # 終了予定 ========================================================================
+        # 終了予定 =========================================================================
         ctx['maxendy'] = endy_max(ln, dt, pr)
         # 終了数/総数 ======================================================================
         ctx['all_cnt'] = all_cnt(ctx['linef'], tdata, ctx['periodf'])
         ctx['comp_cnt'] = comp_cnt(ctx['linef'], tdata, ctx['periodf'])
-        # 残り時間 ========================================================================
+        # 残り時間 =========================================================================
         ctx['left_time'] = left_minute(ctx['linef'], tdata, ctx['periodf'])
         # 終了予測 =========================================================================
         ctx['comptime'] = comp_time(ln, dt, pr)
