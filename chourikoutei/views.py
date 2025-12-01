@@ -3,7 +3,7 @@ import psycopg2
 from io import StringIO
 from config.local import *
 from django.db.models import Q, Count, Max, Sum, Case, When, F
-from django.db.models.functions import Abs
+from django.db.models.functions import Abs, Round
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView
 from .forms import MyModelForm, KouteiEditForm, PeriodsChoiceForm
@@ -134,7 +134,7 @@ class ListAll(ListView):
                       progress=Count("endj") * 100 / Count("name"),
                       left_time=(Sum("changey") - Sum(Abs(F("status") * F("changey"))) +
                                 Sum("processy") - Sum(Abs(F("status") * F("processy")))) /
-                                Max("number"),
+                                Round(Max("number") / 1.8),
                       endy_max=Max("endy"),
                       endj_max=Max("endj"),
                       comp_time=Max("endy")

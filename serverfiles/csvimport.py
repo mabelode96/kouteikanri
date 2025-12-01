@@ -29,7 +29,7 @@ for index, row in df.iterrows():
       cur = conn.cursor()
       # 区分
       if row['処理区分名称'] == '確定':
-        kbn = "(kubun = '予測' OR kubun = '合算')"
+        kbn = "(kubun = '予測' OR kubun = '合算' OR kubun = '確定')"
       else:
         kbn = "kubun = '" + row['処理区分名称'] + "'"
       # 開始時間
