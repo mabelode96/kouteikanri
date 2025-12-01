@@ -132,8 +132,9 @@ class ListAll(ListView):
                       end_cnt=Count("endj"),
                       left_cnt=Count("name") - Count("endj"),
                       progress=Count("endj") * 100 / Count("name"),
-                      left_time=Sum("changey") - Sum(Abs(F("status") * F("changey"))) +
-                                Sum("processy") - Sum(Abs(F("status") * F("processy"))),
+                      left_time=(Sum("changey") - Sum(Abs(F("status") * F("changey"))) +
+                                Sum("processy") - Sum(Abs(F("status") * F("processy")))) /
+                                Max("number"),
                       endy_max=Max("endy"),
                       endj_max=Max("endj"),
                       comp_time=Max("endy")

@@ -47,8 +47,8 @@ for index, row in df.iterrows():
         e = "endj = '" + str(row['加熱測定日時']) + "', status = 1 "
       # SQLクエリを実行
       cur.execute("UPDATE kouteikanri_chouriproc SET " + s + e +
-                  "WHERE name = " + str(row['品目名称']) +
-                  " AND date = '" + dt + "' AND bin = " +
+                  "WHERE name = '" + row['品目名称'] +
+                  "' AND date = '" + dt + "' AND bin = " +
                   str(bn) + " AND " + kbn  + ";"
                   )
       # 変更をコミット
