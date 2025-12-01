@@ -76,7 +76,7 @@ def real_time(yotei, end, left):
     s = ((lm - d * 1440) - h * 60) - m
     td = et + datetime.timedelta(days=d, hours=h, minutes=m, seconds=s)
     ts = yotei - td
-    rt = int(ts.days * 1440 + ts.seconds / 60)
+    rt = int(ts.days * 1440 + ts.seconds / 60 / 5)
     if rt == 0:
         rs = '<span style="color:blue;">遅れなし</span>'
     elif rt < 0:
