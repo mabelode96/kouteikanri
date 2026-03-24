@@ -60,7 +60,7 @@ class JissekiView(ListView):
         if select == '1':
             get_tounyu()
             return Tounyu.objects.filter(
-                Q(jisseki__isnull=True) &
+                Q(jisseki__exact=0) &
                 Q(date__exact=d) &
                 Q(bin__gte=b0) &
                 Q(bin__lte=b1) &
