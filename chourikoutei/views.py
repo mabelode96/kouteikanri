@@ -638,7 +638,7 @@ def get_dekidaka():
         Jisseki.objects.all().delete()
         df = pd.read_csv(
             'data/dekidaka.csv', skiprows=1, encoding='CP932',
-            usecols=[0, 1, 2, 3, 4, 5, 6, 12, 13, 16, 21, 24, 31, 34],
+            usecols=[0, 1, 2, 3, 4, 5, 6, 13, 14, 17, 22, 25, 32, 35],
             names=["date", "chain", "bin", "line", "hinban",
                    "name", "kubun", "shiji", "jisseki", "tantou",
                    "hinonflg", "kanetsu", "reikyaku", "kanryouflg"
@@ -688,7 +688,7 @@ def get_tounyu():
         Tounyu.objects.all().delete()
         df = pd.read_csv(
             'data/tounyu.csv', skiprows=1, encoding='CP932',
-            usecols=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 14, 17],
+            usecols=[0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 12, 15, 18],
             names=["date", "chain", "bin", "line", "hinban", "name",
                    "kubun", "t_hinban", "t_name", "shiji", "jisseki",
                    "tantou", "kanryouflg"
