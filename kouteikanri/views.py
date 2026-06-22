@@ -12,6 +12,8 @@ import pandas as pd
 from django.views.generic import TemplateView
 from django_pandas.io import read_frame
 from config.local import *
+import platform
+from smb.SMBConnection import SMBConnection
 
 
 # 検索
@@ -556,6 +558,18 @@ def edit(request, id=None):
             # =============================================================================
             # 保存
             koutei.save()
+            if koutei.hinban is None:
+                start = 0
+            else:
+                if koutei.startj is None:
+                    start = 0
+                else:
+                    if koutei.endj is None:
+                        start = 1
+                    else:
+                        start = 0
+            makecsv(start, koutei.hinban, koutei.name, koutei.bin, koutei.kubun,
+                    koutei.value, koutei.period, koutei.line)
             update_list = []
             i = 1
             koutei_old = Process.objects.filter(
@@ -621,6 +635,12 @@ def copy(request, id=None):
             koutei.fkey = nm
             # 保存
             koutei.save()
+            if koutei.hinban is None:
+                start = 0
+            else:
+                start = 1
+            makecsv(start, koutei.hinban, koutei.name, koutei.bin, koutei.kubun,
+                    koutei.value, koutei.period, koutei.line)
             if 'next' in request.GET:
                 return redirect(request.GET['next'])
         return redirect('kouteikanri:list', request.POST['line'], request.POST['date'], request.POST['period'])
@@ -650,6 +670,12 @@ def end_none(request, id=id):
         koutei.processj = None
         koutei.status = 0
         koutei.save()
+        if koutei.hinban is None:
+            start = 0
+        else:
+            start = 1
+        makecsv(start, koutei.hinban, koutei.name, koutei.bin, koutei.kubun,
+                koutei.value, koutei.period, koutei.line)
     return redirect('kouteikanri:list', koutei.line, koutei.date, koutei.period)
 
 
@@ -680,6 +706,12 @@ def start_or_end(request, id=id):
         # 開始時間を更新
         koutei.startj = nw
         koutei.save()
+        if koutei.hinban is None:
+            start = 0
+        else:
+            start = 1
+        makecsv(start, koutei.hinban, koutei.name, koutei.bin, koutei.kubun,
+                koutei.value, koutei.period, koutei.line)
     else:
         if koutei.endj is None:
             koutei.endj = datetime.datetime.now().astimezone()
@@ -689,7 +721,33 @@ def start_or_end(request, id=id):
                 koutei.processj = get_stime(koutei.startj, koutei.endj)
         koutei.status = 1
         koutei.save()
+        makecsv(0, koutei.hinban, koutei.name, koutei.bin, koutei.kubun,
+                koutei.value, koutei.period, koutei.line)
     return redirect(request.META.get('HTTP_REFERER', '/', ))
+
+
+def makecsv(start, hinban, name, bin, kubun, value, period, line):
+    conn = SMBConnection(
+        SMB_USER,
+        SMB_PASS,
+        platform.uname().node,
+        REMOTE_NAME,
+        domain=WORKGROUP,
+        use_ntlm_v2=True,
+        is_direct_tcp=IS_DIRECT_TCP
+    )
+    conn.connect(REMOTE_IP, CNXN_PORT)
+    filename = 'sample.txt'
+    if start == 1:
+        content = (str(hinban)+','+str(name)+',ローソン,'+str(bin)+','+
+                   str(kubun)+','+str(value)+','+str(period))
+    else:
+        content = '999999'
+    with open(filename, "w", encoding="utf-8") as file:
+        file.write(content)
+    with open('sample.txt', 'rb') as file:
+        conn.storeFile(SERVICE_NAME, period+line+'.txt', file)
+        conn.close()
 
 
 # 生産中をキャンセル
@@ -721,6 +779,8 @@ def start_cancel(request, **kwargs):
             # 生産中のデータを一括更新
             Process.objects.bulk_update(
                 update_list, fields=["changej", "startj", "status"])
+            makecsv(0, koutei.hinban, koutei.name, koutei.bin, koutei.kubun,
+                    koutei.value, koutei.period, koutei.line)
         return redirect(request.META.get('HTTP_REFERER', '/', ))
 
 

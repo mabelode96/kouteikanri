@@ -39,6 +39,16 @@ connection_config = {
     'dbname ': 'postgres'
 }
 
+# Samba client settings
+IS_DIRECT_TCP = False
+CNXN_PORT = 139 if not IS_DIRECT_TCP else 445
+REMOTE_NAME = 'nas0'
+SERVICE_NAME = 'share'
+REMOTE_IP = '12.23.1.100'
+WORKGROUP = 'WORKGROUP'
+SMB_USER = 'administrator'
+SMB_PASS = 'root'
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 

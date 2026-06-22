@@ -9,3 +9,4 @@ openpyxl==3.0.10
 pandas~=2.2.2
 plotly~=5.23.0
 psycopg2-binary==2.9.9
+pysmb~=1.2.14
