@@ -743,7 +743,7 @@ def makecsv(start, hinban, name, bin, kubun, value, period, line):
                    str(kubun)+','+str(value)+','+str(period))
     else:
         content = '999999'
-    with open(filename, "w", encoding="utf-8") as file:
+    with open(filename, "w", encoding="shift_jis") as file:
         file.write(content)
     with open('sample.txt', 'rb') as file:
         conn.storeFile(SERVICE_NAME, period+line+'.txt', file)
