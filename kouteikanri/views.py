@@ -968,6 +968,7 @@ def upload(request):
                                 seisand=ws.cell(row=j, column=9).value,
                                 conveyor=ws.cell(row=j, column=10).value,
                                 staff=ws.cell(row=j, column=11).value,
+                                staffj=ws.cell(row=j, column=11).value,
                                 panmm=ws.cell(row=j, column=12).value,
                                 slicev=ws.cell(row=j, column=13).value,
                                 slicep=ws.cell(row=j, column=14).value,
