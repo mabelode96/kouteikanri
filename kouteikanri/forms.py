@@ -105,7 +105,7 @@ class KouteiEditForm(ModelForm):
     class Meta:
         model = Process
         fields = ('id', 'hinban', 'name', 'bin', 'kubun', 'line',
-                  'period', 'date', 'value', 'seisanh', 'staff', 'slicev',
+                  'period', 'date', 'value', 'seisanh', 'staffj', 'slicev',
                   'startj', 'endj', 'changej', 'processj', 'comment', 'status')
 
 
