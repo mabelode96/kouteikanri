@@ -88,6 +88,26 @@ def real_time(yotei, end, left):
 
 
 @register.simple_tag
+def real_time_n(yotei, end, left):
+    if end is None:
+        return ''
+    else:
+        et = end
+    if left is None:
+        lm = 0
+    else:
+        lm = left
+    d = int(lm / 1440)
+    h = int((lm - d * 1440) / 60)
+    m = int((lm - d * 1440) - h * 60)
+    s = ((lm - d * 1440) - h * 60) - m
+    td = et + datetime.timedelta(days=d, hours=h, minutes=m, seconds=s)
+    ts = yotei - td
+    rt = int(ts.days * 1440 + ts.seconds / 60)
+    return rt
+
+
+@register.simple_tag
 def close_time(start):
     if start is None:
         return ''

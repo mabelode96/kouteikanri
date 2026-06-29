@@ -46,12 +46,14 @@ class All(ListView):
     context_object_name = 'data'
     template_name = 'all.html'
     d = datetime.datetime.today().strftime("%Y-%m-%d")
-    form = MyModelForm(initial={'date': d, 'period': '昼勤'})
+    form = MyModelForm(initial={'date': d, 'period': '昼勤', 'idle_info': idleinfo})
+    idle_info = idleinfo
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx['date'] = self.kwargs['date']
         ctx['period'] = self.kwargs['period']
+        ctx['idle_info'] = idleinfo
         return ctx
 
     def get_queryset(self, **kwargs):
@@ -82,7 +84,9 @@ class All(ListView):
     def post(request):
         date = request.POST['date']
         period = request.POST['period']
-        return render(request, 'kouteikanri:all', context={'date': date, 'period': period})
+        idle_info = idleinfo
+        return render(request, 'kouteikanri:all',
+                      context={'date': date, 'period': period, 'idle_info': idle_info})
 
 
 # セットチェック 全ライン一覧
