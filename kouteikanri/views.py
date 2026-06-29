@@ -815,6 +815,7 @@ def reset_all(request, **kwargs):
         )
         if kouteis.count() > 0:
             for koutei in kouteis:
+                koutei.staffj = None
                 koutei.startj = None
                 koutei.endj = None
                 koutei.changej = None
@@ -823,7 +824,7 @@ def reset_all(request, **kwargs):
                 update_list.append(koutei)
             # 工程のデータを一括更新
             Process.objects.bulk_update(
-                update_list, fields=["startj", "endj", "changej", "processj", "status"])
+                update_list, fields=["staffj", "startj", "endj", "changej", "processj", "status"])
         return redirect(request.META.get('HTTP_REFERER', '/', ))
 
 
@@ -1001,6 +1002,9 @@ def upload(request):
                             koutei.price = ws.cell(row=j, column=4).value
                             koutei.conveyor = ws.cell(row=j, column=10).value
                             koutei.staff = ws.cell(row=j, column=11).value
+                            if not ws.cell(row=j, column=11).value is None:
+                                if koutei.staffj == 0:
+                                    koutei.staffj = ws.cell(row=j, column=11).value
                             koutei.panmm = ws.cell(row=j, column=12).value
                             koutei.slicep = ws.cell(row=j, column=14).value
                             koutei.changey = chy

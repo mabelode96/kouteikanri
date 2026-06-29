@@ -37,6 +37,7 @@ class Process(models.Model):
     endj = models.DateTimeField('終了時間', blank=True)
     changej = models.IntegerField('切替時間', blank=True)
     processj = models.IntegerField('実際時間', blank=True)
+    staffj = models.IntegerField('実際人員', default=0)
     status = models.IntegerField('status', default=0)
     set = models.IntegerField('set', default=0)
     setj = models.DateTimeField('準備時間', blank=True)
@@ -47,6 +48,27 @@ class Process(models.Model):
 
     class Meta:
         db_table = 'kouteikanri_process'
+
+    def __str__(self):
+        return self.name
+
+
+class Kouseihin(models.Model):
+    jigyousyo = models.CharField('事業所', blank=True, max_length=50, default=jigyousyo)
+    date = models.DateField('製造日', blank=True)
+    bin = models.IntegerField('便', blank=True)
+    kubun = models.CharField('区分', blank=True, max_length=50)
+    hinban = models.IntegerField('品番', blank=True)
+    shikakaricd = models.IntegerField('構成仕掛品CD', blank=True)
+    name = models.CharField('構成仕掛品名', blank=True, max_length=50)
+    value = models.FloatField('使用量', blank=True)
+    tanni = models.CharField('単位', blank=True, max_length=50)
+    comp = models.IntegerField('完了', blank=True)
+
+    tracker = FieldTracker()
+
+    class Meta:
+        db_table = 'kouteikanri_kouseihin'
 
     def __str__(self):
         return self.name
