@@ -37,7 +37,7 @@ class Process(models.Model):
     endj = models.DateTimeField('終了時間', blank=True)
     changej = models.IntegerField('切替時間', blank=True)
     processj = models.IntegerField('実際時間', blank=True)
-    staffj = models.IntegerField('実際人員', default=0)
+    staffj = models.IntegerField('実際人員', blank=True)
     status = models.IntegerField('status', default=0)
     set = models.IntegerField('set', default=0)
     setj = models.DateTimeField('準備時間', blank=True)
