@@ -62,7 +62,7 @@ class KouteiEditForm(ModelForm):
         label='時間帯', to_field_name='period', empty_label=None)
     value = forms.IntegerField(label='数量', required=False)
     seisanh = forms.IntegerField(label='生産数/h', required=False)
-    staff = forms.IntegerField(label='人員', required=False)
+    staffj = forms.IntegerField(label='人員', required=False)
     slicev = forms.IntegerField(label='スライス枚数', required=False)
     startj = forms.DateTimeField(
         label='開始時間',
@@ -123,7 +123,7 @@ class KouteiAddForm(ModelForm):
     value = forms.IntegerField(label='数量', required=False, widget=forms.HiddenInput())
     seisand = forms.FloatField(label='生産高', required=False, widget=forms.HiddenInput())
     conveyor = forms.FloatField(label='コンベア速度', required=False, widget=forms.HiddenInput())
-    staff = forms.IntegerField(label='人員', required=False, widget=forms.HiddenInput())
+    staffj = forms.IntegerField(label='人員', required=False, widget=forms.HiddenInput())
     panmm = forms.CharField(label='パンミリ数', required=False, max_length=50, widget=forms.HiddenInput())
     slicev = forms.IntegerField(label='スライス枚数', required=False, widget=forms.HiddenInput())
     slicep = forms.IntegerField(label='スライス能力', required=False, widget=forms.HiddenInput())
@@ -160,7 +160,7 @@ class KouteiAddForm(ModelForm):
         fields = ('id', 'line', 'period', 'date', 'bin',
                   'hinban', 'price', 'name', 'kubun',
                   'seisanh', 'value', 'seisand', 'conveyor',
-                  'panmm', 'slicev', 'slicep', 'staff',
+                  'panmm', 'slicev', 'slicep', 'staffj',
                   'changey', 'processy', 'starty', 'endy', 'status')
 
 
@@ -186,6 +186,7 @@ class KouteiCopyForm(ModelForm):
     seisand = forms.FloatField(label='生産高', required=False, widget=forms.HiddenInput())
     conveyor = forms.FloatField(label='コンベア速度', required=False, widget=forms.HiddenInput())
     staff = forms.IntegerField(label='人員', required=False)
+    staffj = forms.IntegerField(label='実人員', required=False)
     panmm = forms.CharField(label='パンミリ数', required=False, max_length=50, widget=forms.HiddenInput())
     slicep = forms.IntegerField(label='スライス能力', required=False, widget=forms.HiddenInput())
     changey = forms.IntegerField(label='切替予定', required=False)
@@ -221,7 +222,7 @@ class KouteiCopyForm(ModelForm):
         fields = ('id', 'line', 'period', 'date', 'bin',
                   'hinban', 'price', 'name', 'kubun',
                   'seisanh', 'value', 'seisand', 'conveyor',
-                  'panmm', 'slicev', 'slicep', 'staff',
+                  'panmm', 'slicev', 'slicep', 'staff', 'staffj',
                   'changey', 'processy', 'starty', 'endy', 'status')
 
 
