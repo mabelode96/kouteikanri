@@ -1,7 +1,7 @@
 import os
 import shutil
 import hashlib
-import csvimport
+#import csvimport
 import deki_import
 import kousei_import
 
@@ -35,6 +35,27 @@ for i in n:
     if os.path.isfile(spath):
         if not os.path.isfile(lpath):
             shutil.copy(spath, lpath)
+            if i == 1:
+                print('出来高')
+                # csvimport.update_deki()
+                deki_import.update_deki()
+            elif i == 2:
+                print('投入')
+            elif i == 3:
+                print('2便予測')
+                kousei_import.update_kouseihin('3')
+            elif i == 4:
+                print('2便確定')
+                kousei_import.update_kouseihin('4')
+            elif i == 5:
+                print('3便予測')
+                kousei_import.update_kouseihin('5')
+            elif i == 6:
+                print('3便確定')
+                kousei_import.update_kouseihin('6')
+            elif i == 7:
+                print('クール')
+                kousei_import.update_kouseihin('7')
         else:
             with open(lpath,'rb') as lf:
                 ldata = lf.read()
@@ -42,19 +63,25 @@ for i in n:
             with open(spath,'rb') as sf:
                 sdata = sf.read()
                 shash = hashlib.md5(sdata).hexdigest()
-            #print(lhash, shash)
+            print(lhash, shash)
             if ldata != sdata:
                 shutil.copy(spath, lpath)
                 if i == 1:
+                    print('1')
                     #csvimport.update_deki()
                     deki_import.update_deki()
                 elif i == 3:
-                    kousei_import.update_kouseihin(3)
+                    print('3')
+                    kousei_import.update_kouseihin('3')
                 elif i == 4:
-                    kousei_import.update_kouseihin(4)
+                    print('4')
+                    kousei_import.update_kouseihin('4')
                 elif i == 5:
-                    kousei_import.update_kouseihin(5)
+                    print('5')
+                    kousei_import.update_kouseihin('5')
                 elif i == 6:
-                    kousei_import.update_kouseihin(6)
+                    print('6')
+                    kousei_import.update_kouseihin('6')
                 elif i == 7:
-                    kousei_import.update_kouseihin(7)
+                    print('7')
+                    kousei_import.update_kouseihin('7')

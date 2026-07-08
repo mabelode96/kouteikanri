@@ -1,9 +1,8 @@
 import pandas as pd
+import psycopg2
 from datetime import datetime
 from datetime import timedelta
-import psycopg2
-
-HOSTNAME="localhost"
+from config.local import hostname
 
 def update_deki():
     csv_file = 'kouteikanri/data/dekidaka.csv'
@@ -11,7 +10,7 @@ def update_deki():
 
     # データベースに接続
     conn = psycopg2.connect(
-        host=HOSTNAME,
+        host=hostname,
         port="5432",
         database="postgres",
         user="postgres",

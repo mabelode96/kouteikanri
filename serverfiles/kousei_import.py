@@ -1,26 +1,24 @@
 import pandas as pd
+import psycopg2
 from datetime import datetime
 from datetime import timedelta
-import psycopg2
+from config.local import hostname
+from config.local import jigyousyo
 
-HOSTNAME = '12.23.1.198'
-JIGYOUSYO = '盛岡'
-flag = 999 #ローカルテスト用
-
-def update_kouseihin(flag):
-    if flag == 3:
+def update_kouseihin(s):
+    if s == '3':
         csv_file = 'kouteikanri/data/lw2y.txt'
         kb = '予測'
-    elif flag ==4:
+    elif s == '4':
         csv_file = 'kouteikanri/data/lw2k.txt'
         kb = '確定'
-    elif flag ==5:
+    elif s == '5':
         csv_file = 'kouteikanri/data/lw3y.txt'
         kb = '予測'
-    elif flag ==6:
+    elif s == '6':
         csv_file = 'kouteikanri/data/lw3k.txt'
         kb = '確定'
-    elif flag ==7:
+    elif s == '7':
         csv_file = 'kouteikanri/data/cd1k.txt'
         kb = '確定'
     else: #ローカルテスト用
@@ -34,16 +32,16 @@ def update_kouseihin(flag):
         dt = datetime.strftime(dt + timedelta(days=0), "%Y/%m/%d")
         f.close()
 
-    CSV_COLUMN = ['nu1', 'nu2', 'nu3', 'hinban', 'nu4', 'bin', 'nu5', 'shikakaricd', 'name',
+    csv_column = ['nu1', 'nu2', 'nu3', 'hinban', 'nu4', 'bin', 'nu5', 'shikakaricd', 'name',
                   'nu6', 'nu7', 'nu8', 'nu9', 'nu10', 'value', 'tanni', 'nu11',
                   'nu12', 'nu13', 'nu14', 'nu15', 'nu16', 'nu17', 'nu18', 'nu19', 'nu20']
 
-    df = pd.read_csv(csv_file, sep='\t', encoding='cp932', header=None, skiprows=[0], names=CSV_COLUMN)
+    df = pd.read_csv(csv_file, sep='\t', encoding='cp932', header=None, skiprows=[0], names=csv_column)
     bn = df.iloc[0, 5]
 
     # データベースに接続
     conn = psycopg2.connect(
-        host=HOSTNAME,
+        host=hostname,
         port="5432",
         database="postgres",
         user="postgres",
@@ -61,17 +59,15 @@ def update_kouseihin(flag):
 
     for index, row in df.iterrows():
         # レコードを追加
-        cur.execute("INSERT INTO kouteikanri_kouseihin(jigyousyo,date,"
-                    "bin,kubun,hinban,shikakaricd,name,value,tanni,comp) "
-                    "SELECT '" + JIGYOUSYO + "','" + dt + "'," +
-                    str(row['bin']) + ",'" + kb + "'," + str(row['hinban']) + "," +
-                    str(row['shikakaricd']) + ",'" + row['name'] + "'," +
-                    str(row['value']) + ",'" + row['tanni'] + "',0;"
+        cur.execute("INSERT INTO kouteikanri_kouseihin(jigyousyo, date,"
+                    "bin, kubun, hinban, shikakaricd, name, value, tanni, comp) "
+                    "SELECT '" + jigyousyo + "', '" + dt + "', " +
+                    str(row['bin']) + ",' " + kb + "', " + str(row['hinban']) + ", " +
+                    str(row['shikakaricd']) + ", '" + row['name'] + "', " +
+                    str(row['value']) + ", '" + row['tanni'] + "', 0;"
                     )
         # 変更をコミット
         conn.commit()
 
     # カーソルを閉じる
     cur.close()
-
-update_kouseihin(flag)
