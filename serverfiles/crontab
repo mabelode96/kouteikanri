@@ -1,2 +1,2 @@
-*/1 *   * * *   root    /root/kouteikanri/venv/bin/python /root/csvcopy.py
-*/2 *   * * *   root    sh /root/yobi.sh
+*/1 *   * * *   root    /root/kouteikanri/venv/bin/python /root/kouteikanri/serverfiles/csvcopy.py
+*/2 *   * * *   root    sh /root/kouteikanri/serverfiles/yobi.sh
