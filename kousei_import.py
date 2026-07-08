@@ -25,7 +25,7 @@ def update_kouseihin(s):
         csv_file = 'data/製品構成原材料データ.txt'
         kb = '確定'
 
-    with open(csv_file, 'r') as f:
+    with open(csv_file, 'r', encoding='cp932') as f:
         lines = f.readlines()
         target_line = lines[0].split('\t')
         dt = datetime.strptime(target_line[3], "%Y%m%d").date()

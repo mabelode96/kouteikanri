@@ -21,7 +21,7 @@ def update_deki():
     # カーソルオブジェクトを作成
     dt = datetime.strftime(datetime.today(), "%Y/%m/%d")
     cur = conn.cursor()
-    cur.execute("DELETE FROM kouteikanri_jisseki WHERE date = '" + dt + "';")
+    cur.execute("DELETE FROM kouteikanri_jisseki WHERE date >= '" + dt + "';")
     # 変更をコミット
     conn.commit()
     # カーソルを閉じる
@@ -33,12 +33,9 @@ def update_deki():
         else:
             dt = datetime.strftime(datetime.today(), "%Y/%m/%d")
             bn = row['便']
-        if row['製造日'] == dt:
+        if row['製造日'] >= dt:
             # 区分
-            if row['処理区分名称'] == '予測':
-                kbn = '確定'
-            else:
-                kbn = str(row['処理区分名称'])
+            kbn = row['処理区分名称']
             # 担当者名
             if pd.notnull(row['担当者名']):
                 tnt = "'" + str(row['担当者名']) + "'"
@@ -77,7 +74,7 @@ def update_deki():
                         knt + " AS kanetsu, " + rky + " AS reikyaku, " +
                         str(row['みなし完了フラグ']) + " AS minashiflg, " +
                         str(row['追加指示完了フラグ']) + " AS tsukaflg, 0 "
-                        "FROM kouteikanri_kouseihin AS K WHERE date >= '" + dt +
+                        "FROM kouteikanri_kouseihin AS K WHERE date = '" + row['製造日'] +
                         "' AND bin = " + str(bn) + " AND shikakaricd = " + str(row['品目コード']) + ";"
                         )
             # 変更をコミット
@@ -104,62 +101,65 @@ def update_deki():
                 "' AND hinban IS NOT NULL AND set = 0;")
     for row in cur:
         print(str(row[3]) + " " + str(row[4]) + "便 " + str(row[5]) + " " + row[8] + " " + row[7])
-        if str(row[4]) == 3:
-            dp = 1
+        # 前日は除外
+        if row[7] == '前日':
+            print("前日は除外")
         else:
-            dp = 0
-        dd = datetime.strftime(row[3] + timedelta(days=dp), "%Y/%m/%d")
-        print(dd)
-        cur0 = conn.cursor()
-        cur0.execute("SELECT COUNT(*) FROM kouteikanri_jisseki WHERE date = '" + dd +
-                     "' AND bin = " + str(row[4]) + " AND hinban = " + str(row[5]) +
-                     " AND kubun = '" + str(row[7]) + "' AND comp = 1;")
-        rows0 = cur0.fetchall()
-        count0 = rows0[0][0]
-        print("　完成: " + str(count0))
-        cur0.close()
-        # 1件以上完成した仕掛品がある場合
-        if count0 >= 1:
-            cur2 = conn.cursor()
-            cur2.execute("SELECT COUNT(*) FROM kouteikanri_jisseki WHERE date = '" + dd +
-                         "' AND bin = " + str(row[4]) + " AND hinban = " + str(row[5]) +
-                         " AND kubun = '" + str(row[7]) + "' AND comp = 0;")
-            rows = cur2.fetchall()
-            count = rows[0][0]
-            print("　未完成: " + str(count))
-            # 未完成が0件なら完了
-            if count == 0:
-                cur3 = conn.cursor()
-                cur3.execute("UPDATE kouteikanri_process SET set = 1 WHERE id = " + str(row[0]) + ";")
-                print("　　全て完成したので完了にします")
-                # 変更をコミット
-                conn.commit()
-                cur3.close()
+            if row[4] == 3:
+                dp = 1
             else:
-                print("　　未完成があるため完了できません")
-            # カーソルを閉じる
-            cur2.close()
-        # 1件も完成した仕掛品がない場合
-        else:
-            cur2 = conn.cursor()
-            cur2.execute("SELECT COUNT(*) FROM kouteikanri_jisseki WHERE date = '" + dd +
+                dp = 0
+            dd = datetime.strftime(row[3] + timedelta(days=dp), "%Y/%m/%d")
+            print(dd)
+            cur0 = conn.cursor()
+            cur0.execute("SELECT COUNT(*) FROM kouteikanri_jisseki WHERE date = '" + dd +
                          "' AND bin = " + str(row[4]) + " AND hinban = " + str(row[5]) +
-                         " AND kubun = '" + str(row[7]) + "';")
-            rows = cur2.fetchall()
-            count = rows[0][0]
-            print("　仕掛品数: " + str(count))
-            # 仕掛品数が0件なら完了にする
-            # 全製品のデータがない場合も有効か？
-            if count == 0:
-                cur3 = conn.cursor()
-                cur3.execute("UPDATE kouteikanri_process SET set = 1 WHERE id = " + str(row[0]) + ";")
-                print("　　仕掛品がないため完了にします")
-                # 変更をコミット
-                conn.commit()
-                cur3.close()
+                         " AND kubun = '" + row[7] + "' AND comp = 1;")
+            rows0 = cur0.fetchall()
+            count0 = rows0[0][0]
+            print("　完成: " + str(count0))
+            cur0.close()
+            # 1件以上完成した仕掛品がある場合
+            if count0 >= 1:
+                cur2 = conn.cursor()
+                cur2.execute("SELECT COUNT(*) FROM kouteikanri_jisseki WHERE date = '" + dd +
+                             "' AND bin = " + str(row[4]) + " AND hinban = " + str(row[5]) +
+                             " AND kubun = '" + row[7] + "' AND comp = 0;")
+                rows = cur2.fetchall()
+                count = rows[0][0]
+                print("　未完成: " + str(count))
+                # 未完成が0件なら完了
+                if count == 0:
+                    cur3 = conn.cursor()
+                    cur3.execute("UPDATE kouteikanri_process SET set = 1 WHERE id = " + str(row[0]) + ";")
+                    print("　　全て完成したので完了にします")
+                    # 変更をコミット
+                    conn.commit()
+                    cur3.close()
+                else:
+                    print("　　未完成があるため完了できません")
+                # カーソルを閉じる
+                cur2.close()
+            # 1件も完成した仕掛品がない場合
             else:
-                print("　　未完成があるため完了できません")
-            # カーソルを閉じる
-            cur2.close()
+                cur2 = conn.cursor()
+                cur2.execute("SELECT COUNT(*) FROM kouteikanri_jisseki WHERE date = '" + dd +
+                             "' AND bin = " + str(row[4]) + " AND hinban = " + str(row[5]) +
+                             " AND kubun = '" + row[7] + "';")
+                rows = cur2.fetchall()
+                count = rows[0][0]
+                print("　仕掛品数: " + str(count))
+                # 仕掛品数が0件なら完了にする
+                if count == 0:
+                    cur3 = conn.cursor()
+                    cur3.execute("UPDATE kouteikanri_process SET set = 1 WHERE id = " + str(row[0]) + ";")
+                    print("　　仕掛品がないため完了にします")
+                    # 変更をコミット
+                    conn.commit()
+                    cur3.close()
+                else:
+                    print("　　未完成があるため完了できません")
+                # カーソルを閉じる
+                cur2.close()
     cur.close()
     # =================================================================================
