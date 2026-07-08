@@ -12,25 +12,25 @@ lpath = ''
 for i in n:
     if i == 1:
         spath = '/mnt/nas0/生産実行システム/backup/出来高実績一覧表.csv'
-        lpath = 'kouteikanri/data/dekidaka.csv'
+        lpath = 'data/dekidaka.csv'
     elif i == 2:
         spath = '/mnt/nas0/生産実行システム/backup/投入実績一覧表.csv'
-        lpath = 'kouteikanri/data/tounyu.csv'
+        lpath = 'data/tounyu.csv'
     elif i == 3:
         spath = '/mnt/nas0/原材料展開/csv/2303977ローソン２便予測（全）/製品構成原材料データ.txt'
-        lpath = 'kouteikanri/data/lw2y.txt'
+        lpath = 'data/lw2y.txt'
     elif i == 4:
         spath = '/mnt/nas0/原材料展開/csv/2303981【ＳＣＭ】ローソン２便確定/製品構成原材料データ.txt'
-        lpath = 'kouteikanri/data/lw2k.txt'
+        lpath = 'data/lw2k.txt'
     elif i == 5:
         spath = '/mnt/nas0/原材料展開/csv/2304452ローソン３便予測/製品構成原材料データ.txt'
-        lpath = 'kouteikanri/data/lw3y.txt'
+        lpath = 'data/lw3y.txt'
     elif i == 6:
         spath = '/mnt/nas0/原材料展開/csv/2303983【ＳＣＭ】ローソン３便確定/製品構成原材料データ.txt'
-        lpath = 'kouteikanri/data/lw3k.txt'
+        lpath = 'data/lw3k.txt'
     elif i == 7:
         spath = '/mnt/nas0/原材料展開/csv/2304791クールデリカ１便/製品構成原材料データ.txt'
-        lpath = 'kouteikanri/data/cd1k.txt'
+        lpath = 'data/cd1k.txt'
 
     if os.path.isfile(spath):
         if not os.path.isfile(lpath):
