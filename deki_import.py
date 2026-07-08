@@ -103,12 +103,13 @@ def update_deki():
     cur.execute("SELECT * FROM kouteikanri_process WHERE date >= '" + dt +
                 "' AND hinban IS NOT NULL AND set = 0;")
     for row in cur:
-        print(str(row[5]) + "  " + row[8] + "  " + row[7])
+        print(str(row[3]) + " " + str(row[4]) + "便 " + str(row[5]) + " " + row[8] + " " + row[7])
         if str(row[4]) == 3:
             dp = 1
         else:
             dp = 0
         dd = datetime.strftime(row[3] + timedelta(days=dp), "%Y/%m/%d")
+        print(dd)
         cur0 = conn.cursor()
         cur0.execute("SELECT COUNT(*) FROM kouteikanri_jisseki WHERE date = '" + dd +
                      "' AND bin = " + str(row[4]) + " AND hinban = " + str(row[5]) +
