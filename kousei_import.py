@@ -7,19 +7,19 @@ from config.local import jigyousyo
 
 def update_kouseihin(s):
     if s == '3':
-        csv_file = 'kouteikanri/data/lw2y.txt'
+        csv_file = 'data/lw2y.txt'
         kb = '予測'
     elif s == '4':
-        csv_file = 'kouteikanri/data/lw2k.txt'
+        csv_file = 'data/lw2k.txt'
         kb = '確定'
     elif s == '5':
-        csv_file = 'kouteikanri/data/lw3y.txt'
+        csv_file = 'data/lw3y.txt'
         kb = '予測'
     elif s == '6':
-        csv_file = 'kouteikanri/data/lw3k.txt'
+        csv_file = 'data/lw3k.txt'
         kb = '確定'
     elif s == '7':
-        csv_file = 'kouteikanri/data/cd1k.txt'
+        csv_file = 'data/cd1k.txt'
         kb = '確定'
     else: #ローカルテスト用
         csv_file = 'data/製品構成原材料データ.txt'

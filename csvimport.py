@@ -5,7 +5,7 @@ from datetime import timedelta
 from config.local import hostname
 
 def update_deki():
-    csv_file = 'kouteikanri/data/dekidaka.csv'
+    csv_file = 'data/dekidaka.csv'
     df = pd.read_csv(csv_file, encoding='shift_jis')
 
     # データベースに接続

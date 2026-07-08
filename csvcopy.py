@@ -1,7 +1,7 @@
 import os
 import shutil
 import hashlib
-#import csvimport
+# import csvimport
 import deki_import
 import kousei_import
 
@@ -67,21 +67,23 @@ for i in n:
             if ldata != sdata:
                 shutil.copy(spath, lpath)
                 if i == 1:
-                    print('1')
-                    #csvimport.update_deki()
+                    print('出来高')
+                    # csvimport.update_deki()
                     deki_import.update_deki()
+                elif i == 2:
+                    print('投入')
                 elif i == 3:
-                    print('3')
+                    print('2便予測')
                     kousei_import.update_kouseihin('3')
                 elif i == 4:
-                    print('4')
+                    print('2便確定')
                     kousei_import.update_kouseihin('4')
                 elif i == 5:
-                    print('5')
+                    print('3便予測')
                     kousei_import.update_kouseihin('5')
                 elif i == 6:
-                    print('6')
+                    print('3便確定')
                     kousei_import.update_kouseihin('6')
                 elif i == 7:
-                    print('7')
+                    print('クール')
                     kousei_import.update_kouseihin('7')
